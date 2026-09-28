@@ -1,0 +1,331 @@
+{% extends "base.html" %}
+
+{% block title %}Create Your Comic — ComicCraft AI Studio{% endblock %}
+
+{% block content %}
+<div class="studio-workspace-container">
+  
+  <!-- Studio Main Row: Form Cockpit + Live Storyboard Preview -->
+  <div class="studio-grid">
+    
+    <!-- LEFT COLUMN: Creation Cockpit -->
+    <div class="studio-card main-cockpit">
+      
+      <!-- Card Title & Subtitle matching Reference UI -->
+      <div class="cockpit-header">
+        <div class="card-header-title">
+          <span class="sparkle-icon">✨</span>
+          <span>Create Your Comic</span>
+        </div>
+        <p class="card-header-subtitle">
+          Enter your story prompt and let Gemini AI generate an illustrated multi-panel comic strip.
+        </p>
+      </div>
+
+      <form action="/generate" method="POST" id="comic-create-form" class="form-grid">
+        
+        <!-- 1. Story Prompt with Magic Inspiration Wand -->
+        <div class="form-group">
+          <div class="label-row">
+            <label class="form-label" for="prompt-input">
+              <span>Story Prompt</span>
+            </label>
+            <button type="button" id="btn-inspire" class="btn-magic-inspire" title="Generate a random creative comic premise">
+              <span>🪄</span>
+              <span>Inspire Me</span>
+            </button>
+          </div>
+
+          <textarea 
+            id="prompt-input" 
+            name="prompt" 
+            class="form-textarea" 
+            rows="3"
+            placeholder="Enter your comic idea (e.g. A brave little fox named Hope goes on an enchanted adventure into the mystical Whispering Woods to find the lost Starlight Blossom...)"
+            required
+          >A brave little fox named Hope goes on an enchanted adventure into the mystical Whispering Woods to find the lost Starlight Blossom.</textarea>
+          
+          <!-- Preset Inspiration Chips (including Hope tutorial) -->
+          <div class="presets-container">
+            <button type="button" class="preset-chip highlighted" data-char="Hope" data-style="Classic Comic Book" data-panels="4" data-prompt="A brave little fox named Hope goes on an enchanted adventure into the mystical Whispering Woods to find the lost Starlight Blossom.">
+              🦊 Hope's Journey (Tutorial)
+            </button>
+            <button type="button" class="preset-chip" data-char="Aria Volt" data-style="Cyberpunk Sci-Fi" data-panels="4" data-prompt="A renegade cyber-hacker uncovers an ancient celestial AI core deep beneath the neon spires of Neo-Veridia.">
+              🌆 Cyberpunk Core
+            </button>
+            <button type="button" class="preset-chip" data-char="Jack Vance" data-style="Dark Graphic Novel" data-panels="4" data-prompt="A hard-boiled detective in 1940s New York investigates mysterious glowing footprints leading into Central Park.">
+              🕵️ Noir Detective
+            </button>
+            <button type="button" class="preset-chip" data-char="Sir Kay" data-style="Classic Comic Book" data-panels="4" data-prompt="A clockwork knight defends the last ember of magic from shadowy mechanical beasts in an enchanted forest.">
+              ⚔️ Clockwork Knight
+            </button>
+            <button type="button" class="preset-chip" data-char="Captain Nova" data-style="Cyberpunk Sci-Fi" data-panels="4" data-prompt="An interstellar explorer navigates through crystalline asteroid storms to rescue a dormant star creature.">
+              🚀 Space Odyssey
+            </button>
+          </div>
+        </div>
+
+        <!-- 2. Main Character Name -->
+        <div class="form-group">
+          <label class="form-label" for="character-input">
+            <span>Main Character Name</span>
+          </label>
+          <div class="input-with-icon">
+            <span class="input-icon">👤</span>
+            <input 
+              type="text" 
+              id="character-input" 
+              name="character_name" 
+              class="form-input has-icon" 
+              placeholder="e.g., Hope" 
+              value="Hope"
+              required
+            >
+          </div>
+        </div>
+
+        <!-- 3. Visual Art Style Cards (Ultra Unique & Attractive) -->
+        <div class="form-group">
+          <div class="label-row">
+            <label class="form-label">
+              <span>Art Style</span>
+            </label>
+            <span class="label-hint">Select visual aesthetic</span>
+          </div>
+
+          <!-- Hidden select for form submission and test compatibility -->
+          <select id="art-style-select" name="art_style" class="hidden-accessible-select">
+            {% for style in styles %}
+            <option value="{{ style.name }}" {% if style.name == 'Classic Comic Book' %}selected{% endif %}>
+              {{ style.name }}
+            </option>
+            {% endfor %}
+          </select>
+
+          <!-- Interactive Visual Style Cards -->
+          <div class="style-cards-grid" id="style-cards-container">
+            <div class="style-card active" data-style="Classic Comic Book">
+              <div class="style-icon-badge">💥</div>
+              <div class="style-card-info">
+                <div class="style-card-title">Classic Comic Book</div>
+                <div class="style-card-desc">Bold ink lines, halftone dots, golden age hero palette</div>
+              </div>
+              <div class="style-check">✓</div>
+            </div>
+
+            <div class="style-card" data-style="Manga / Anime">
+              <div class="style-icon-badge">⛩️</div>
+              <div class="style-card-info">
+                <div class="style-card-title">Manga / Anime</div>
+                <div class="style-card-desc">High-speed dynamic screentones, expressive character eyes</div>
+              </div>
+              <div class="style-check">✓</div>
+            </div>
+
+            <div class="style-card" data-style="Dark Graphic Novel">
+              <div class="style-icon-badge">🕵️</div>
+              <div class="style-card-info">
+                <div class="style-card-title">Dark Graphic Novel</div>
+                <div class="style-card-desc">Chiaroscuro shadows, gritty Frank Miller noir inking</div>
+              </div>
+              <div class="style-check">✓</div>
+            </div>
+
+            <div class="style-card" data-style="Cyberpunk Sci-Fi">
+              <div class="style-icon-badge">⚡</div>
+              <div class="style-card-info">
+                <div class="style-card-title">Cyberpunk Sci-Fi</div>
+                <div class="style-card-desc">Neon cyan & magenta rim light, holographic reflections</div>
+              </div>
+              <div class="style-check">✓</div>
+            </div>
+
+            <div class="style-card" data-style="Vintage 1950s Pulp">
+              <div class="style-icon-badge">📜</div>
+              <div class="style-card-info">
+                <div class="style-card-title">Vintage 1950s Pulp</div>
+                <div class="style-card-desc">Warm sepia grain, aged newsprint, retro sci-fi flair</div>
+              </div>
+              <div class="style-check">✓</div>
+            </div>
+
+            <div class="style-card" data-style="Watercolor Fantasy">
+              <div class="style-icon-badge">🎨</div>
+              <div class="style-card-info">
+                <div class="style-card-title">Watercolor Fantasy</div>
+                <div class="style-card-desc">Soft ethereal washes, luminous storybook fantasy glow</div>
+              </div>
+              <div class="style-check">✓</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Number of Panels & Story Pacing -->
+        <div class="form-group">
+          <div class="label-row">
+            <label class="form-label">
+              <span>Panel Layout & Arc</span>
+            </label>
+            <span class="label-hint">Narrative length</span>
+          </div>
+
+          <select id="panel-count-select" name="panel_count" class="hidden-accessible-select">
+            <option value="2">2 Panels</option>
+            <option value="3">3 Panels</option>
+            <option value="4" selected>4 Panels</option>
+            <option value="6">6 Panels</option>
+          </select>
+
+          <div class="panel-count-selector">
+            <button type="button" class="panel-btn" data-count="2">
+              <span class="p-num">2</span>
+              <span class="p-label">Quick Strip</span>
+            </button>
+            <button type="button" class="panel-btn" data-count="3">
+              <span class="p-num">3</span>
+              <span class="p-label">Triptych</span>
+            </button>
+            <button type="button" class="panel-btn active" data-count="4">
+              <span class="p-num">4</span>
+              <span class="p-label">Classic Arc ★</span>
+            </button>
+            <button type="button" class="panel-btn" data-count="6">
+              <span class="p-num">6</span>
+              <span class="p-label">Deluxe Spread</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 5. Royal Blue Action Button -->
+        <button type="submit" id="btn-submit-comic" class="btn-generate">
+          <span class="btn-sparkle">✨</span>
+          <span class="btn-text">Generate Comic</span>
+          <span class="btn-arrow">→</span>
+        </button>
+
+      </form>
+    </div>
+
+    <!-- RIGHT COLUMN: Interactive Live Storyboard Mock Preview -->
+    <div class="studio-sidebar-preview">
+      
+      <!-- Live Preview Card -->
+      <div class="studio-card preview-box">
+        <div class="preview-header">
+          <div class="preview-badge">
+            <span class="live-dot"></span>
+            <span>LIVE STORYBOARD PREVIEW</span>
+          </div>
+          <span id="preview-style-badge" class="preview-style-pill">Classic Comic Book</span>
+        </div>
+
+        <!-- Mock Comic Panel 1 -->
+        <div class="live-panel-mock">
+          <div class="mock-header">
+            <span>Panel 1: The Inciting Hook</span>
+            <span id="mock-panel-meta">Scene 1 of 4</span>
+          </div>
+
+          <div class="mock-panel-art-frame">
+            <img src="/static/images/hope_fox.jpg" id="mock-art-image" alt="Artwork Preview" class="mock-art-img">
+            <div id="mock-sound-badge" class="mock-sound-effect">RUSTLE...</div>
+            <div class="art-overlay-gradient"></div>
+            <div class="camera-shot-tag">ESTABLISHING WIDE SHOT</div>
+          </div>
+
+          <!-- Narration Caption Box -->
+          <div class="mock-narration-box">
+            <div class="mock-sub-title">NARRATION:</div>
+            <p id="mock-narration-text">
+              "Meadowvale's elders called it madness. But when the starlight blossoms began to wither, courage wasn't a choice—it was a necessity."
+            </p>
+          </div>
+
+          <!-- Speech Balloon Preview -->
+          <div class="mock-speech-balloon">
+            <div class="mock-speaker-row">
+              <span class="balloon-icon">💬</span>
+              <span id="mock-speaker-name">HOPE</span>
+            </div>
+            <p id="mock-dialogue-text">
+              "The elders warned that no one returns from the Gloom... but I can feel the trees weeping."
+            </p>
+          </div>
+        </div>
+
+        <!-- Studio Quick Metrics -->
+        <div class="preview-metrics-grid">
+          <div class="metric-item">
+            <span class="metric-label">Gemini Engine</span>
+            <span class="metric-val text-blue">2.5 Flash</span>
+          </div>
+          <div class="metric-item">
+            <span class="metric-label">Export Layout</span>
+            <span class="metric-val text-emerald">A4 Print PDF</span>
+          </div>
+          <div class="metric-item">
+            <span class="metric-label">Est. Time</span>
+            <span class="metric-val text-amber">~8-12s</span>
+          </div>
+        </div>
+
+        <!-- Inspiration Tips -->
+        <div class="inspiration-tip-card">
+          <span class="tip-icon">💡</span>
+          <p class="tip-text">
+            <strong>Pro Comic Tip:</strong> Give your protagonist a clear sensory motivation in Panel 1 to ground the dramatic stakes.
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<!-- High-Fidelity Comic Storyboard Loading Modal Overlay -->
+<div id="loading-overlay" class="loading-overlay">
+  <div class="loading-modal-box">
+    
+    <!-- Comic Book Inking Spinner -->
+    <div class="loading-comic-loader">
+      <div class="comic-loader-icon">POW!</div>
+      <div class="loading-spinner-ring"></div>
+    </div>
+
+    <!-- Dynamic Loading Step Text -->
+    <h3 id="loading-step" class="loading-title">⚡ Writing Dramatic Story Arc with Gemini...</h3>
+    <p id="loading-detail" class="loading-subtitle">
+      Structuring realistic three-act narrative pacing, sensory worldbuilding, and authentic dialogue.
+    </p>
+
+    <!-- Animated Progress Bar -->
+    <div class="loading-progress-bar-wrap">
+      <div class="loading-progress-bar" id="loading-progress-bar"></div>
+    </div>
+
+    <!-- Step Progress Checklist -->
+    <div class="loading-steps-list">
+      <div class="step-check-item active" id="step-item-1">
+        <span class="step-dot"></span>
+        <span>1. Gemini Story Arc & Dialogues</span>
+      </div>
+      <div class="step-check-item" id="step-item-2">
+        <span class="step-dot"></span>
+        <span>2. Cinematic Panel Prompts</span>
+      </div>
+      <div class="step-check-item" id="step-item-3">
+        <span class="step-dot"></span>
+        <span>3. AI Illustration & Inking</span>
+      </div>
+      <div class="step-check-item" id="step-item-4">
+        <span class="step-dot"></span>
+        <span>4. High-Res PDF Comic Book</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

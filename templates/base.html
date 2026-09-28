@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}ComicCraft — AI Comic Story Creator{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Comic+Neue:ital,wght@0,400;0,700;1,400;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💥</text></svg>">
+  {% block head_extra %}{% endblock %}
+</head>
+<body class="comic-app-body">
+  <!-- Interactive Ambient Particles Canvas (Subtle Floating Cosmic Spores) -->
+  <canvas id="ambient-canvas" class="ambient-canvas"></canvas>
+
+  <!-- Modern Floating Header Bar -->
+  <header class="app-header">
+    <div class="header-container">
+      <a href="/" class="brand-logo" title="ComicCraft Studio Home">
+        <span class="brand-icon">POW!</span>
+        <div class="brand-title-wrap">
+          <span class="brand-text">Comic<span>Craft</span></span>
+          <span class="brand-sub">AI Comic Story Creator</span>
+        </div>
+      </a>
+
+      <div class="header-nav">
+        <div class="badge-gemini" title="Connected to Google Gemini Models">
+          <span class="pulse-indicator"></span>
+          <span>✨ Gemini 2.5 Flash</span>
+        </div>
+        <a href="/" class="nav-link {% if request.url.path == '/' %}active{% endif %}">
+          <span class="nav-icon">🎨</span>
+          <span>Studio</span>
+        </a>
+        <a href="/gallery" class="nav-link {% if request.url.path == '/gallery' %}active{% endif %}">
+          <span class="nav-icon">📚</span>
+          <span>Gallery</span>
+        </a>
+        <a href="/docs" target="_blank" class="nav-link" title="Interactive FastAPI Swagger Docs">
+          <span class="nav-icon">⚡</span>
+          <span>API Docs</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content View -->
+  <main class="main-wrapper">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Global Toast Notification Container -->
+  <div id="toast-notification" class="toast-notification"></div>
+
+  <!-- Footer -->
+  <footer class="app-footer">
+    <div class="footer-inner">
+      <p class="footer-tagline">
+        <strong>ComicCraft</strong> — Next-Generation AI Comic Storyboard Creator using Gemini Models &nbsp;|&nbsp; Built with FastAPI, Jinja2, Google GenAI SDK & Procedural Inking
+      </p>
+      <div class="footer-links">
+        <a href="/" class="footer-link">Studio</a>
+        <span>•</span>
+        <a href="/gallery" class="footer-link">Gallery Archive</a>
+        <span>•</span>
+        <a href="/docs" target="_blank" class="footer-link">OpenAPI Specification</a>
+        <span>•</span>
+        <a href="http://127.0.0.1:8000/download/hope_whispering_woods" target="_blank" class="footer-link">Sample Hope PDF</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/static/js/main.js"></script>
+  {% block script_extra %}{% endblock %}
+</body>
+</html>

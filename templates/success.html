@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Comic Exported Successfully — ComicCraft{% endblock %}
+
+{% block content %}
+<div class="success-card">
+  
+  <!-- Success Notification Box matching ref_m28.webp Panel 6 -->
+  <div class="success-alert">
+    <div class="success-alert-title">
+      <svg class="w-6 h-6 text-emerald-600 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 24px; height: 24px;">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+      </svg>
+      Comic Exported Successfully!
+    </div>
+    <div class="success-alert-sub">
+      Your comic has been downloaded as a PDF.
+    </div>
+  </div>
+
+  <!-- Comic Details Summary -->
+  <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px; margin-bottom: 28px; text-align: left;">
+    <div style="font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 4px;">EXPORTED TITLE</div>
+    <div style="font-size: 18px; font-weight: 800; color: #0f172a; margin-bottom: 4px;">{{ comic.title }}</div>
+    <div style="font-size: 13px; color: #475569; font-weight: 500;">
+      Protagonist: <strong>{{ comic.character_name }}</strong> • Style: <strong>{{ comic.art_style }}</strong> • <strong>{{ comic.panel_count }} Panels</strong>
+    </div>
+  </div>
+
+  <!-- Primary Call-to-Action matching reference -->
+  <div style="display: flex; flex-direction: column; gap: 12px; align-items: center;">
+    <a href="/" class="btn-generate" style="max-width: 320px; text-decoration: none;">
+      Create Another Comic
+    </a>
+    <div style="display: flex; gap: 10px; width: 100%; max-width: 320px;">
+      <a href="/download/{{ comic.id }}" class="btn-action btn-outline" style="flex: 1;">
+        📥 Re-download PDF
+      </a>
+      <a href="/comic/{{ comic.id }}" class="btn-action btn-outline" style="flex: 1;">
+        👁️ View Strip
+      </a>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+
+{% block title %}{{ comic.title }} — ComicCraft Viewer{% endblock %}
+
+{% block content %}
+<div class="comic-viewer-container">
+  
+  <!-- Comic Header Card -->
+  <div class="comic-top-banner studio-card">
+    <div class="banner-info-col">
+      <div class="comic-badge-row">
+        <span class="genre-pill">★ {{ comic.genre }}</span>
+        <span class="style-pill">{{ comic.art_style }}</span>
+        <span class="date-pill">{{ comic.panels|length }} Panels</span>
+      </div>
+      <h1 class="comic-main-title">{{ comic.title }}</h1>
+      <p class="comic-protagonist-tag">
+        Starring Protagonist: <strong>{{ comic.character_name }}</strong>
+      </p>
+    </div>
+
+    <!-- Reader Mode Controls & Action Buttons -->
+    <div class="banner-action-col">
+      <!-- Mode Switcher -->
+      <div class="reader-mode-toggle" id="reader-mode-toggle">
+        <button type="button" class="mode-btn active" data-mode="classic" title="Classic Comic Book Side-by-Side Spread">
+          <span>📰 Classic</span>
+        </button>
+        <button type="button" class="mode-btn" data-mode="webtoon" title="Vertical Continuous Webtoon Scroll">
+          <span>📜 Webtoon</span>
+        </button>
+        <button type="button" class="mode-btn" data-mode="cinema" id="btn-open-cinema" title="Fullscreen Cinema Step-Through Mode">
+          <span>🎬 Cinema</span>
+        </button>
+      </div>
+
+      <!-- PDF Download & Actions -->
+      <div class="action-btn-group">
+        <a href="/download/{{ comic.id }}" class="btn-action btn-blue" title="Download Print-Ready A4 PDF">
+          <span>📥</span>
+          <span>Download PDF</span>
+        </a>
+        <button type="button" class="btn-action btn-outline" id="btn-share-comic" title="Copy Comic Link to Clipboard">
+          <span>🔗</span>
+          <span>Share</span>
+        </button>
+        <a href="/" class="btn-action btn-outline" title="Return to Creator Studio">
+          <span>✨</span>
+          <span>New</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Prologue / Synopsis Card -->
+  {% if comic.synopsis %}
+  <div class="narration-prologue-card studio-card">
+    <div class="prologue-label">PROLOGUE:</div>
+    <p class="prologue-text">"{{ comic.synopsis }}"</p>
+  </div>
+  {% endif %}
+
+  <!-- Comic Panels Container (Switches between .layout-classic and .layout-webtoon) -->
+  <div class="panels-container layout-classic" id="panels-wrapper">
+    {% for panel in comic.panels %}
+    <div class="panel-display-item studio-card" id="panel-card-{{ panel.panel_number }}" data-panel-idx="{{ loop.index0 }}">
+      
+      <!-- Panel Header Bar -->
+      <div class="panel-title-header">
+        <div class="panel-title-left">
+          <span class="panel-num-tag">PANEL {{ panel.panel_number }}</span>
+          <span class="panel-name">{{ panel.panel_title }}</span>
+        </div>
+        <span class="panel-counter">Scene {{ panel.panel_number }} of {{ comic.panels|length }}</span>
+      </div>
+
+      <!-- Content Grid: Image Frame on Left + Story & Dialogue on Right -->
+      <div class="panel-content-grid">
+        
+        <!-- Artwork Frame -->
+        <div class="panel-image-wrapper">
+          <img 
+            src="{{ panel.image_url }}" 
+            alt="Panel {{ panel.panel_number }}: {{ panel.panel_title }}" 
+            class="panel-main-img" 
+            id="panel-img-{{ panel.panel_number }}"
+            loading="lazy"
+          >
+          
+          {% if panel.sound_effect %}
+          <button 
+            type="button" 
+            class="sound-badge-interactive" 
+            data-sound="{{ panel.sound_effect }}" 
+            title="Click to hear comic sound effect!"
+          >
+            {{ panel.sound_effect }}
+            <span class="sound-sparkle">💥</span>
+          </button>
+          {% endif %}
+
+          <!-- One-click Regenerate Art button -->
+          <button 
+            type="button" 
+            class="btn-regen-panel" 
+            id="btn-regen-{{ panel.panel_number }}"
+            onclick="regeneratePanel('{{ comic.id }}', {{ panel.panel_number }})"
+            title="Re-roll or regenerate this panel's AI illustration"
+          >
+            <span class="regen-icon">🔄</span>
+            <span class="regen-label">Regenerate</span>
+          </button>
+
+          <div class="panel-art-sheen"></div>
+        </div>
+
+        <!-- Narration & Character Dialogue Balloon -->
+        <div class="panel-text-wrapper">
+          
+          <!-- Narration Caption Box -->
+          {% if panel.caption %}
+          <div class="narration-caption-card">
+            <div class="narration-sub">NARRATION:</div>
+            <p class="narration-body">{{ panel.caption }}</p>
+          </div>
+          {% endif %}
+
+          <!-- Realistic Speech Balloon -->
+          {% if panel.dialogue %}
+          <div class="speech-bubble-card">
+            <div class="speech-speaker">
+              <span class="speaker-bubble-icon">💬</span>
+              <span>{{ panel.speaker }}</span>
+            </div>
+            <div class="speech-text">
+              "{{ panel.dialogue_text }}"
+            </div>
+          </div>
+          {% endif %}
+
+        </div>
+
+      </div>
+
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Bottom Reader Navigation & Action Bar -->
+  <div class="comic-bottom-bar studio-card">
+    <div class="bottom-actions-inner">
+      <a href="/download/{{ comic.id }}" class="btn-action btn-blue btn-lg">
+        <span>📥</span>
+        <span>Download Complete PDF Book</span>
+      </a>
+      <a href="/" class="btn-action btn-outline btn-lg">
+        <span>✨</span>
+        <span>Create Another Comic</span>
+      </a>
+      <a href="/gallery" class="btn-action btn-outline btn-lg">
+        <span>📚</span>
+        <span>Browse Gallery Archive</span>
+      </a>
+    </div>
+  </div>
+
+</div>
+
+<!-- Fullscreen Cinema Mode Lightbox Modal -->
+<div id="cinema-modal" class="cinema-modal">
+  <div class="cinema-overlay" id="cinema-overlay"></div>
+  <div class="cinema-lightbox">
+    
+    <!-- Cinema Top Bar -->
+    <div class="cinema-top">
+      <div class="cinema-title-wrap">
+        <h3 class="cinema-title" id="cinema-panel-title">Panel 1: The Inciting Hook</h3>
+        <span class="cinema-counter" id="cinema-counter">1 / 4</span>
+      </div>
+      <button type="button" class="btn-cinema-close" id="btn-close-cinema" title="Close Cinema Mode (Esc)">✕</button>
+    </div>
+
+    <!-- Cinema Main Presentation Area -->
+    <div class="cinema-stage">
+      <div class="cinema-media-frame">
+        <img src="" id="cinema-img" alt="Cinema View" class="cinema-img">
+        <div id="cinema-sound" class="cinema-sound-badge"></div>
+      </div>
+
+      <div class="cinema-story-panel">
+        <div class="cinema-narration" id="cinema-narration"></div>
+        <div class="cinema-balloon" id="cinema-balloon">
+          <div class="cinema-speaker" id="cinema-speaker"></div>
+          <div class="cinema-dialogue" id="cinema-dialogue"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cinema Bottom Controls -->
+    <div class="cinema-controls">
+      <button type="button" class="cinema-nav-btn" id="btn-cinema-prev">
+        <span>← Previous Panel</span>
+      </button>
+      <div class="cinema-dots-indicator" id="cinema-dots"></div>
+      <button type="button" class="cinema-nav-btn" id="btn-cinema-next">
+        <span>Next Panel →</span>
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- Embedded Comic JSON Data for Interactive Cinema Mode & Sound Synthesizer -->
+<script id="comic-data-json" type="application/json">
+  {{ comic | tojson }}
+</script>
+{% endblock %}

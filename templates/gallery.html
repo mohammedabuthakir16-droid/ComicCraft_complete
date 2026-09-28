@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}Comic Gallery & Archive — ComicCraft Creations{% endblock %}
+
+{% block content %}
+<div class="gallery-container">
+  
+  <!-- Gallery Header Card -->
+  <div class="gallery-hero-card studio-card">
+    <div class="gallery-hero-content">
+      <div class="gallery-title-row">
+        <span class="gallery-badge-icon">📚</span>
+        <h1 class="gallery-main-title">Comic Gallery & Archive</h1>
+      </div>
+      <p class="gallery-sub">
+        Explore your collection of AI-generated multi-panel comic strips, graphic novel chapters, and downloadable PDFs.
+      </p>
+    </div>
+    <div class="gallery-actions">
+      <a href="/" class="btn-action btn-blue">
+        <span>✨</span>
+        <span>Create New Comic</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Comics Grid -->
+  {% if comics %}
+  <div class="gallery-comics-grid">
+    {% for comic in comics %}
+    <div class="comic-shelf-card studio-card">
+      
+      <!-- Card Image Thumbnail -->
+      <a href="/comic/{{ comic.id }}" class="shelf-thumb-link">
+        <div class="shelf-thumb-wrap">
+          {% if comic.panels and comic.panels[0].image_url %}
+          <img src="{{ comic.panels[0].image_url }}" alt="{{ comic.title }}" class="shelf-thumb-img" loading="lazy">
+          {% else %}
+          <div class="shelf-thumb-placeholder">
+            <span>💥</span>
+            <span>No Image Preview</span>
+          </div>
+          {% endif %}
+          
+          <div class="shelf-overlay-sheen"></div>
+
+          <!-- Style & Panel Badges -->
+          <div class="shelf-badge-top">
+            <span class="badge-panels-count">{{ comic.panel_count }} PANELS</span>
+          </div>
+          <div class="shelf-badge-bottom">
+            <span class="badge-style-name">{{ comic.art_style }}</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- Card Information -->
+      <div class="shelf-body">
+        <div class="shelf-meta-row">
+          <span class="shelf-genre-tag">{{ comic.genre }}</span>
+          <span class="shelf-date-tag">{{ comic.created_at[:10] if comic.created_at else 'Recent' }}</span>
+        </div>
+
+        <h3 class="shelf-comic-title">
+          <a href="/comic/{{ comic.id }}" class="shelf-title-link">{{ comic.title }}</a>
+        </h3>
+
+        <div class="shelf-character-row">
+          <span class="char-icon">👤</span>
+          <span class="char-name">Protagonist: <strong>{{ comic.character_name }}</strong></span>
+        </div>
+
+        <p class="shelf-synopsis">
+          {{ comic.synopsis[:110] }}{% if comic.synopsis|length > 110 %}...{% endif %}
+        </p>
+      </div>
+
+      <!-- Action Footer -->
+      <div class="shelf-footer">
+        <a href="/comic/{{ comic.id }}" class="btn-action btn-blue btn-sm shelf-read-btn">
+          <span>Read Strip</span>
+          <span>→</span>
+        </a>
+        <a href="/download/{{ comic.id }}" class="btn-action btn-outline btn-sm" title="Download High-Res PDF">
+          <span>📥 PDF</span>
+        </a>
+        <form action="/delete/{{ comic.id }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this comic from your shelf?');" class="shelf-delete-form">
+          <button type="submit" class="btn-action btn-outline btn-sm btn-delete" title="Delete Comic">
+            <span>🗑️</span>
+          </button>
+        </form>
+      </div>
+
+    </div>
+    {% endfor %}
+  </div>
+
+  {% else %}
+  <!-- Empty State -->
+  <div class="empty-shelf-card studio-card">
+    <div class="empty-shelf-icon">📚</div>
+    <h2 class="empty-shelf-title">Your Comic Shelf is Empty</h2>
+    <p class="empty-shelf-desc">
+      You haven't generated any illustrated comic strips yet. Head to the studio and let Gemini create your first adventure!
+    </p>
+    <a href="/" class="btn-action btn-blue btn-lg">
+      <span>✨</span>
+      <span>Create Your First Comic</span>
+    </a>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}
