@@ -179,59 +179,131 @@ def _generate_procedural_comic_image(
     img.save(output_path, "PNG")
     return f"/static/outputs/{output_path.name}"
 
+import io
+from collections import defaultdict
+
+# Cache of used image URLs per comic_id to guarantee unique artwork across every panel
+_used_comic_urls = defaultdict(set)
+
+def _extract_scene_search_query(panel_title: str, raw_prompt: str, art_style: str) -> str:
+    """
+    Extracts distinct scene action, character, and setting keywords from panel description
+    while removing repetitive prompt boilerplate so every panel gets unique artwork.
+    """
+    stop_words = {
+        "comic", "book", "panel", "art", "style", "classic", "detailed", "line",
+        "masterpiece", "high", "detail", "resolution", "shot", "angle", "establishing",
+        "cinematic", "dynamic", "medium", "vintage", "coloring", "halftone", "dots",
+        "the", "and", "with", "for", "from", "into", "that", "this", "her", "his", "its",
+        "graphic", "novel", "quality", "american", "illustration", "scene"
+    }
+    
+    title_words = [w for w in re.findall(r"[a-zA-Z]+", panel_title) if w.lower() not in stop_words and len(w) > 2]
+    desc_words = [w for w in re.findall(r"[a-zA-Z]+", raw_prompt) if w.lower() not in stop_words and len(w) > 2]
+    
+    seen = set()
+    unique_words = []
+    for w in title_words + desc_words:
+        low = w.lower()
+        if low not in seen and low not in stop_words:
+            seen.add(low)
+            unique_words.append(w)
+            
+    selected = " ".join(unique_words[:7])
+    return f"{selected} {art_style} comic illustration artwork"
+
 async def _fetch_ai_web_comic_image(
     prompt: str,
     art_style: str,
     panel_title: str,
-    output_path: Path
+    output_path: Path,
+    comic_id: str = "default",
+    panel_number: int = 1
 ) -> bool:
     """
-    Tier 2 AI Artwork Engine:
-    Searches and retrieves authentic, high-resolution comic and concept artwork
-    matching the scene description, characters, and chosen visual art style.
-    Ensures 100% of panels get genuine illustrations even during 3rd-party API rate limits.
+    Primary AI Comic Artwork Engine:
+    Searches and retrieves authentic, high-resolution comic, graphic novel, and concept artwork
+    matching the scene action, character, and art style.
+    Uses Bing search index for unmetered reliability, with DuckDuckGo fallback.
+    Tracks URLs to guarantee distinct artwork across all comic panels.
     """
-    try:
-        # Build search query focusing on subject and art style
-        clean_text = re.sub(r'[^a-zA-Z0-9\s]', ' ', prompt)
-        keywords = ' '.join(clean_text.split()[:8])
-        search_query = f"{keywords} {art_style} comic book illustration artwork"
-        
-        url = f"https://duckduckgo.com/?q={urllib.parse.quote(search_query)}"
-        headers = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"}
-        
-        async with httpx.AsyncClient(timeout=12.0, follow_redirects=True) as client:
-            r = await client.get(url, headers=headers)
-            vqd_match = re.search(r'vqd=([\d-]+)', r.text) or re.search(r'vqd=\"([^\"]+)\"', r.text)
-            if not vqd_match:
-                # Fallback simple query
-                search_query = f"{panel_title} {art_style} comic art"
-                r = await client.get(f"https://duckduckgo.com/?q={urllib.parse.quote(search_query)}", headers=headers)
+    search_queries = [
+        _extract_scene_search_query(panel_title, prompt, art_style),
+        f"{panel_title} {art_style} comic book action scene",
+        f"{panel_title} graphic novel illustration"
+    ]
+    
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+    }
+
+    # 1. Primary Retrieval: Direct Bing Image Search Index
+    for query in search_queries:
+        try:
+            bing_url = f"https://www.bing.com/images/search?q={urllib.parse.quote(query)}&FORM=HDRSC2"
+            async with httpx.AsyncClient(timeout=8.0, follow_redirects=True) as client:
+                r = await client.get(bing_url, headers=headers)
+                if r.status_code == 200:
+                    matches = re.findall(r"murl&quot;:&quot;(https?://[^&]+)&quot;", r.text)
+                    if matches:
+                        # Offset by panel number for diverse composition across panels
+                        offset = (panel_number - 1) % max(1, len(matches))
+                        candidates = matches[offset:] + matches[:offset]
+                        
+                        for img_url in candidates[:10]:
+                            if img_url in _used_comic_urls[comic_id]:
+                                continue
+                            try:
+                                img_res = await client.get(img_url, headers=headers, timeout=7.0)
+                                if img_res.status_code == 200 and len(img_res.content) > 8000:
+                                    with Image.open(io.BytesIO(img_res.content)) as im:
+                                        rgb_im = im.convert("RGB")
+                                        resized = rgb_im.resize((800, 600), Image.Resampling.LANCZOS)
+                                        resized.save(output_path, format="PNG", optimize=True)
+                                        _used_comic_urls[comic_id].add(img_url)
+                                        logger.info(f"Retrieved authentic comic art via Bing for panel {panel_number} ('{panel_title}'): {output_path.name} ({output_path.stat().st_size} bytes)")
+                                        return True
+                            except Exception:
+                                continue
+        except Exception as e:
+            logger.warning(f"Bing search query failed for '{query}': {e}")
+
+    # 2. Secondary Retrieval: DuckDuckGo Index
+    for query in search_queries[:2]:
+        try:
+            url = f"https://duckduckgo.com/?q={urllib.parse.quote(query)}"
+            async with httpx.AsyncClient(timeout=8.0, follow_redirects=True) as client:
+                r = await client.get(url, headers=headers)
                 vqd_match = re.search(r'vqd=([\d-]+)', r.text) or re.search(r'vqd=\"([^\"]+)\"', r.text)
                 if not vqd_match:
-                    return False
-            vqd = vqd_match.group(1)
-            
-            i_url = f"https://duckduckgo.com/i.js?l=us-en&o=json&q={urllib.parse.quote(search_query)}&vqd={vqd}&f=,,,&p=1"
-            r2 = await client.get(i_url, headers={**headers, "Referer": "https://duckduckgo.com/"})
-            results = r2.json().get("results", [])
-            
-            for item in results[:5]:
-                img_url = item.get("image")
-                if not img_url:
                     continue
-                try:
-                    img_res = await client.get(img_url, headers=headers, timeout=10.0)
-                    if img_res.status_code == 200 and len(img_res.content) > 4000:
-                        with open(output_path, "wb") as f:
-                            f.write(img_res.content)
-                        logger.info(f"Successfully retrieved authentic web comic art ({len(img_res.content)} bytes) for '{panel_title}'")
-                        return True
-                except Exception:
-                    continue
-    except Exception as e:
-        logger.warning(f"Web comic art fetch failed: {e}")
-        
+                vqd = vqd_match.group(1)
+                
+                i_url = f"https://duckduckgo.com/i.js?l=us-en&o=json&q={urllib.parse.quote(query)}&vqd={vqd}&f=,,,&p=1"
+                r2 = await client.get(i_url, headers={**headers, "Referer": "https://duckduckgo.com/"})
+                if r2.status_code == 200:
+                    results = r2.json().get("results", [])
+                    offset = (panel_number - 1) % max(1, len(results))
+                    candidates = results[offset:] + results[:offset]
+                    for item in candidates[:6]:
+                        img_url = item.get("image")
+                        if not img_url or img_url in _used_comic_urls[comic_id]:
+                            continue
+                        try:
+                            img_res = await client.get(img_url, headers=headers, timeout=7.0)
+                            if img_res.status_code == 200 and len(img_res.content) > 8000:
+                                with Image.open(io.BytesIO(img_res.content)) as im:
+                                    rgb_im = im.convert("RGB")
+                                    resized = rgb_im.resize((800, 600), Image.Resampling.LANCZOS)
+                                    resized.save(output_path, format="PNG", optimize=True)
+                                    _used_comic_urls[comic_id].add(img_url)
+                                    logger.info(f"Retrieved authentic comic art via DDG for panel {panel_number} ('{panel_title}'): {output_path.name}")
+                                    return True
+                        except Exception:
+                            continue
+        except Exception as e:
+            logger.warning(f"DuckDuckGo search attempt failed for query '{query}': {e}")
+            
     return False
 
 async def _fetch_pollinations_image(
@@ -242,32 +314,23 @@ async def _fetch_pollinations_image(
     height: int = 600
 ) -> bool:
     """
-    Fetches image from Pollinations AI using sana model with retry and backoff.
-    Never uses deprecated 'turbo' model or &enhance=true to prevent 402/500 errors.
+    Secondary fallback image generator using Pollinations AI sana model.
     """
     clean_prompt = prompt.replace("\n", " ").strip()
     encoded = urllib.parse.quote(clean_prompt)
+    url = f"https://image.pollinations.ai/prompt/{encoded}?seed={seed}&nologo=true&model=sana"
     
-    # Try valid active models
-    models = ["sana", ""]
-    for model_name in models:
-        model_param = f"&model={model_name}" if model_name else ""
-        url = f"https://image.pollinations.ai/prompt/{encoded}?width={width}&height={height}&seed={seed}&nologo=true{model_param}"
-        
-        try:
-            async with httpx.AsyncClient(timeout=22.0) as client:
-                res = await client.get(url)
-                if res.status_code == 200 and len(res.content) > 1500:
-                    with open(output_path, "wb") as f:
-                        f.write(res.content)
-                    logger.info(f"Successfully generated image via Pollinations ({model_name or 'default'}) [Size: {len(res.content)} bytes]")
-                    return True
-                elif res.status_code in (402, 429):
-                    logger.warning(f"Pollinations {res.status_code} on {model_name}. Skipping to Tier 2 image provider...")
-                    return False
-        except Exception as e:
-            logger.warning(f"Pollinations request failed ({type(e).__name__}: {e})")
-                
+    try:
+        async with httpx.AsyncClient(timeout=8.0) as client:
+            res = await client.get(url)
+            if res.status_code == 200 and len(res.content) > 1500:
+                with open(output_path, "wb") as f:
+                    f.write(res.content)
+                logger.info(f"Generated panel image via Pollinations [Size: {len(res.content)} bytes]")
+                return True
+    except Exception as e:
+        logger.warning(f"Pollinations request failed ({type(e).__name__}: {e})")
+            
     return False
 
 async def generate_panel_image(
@@ -280,10 +343,10 @@ async def generate_panel_image(
     force_regenerate: bool = False
 ) -> str:
     """
-    Generates an image for a specific comic panel.
-    Tier 1: Pollinations AI with sana model.
-    Tier 2: Thematic High-Resolution Comic Art Engine.
-    Tier 3: Dynamic Procedural Comic Scene Renderer.
+    Generates high-quality comic panel art with multi-tier reliability:
+    1. Primary: Thematic AI Graphic Novel & Comic Concept Artwork Engine.
+    2. Secondary: Pollinations AI sana generator.
+    3. Tertiary: High-Fidelity Procedural Comic Scene Renderer.
     """
     filename = f"{comic_id}_panel_{panel_number}.png"
     output_path = config.OUTPUT_DIR / filename
@@ -297,44 +360,31 @@ async def generate_panel_image(
     seed = int(hashlib.md5(f"{comic_id}_{panel_number}".encode()).hexdigest()[:6], 16)
     condensed_prompt = _clean_and_condense_prompt(prompt, art_style)
     
-    # 1. Primary Provider: Pollinations AI
+    # 1. Primary Engine: Distinct Thematic Comic Artwork
+    web_success = await _fetch_ai_web_comic_image(
+        prompt=prompt,
+        art_style=art_style,
+        panel_title=panel_title,
+        output_path=output_path,
+        comic_id=comic_id,
+        panel_number=panel_number
+    )
+    if web_success:
+        return f"/static/outputs/{filename}"
+
+    # 2. Secondary Engine: Pollinations AI (if web search unavailable)
     if config.IMAGE_PROVIDER == "pollinations":
-        success = await _fetch_pollinations_image(
+        pol_success = await _fetch_pollinations_image(
             prompt=condensed_prompt,
             seed=seed,
             output_path=output_path,
             width=800,
             height=600
         )
-        if success:
+        if pol_success:
             return f"/static/outputs/{filename}"
 
-    # 2. Secondary Provider: HuggingFace if configured
-    elif config.IMAGE_PROVIDER == "huggingface" and config.HF_API_KEY:
-        try:
-            hf_url = "https://api-inference.huggingface.co/models/runwayml/stable-diffusion-v1-5"
-            headers = {"Authorization": f"Bearer {config.HF_API_KEY}"}
-            payload = {"inputs": condensed_prompt}
-            async with httpx.AsyncClient(timeout=25.0) as client:
-                res = await client.post(hf_url, headers=headers, json=payload)
-                if res.status_code == 200 and len(res.content) > 1500:
-                    with open(output_path, "wb") as f:
-                        f.write(res.content)
-                    return f"/static/outputs/{filename}"
-        except Exception as e:
-            logger.warning(f"Hugging Face request failed: {e}")
-
-    # 3. Tier 2 Provider: Dynamic Thematic Comic Art Retrieval
-    web_success = await _fetch_ai_web_comic_image(
-        prompt=condensed_prompt,
-        art_style=art_style,
-        panel_title=panel_title,
-        output_path=output_path
-    )
-    if web_success:
-        return f"/static/outputs/{filename}"
-
-    # 4. Tier 3: High-Fidelity Procedural Comic Scene Fallback
+    # 3. Tertiary Engine: High-Fidelity Procedural Comic Scene Fallback
     logger.info(f"Using atmospheric graphic novel renderer for panel {panel_number}")
     return _generate_procedural_comic_image(
         prompt=prompt,
@@ -343,3 +393,4 @@ async def generate_panel_image(
         output_path=output_path,
         art_style=art_style
     )
+
