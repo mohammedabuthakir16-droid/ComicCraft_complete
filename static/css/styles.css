@@ -2540,4 +2540,452 @@ body.comic-app-body {
   font-weight: 600;
 }
 
+/* ==========================================================================
+   13. Unique Comic Soundboard & Onomatopoeia Action Bursts
+   ========================================================================== */
+.comic-soundboard-banner {
+  background: linear-gradient(135deg, #ffffff 0%, #fffdf0 50%, #eff6ff 100%);
+  border: 2.5px solid #0f172a;
+  box-shadow: 5px 5px 0px #0f172a;
+  border-radius: 18px;
+  padding: 16px 22px;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+  z-index: 10;
+}
 
+.comic-soundboard-banner::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 140px;
+  height: 100%;
+  background-image: radial-gradient(rgba(15, 23, 42, 0.08) 1.5px, transparent 1.5px);
+  background-size: 6px 6px;
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.soundboard-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.soundboard-title-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.soundboard-icon {
+  font-size: 26px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
+  animation: sfxPulseIcon 2s infinite ease-in-out;
+}
+
+@keyframes sfxPulseIcon {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  50% { transform: scale(1.15) rotate(5deg); }
+}
+
+.soundboard-title-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.soundboard-main-title {
+  font-family: var(--font-comic-title);
+  font-size: 22px;
+  letter-spacing: 0.8px;
+  color: #0f172a;
+  line-height: 1.1;
+  text-shadow: 1px 1px 0px rgba(254, 240, 138, 0.8);
+}
+
+.soundboard-sub {
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.soundboard-status-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #f1f5f9;
+  border: 1.5px solid #cbd5e1;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: #0f172a;
+}
+
+.sfx-pulse {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 8px #22c55e;
+  animation: pulseGlow 1.5s infinite;
+}
+
+.soundboard-buttons-strip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.sfx-blast-btn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: #ffffff;
+  border: 2px solid #0f172a;
+  box-shadow: 3px 3px 0px #0f172a;
+  padding: 8px 14px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background-color 0.15s ease;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.sfx-blast-btn:hover {
+  background: #fef08a;
+  transform: translateY(-2px);
+  box-shadow: 4px 4px 0px #0f172a;
+}
+
+.sfx-blast-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0px #0f172a;
+  background: #fde047;
+}
+
+.sfx-btn-icon {
+  font-size: 16px;
+}
+
+.sfx-btn-label {
+  font-family: var(--font-comic-title);
+  font-size: 16px;
+  letter-spacing: 0.5px;
+  color: #0f172a;
+}
+
+/* Floating Comic Burst Bubble on Click */
+.comic-burst-bubble {
+  position: fixed;
+  z-index: 9999;
+  pointer-events: none;
+  font-family: var(--font-comic-title);
+  font-size: 28px;
+  letter-spacing: 1px;
+  color: #ef4444;
+  background: #fef08a;
+  border: 3px solid #0f172a;
+  padding: 6px 16px;
+  border-radius: 14px;
+  box-shadow: 6px 6px 0px #0f172a;
+  transform: translate(-50%, -50%) rotate(-6deg) scale(0.6);
+  animation: burstPopAndFloat 0.75s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes burstPopAndFloat {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) rotate(-12deg) scale(0.3);
+  }
+  25% {
+    opacity: 1;
+    transform: translate(-50%, -60%) rotate(4deg) scale(1.18);
+  }
+  60% {
+    opacity: 1;
+    transform: translate(-50%, -90%) rotate(-3deg) scale(1.05);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -130%) rotate(8deg) scale(0.85);
+  }
+}
+
+/* ==========================================================================
+   14. Interactive Comic Story Sparks (Premise Roulette)
+   ========================================================================== */
+.story-sparks-box {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border: 2px dashed #94a3b8;
+  border-radius: 16px;
+  padding: 14px 16px;
+  margin-top: 14px;
+  position: relative;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.story-sparks-box:hover {
+  border-color: var(--primary-blue);
+  background: linear-gradient(135deg, #eff6ff 0%, #faf5ff 100%);
+}
+
+.sparks-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.sparks-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sparks-tag {
+  background: #0f172a;
+  color: #fef08a;
+  font-family: var(--font-comic-title);
+  font-size: 13.5px;
+  letter-spacing: 0.5px;
+  padding: 3px 9px;
+  border-radius: 6px;
+}
+
+.sparks-desc {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.btn-roll-sparks {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #ffffff;
+  border: 1.5px solid #0f172a;
+  box-shadow: 2px 2px 0px #0f172a;
+  padding: 4px 11px;
+  border-radius: 8px;
+  font-family: var(--font-comic-title);
+  font-size: 14px;
+  color: #0f172a;
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.btn-roll-sparks:hover {
+  background: #fef08a;
+  transform: translateY(-1px);
+  box-shadow: 3px 3px 0px #0f172a;
+}
+
+.btn-roll-sparks:active {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0px #0f172a;
+}
+
+.btn-roll-sparks.rolling .dice-emoji {
+  display: inline-block;
+  animation: diceRoll 0.4s infinite linear;
+}
+
+@keyframes diceRoll {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.sparks-reels-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.3fr 1.3fr;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+@media (max-width: 768px) {
+  .sparks-reels-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.spark-reel-card {
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.spark-reel-card:hover {
+  border-color: #cbd5e1;
+  transform: translateY(-1px);
+}
+
+.reel-badge {
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: #64748b;
+  text-transform: uppercase;
+}
+
+.reel-content {
+  font-size: 12px;
+  font-weight: 600;
+  color: #0f172a;
+  line-height: 1.35;
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+}
+
+.sparks-apply-row {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-apply-sparks-action {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #ffffff;
+  border: 1.5px solid #0f172a;
+  box-shadow: 2px 2px 0px #0f172a;
+  padding: 5px 12px;
+  border-radius: 8px;
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.btn-apply-sparks-action:hover {
+  transform: translateY(-1px);
+  box-shadow: 3px 3px 0px #0f172a;
+  background: linear-gradient(135deg, #1d4ed8, #1e40af);
+}
+
+.btn-apply-sparks-action:active {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0px #0f172a;
+}
+
+/* ==========================================================================
+   15. Visual Panel Wireframe Miniatures (Blueprint Preview)
+   ========================================================================== */
+.blueprint-mini {
+  width: 40px;
+  height: 32px;
+  background: #f8fafc;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 5px;
+  padding: 2px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 6px;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.panel-btn.active .blueprint-mini {
+  border-color: #2563eb;
+  background: #eff6ff;
+  box-shadow: 0 0 0 1px #2563eb;
+}
+
+.wf-row {
+  display: flex;
+  flex: 1;
+  gap: 2px;
+  width: 100%;
+}
+
+.wf-box {
+  background: #cbd5e1;
+  border-radius: 2px;
+  flex: 1;
+  height: 100%;
+  transition: background-color 0.15s ease;
+}
+
+.wf-box.wf-full {
+  width: 100%;
+  flex: 1;
+}
+
+.panel-btn.active .wf-box {
+  background: #3b82f6;
+}
+
+.wireframe-2 {
+  flex-direction: row;
+}
+
+/* Enhanced 3D Neo-Brutalist Micro-Elevations */
+.panel-btn {
+  border: 2px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.panel-btn:hover {
+  border-color: #94a3b8;
+  transform: translateY(-2px);
+  box-shadow: 3px 3px 0px rgba(15, 23, 42, 0.12);
+}
+
+.panel-btn.active {
+  border-color: #0f172a;
+  background: #ffffff;
+  box-shadow: 4px 4px 0px #0f172a;
+  transform: translateY(-2px);
+}
+
+.style-card {
+  border: 2px solid #e2e8f0;
+  border-radius: 14px;
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.style-card:hover {
+  border-color: #94a3b8;
+  transform: translateY(-2px);
+  box-shadow: 3px 3px 0px rgba(15, 23, 42, 0.12);
+}
+
+.style-card.active {
+  border-color: #0f172a;
+  background: #ffffff;
+  box-shadow: 4px 4px 0px #0f172a;
+  transform: translateY(-2px);
+}
+
+/* Comic Shelf Card Enhancements */
+.comic-shelf-card {
+  border: 2px solid #e2e8f0;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.comic-shelf-card:hover {
+  border-color: #0f172a;
+  transform: translateY(-4px);
+  box-shadow: 6px 6px 0px #0f172a;
+}

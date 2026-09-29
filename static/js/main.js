@@ -21,8 +21,10 @@ document.addEventListener("DOMContentLoaded", () => {
   // 6. Form Submission & Enhanced Loading Modal Progression
   initLoadingModal();
 
-  // 7. Interactive Procedural Web Audio Sound Synthesizer
+  // 7. Interactive Procedural Web Audio Sound Synthesizer & Soundboard
   initSoundBadges();
+  initComicSoundboard();
+  initStorySparks();
 
   // 8. Comic Reader Modes (Classic Spread vs Webtoon Flow)
   initReaderModeToggle();
@@ -500,6 +502,246 @@ function initSoundBadges() {
       showToast(`💥 ${sound}`);
     });
   });
+}
+
+/* ==========================================================================
+   7b. Onomatopoeia Comic Soundboard & Visual Burst Particles
+   ========================================================================== */
+function initComicSoundboard() {
+  const soundBtns = document.querySelectorAll(".sfx-blast-btn");
+  if (!soundBtns.length) return;
+
+  soundBtns.forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      const sfxText = btn.getAttribute("data-sfx") || "POW!";
+      const soundType = btn.getAttribute("data-sound") || "punch";
+
+      // 1. Synthesize Audio
+      playProceduralSfx(soundType);
+
+      // 2. Spawn Floating Visual Comic Burst
+      spawnComicBurst(e.clientX, e.clientY, sfxText);
+
+      // 3. Tactile Feedback
+      btn.style.transform = "scale(0.92) translate(2px, 2px)";
+      setTimeout(() => {
+        btn.style.transform = "";
+      }, 150);
+
+      showToast(`💥 SFX: ${sfxText}`);
+    });
+  });
+}
+
+function spawnComicBurst(x, y, text) {
+  const burst = document.createElement("div");
+  burst.className = "comic-burst-bubble";
+  burst.textContent = text;
+  burst.style.left = `${x}px`;
+  burst.style.top = `${y}px`;
+
+  document.body.appendChild(burst);
+
+  setTimeout(() => {
+    burst.remove();
+  }, 800);
+}
+
+function playProceduralSfx(type) {
+  try {
+    const ctx = getAudioContext();
+    if (!ctx) return;
+    const now = ctx.currentTime;
+
+    if (type === "punch" || type === "boom") {
+      playComicImpactSound(type === "boom" ? "BOOM" : "POW");
+    } else if (type === "laser") {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sawtooth";
+      osc.frequency.setValueAtTime(1100, now);
+      osc.frequency.exponentialRampToValueAtTime(120, now + 0.16);
+
+      gain.gain.setValueAtTime(0.3, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.17);
+    } else if (type === "whoosh") {
+      const bufferSize = ctx.sampleRate * 0.25;
+      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = (Math.random() * 2 - 1);
+      }
+      const noise = ctx.createBufferSource();
+      noise.buffer = buffer;
+
+      const filter = ctx.createBiquadFilter();
+      filter.type = "bandpass";
+      filter.frequency.setValueAtTime(300, now);
+      filter.frequency.linearRampToValueAtTime(1600, now + 0.12);
+      filter.frequency.linearRampToValueAtTime(250, now + 0.25);
+
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(0.01, now);
+      gain.gain.linearRampToValueAtTime(0.35, now + 0.1);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+
+      noise.connect(filter);
+      filter.connect(gain);
+      gain.connect(ctx.destination);
+      noise.start(now);
+    } else if (type === "electric") {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "square";
+      osc.frequency.setValueAtTime(80, now);
+      osc.frequency.setValueAtTime(120, now + 0.05);
+      osc.frequency.setValueAtTime(65, now + 0.1);
+
+      gain.gain.setValueAtTime(0.25, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.21);
+    } else if (type === "sparkle") {
+      const notes = [659.25, 880, 1174.66, 1760];
+      notes.forEach((freq, idx) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(freq, now + idx * 0.04);
+        gain.gain.setValueAtTime(0.18, now + idx * 0.04);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.04 + 0.18);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now + idx * 0.04);
+        osc.stop(now + idx * 0.04 + 0.19);
+      });
+    }
+  } catch (e) {
+    // Audio optional
+  }
+}
+
+/* ==========================================================================
+   7c. Interactive Comic Story Sparks (Premise Roulette)
+   ========================================================================== */
+function initStorySparks() {
+  const btnRoll = document.getElementById("btn-roll-sparks");
+  const btnApply = document.getElementById("btn-apply-sparks");
+  const heroEl = document.getElementById("spark-hero-text");
+  const questEl = document.getElementById("spark-quest-text");
+  const twistEl = document.getElementById("spark-twist-text");
+  const promptInput = document.getElementById("prompt-input");
+  const charInput = document.getElementById("character-input");
+  const artSelect = document.getElementById("art-style-select");
+  const styleCards = document.querySelectorAll(".style-card");
+  const previewBadge = document.getElementById("preview-style-badge");
+
+  if (!btnRoll || !heroEl || !questEl || !twistEl) return;
+
+  const sparkHeroes = [
+    { name: "Hope", label: "🦊 Hope (Spirited Fox)", style: "Classic Comic Book", intro: "A brave little fox named Hope" },
+    { name: "Jack Vance", label: "🕵️ Jack Vance (Noir P.I.)", style: "Dark Graphic Novel", intro: "Cynical detective Jack Vance" },
+    { name: "Aria Volt", label: "⚡ Aria Volt (Netrunner)", style: "Cyberpunk Sci-Fi", intro: "Renegade netrunner Aria Volt" },
+    { name: "Sir Kay", label: "⚔️ Sir Kay (Clockwork Knight)", style: "Classic Comic Book", intro: "A noble clockwork knight named Sir Kay" },
+    { name: "Dr. Luna", label: "🔭 Dr. Luna (Cosmic Astronomer)", style: "Watercolor Fantasy", intro: "Deep-space astrophysicist Dr. Luna" },
+    { name: "Kaelen", label: "🗡️ Kaelen (Blade Mystic)", style: "Manga / Anime", intro: "Exiled blade prodigy Kaelen" },
+    { name: "Pip", label: "🐉 Pip (Star Dragon)", style: "Watercolor Fantasy", intro: "Curious star-drake hatchling Pip" },
+    { name: "Baron Von Zinc", label: "🎩 Baron Von Zinc (Airship Alchemist)", style: "Vintage 1950s Pulp", intro: "Eccentric aerial inventor Baron Von Zinc" }
+  ];
+
+  const sparkQuests = [
+    "ventures into the mystical Whispering Woods to recover the fallen Starlight Blossom",
+    "infiltrates a high-orbit megacity to liberate an ancient celestial AI core",
+    "investigates eerie luminescent footprints leading through rainy New York alleyways",
+    "races across an exploding asteroid belt to save a dormant cosmic leviathan",
+    "defends the last reservoir of pure magic from swarming mechanical shadow-beasts",
+    "embarks on a forbidden deep-sea descent to chart a sunken Atlantean metropolis",
+    "tracks a reality-warping glitch causing temporal echoes across Victorian London"
+  ];
+
+  const sparkTwists = [
+    "only to discover the trees whisper forgotten secrets that rewrite the laws of gravity.",
+    "realizing the stolen artifact is sentient and has chosen them as its protector.",
+    "when time begins moving backwards with each tick of the city clocktower.",
+    "uncovering that the monstrous shadow-beasts were originally created to protect humanity.",
+    "discovering their reflection in mirrors is broadcasting messages from a parallel timeline.",
+    "when the night sky abruptly reorganizes itself into a giant celestial map."
+  ];
+
+  let currentSpark = {
+    hero: sparkHeroes[0],
+    quest: sparkQuests[0],
+    twist: sparkTwists[0]
+  };
+
+  btnRoll.addEventListener("click", () => {
+    btnRoll.classList.add("rolling");
+    playPopSound(580);
+
+    // Rapid shuffle animation
+    let shuffleCount = 0;
+    const interval = setInterval(() => {
+      const randHero = sparkHeroes[Math.floor(Math.random() * sparkHeroes.length)];
+      const randQuest = sparkQuests[Math.floor(Math.random() * sparkQuests.length)];
+      const randTwist = sparkTwists[Math.floor(Math.random() * sparkTwists.length)];
+
+      heroEl.textContent = randHero.label;
+      questEl.textContent = randQuest;
+      twistEl.textContent = randTwist;
+
+      shuffleCount++;
+      if (shuffleCount >= 5) {
+        clearInterval(interval);
+        btnRoll.classList.remove("rolling");
+
+        currentSpark.hero = randHero;
+        currentSpark.quest = randQuest;
+        currentSpark.twist = randTwist;
+
+        playProceduralSfx("sparkle");
+        showToast("🎲 Rolled New Story Sparks!");
+      }
+    }, 60);
+  });
+
+  if (btnApply) {
+    btnApply.addEventListener("click", () => {
+      const fullPrompt = `${currentSpark.hero.intro} ${currentSpark.quest}, ${currentSpark.twist}`;
+
+      if (promptInput) {
+        promptInput.value = fullPrompt;
+        promptInput.focus();
+      }
+
+      if (charInput) {
+        charInput.value = currentSpark.hero.name;
+        charInput.dispatchEvent(new Event("input"));
+      }
+
+      if (artSelect && currentSpark.hero.style) {
+        artSelect.value = currentSpark.hero.style;
+        styleCards.forEach(c => {
+          if (c.getAttribute("data-style") === currentSpark.hero.style) {
+            c.classList.add("active");
+          } else {
+            c.classList.remove("active");
+          }
+        });
+        if (previewBadge) previewBadge.innerText = currentSpark.hero.style;
+      }
+
+      playProceduralSfx("laser");
+      showToast(`⚡ Story Loaded: ${currentSpark.hero.name}'s Adventure!`);
+    });
+  }
 }
 
 /* ==========================================================================

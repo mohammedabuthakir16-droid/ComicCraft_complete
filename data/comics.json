@@ -1,6 +1,184 @@
 {
   "comics": [
     {
+      "id": "comic_102acf4b47",
+      "title": "Neon Silt",
+      "synopsis": "A weary detective pursuing an elusive phantom through the rain-drenched neon veins of the city confronts a terrifying reflection of his own guilt.",
+      "genre": "Neo-Noir Psychological Thriller",
+      "art_style": "Dark Graphic Novel",
+      "character_name": "Detective Vance",
+      "prompt": "Detective chasing a phantom through rain-slicked alleys",
+      "panel_count": 2,
+      "panels": [
+        {
+          "panel_number": 1,
+          "panel_title": "The Ghost in the Puddle",
+          "visual_description": "Establishing cinematic wide shot of a claustrophobic, rain-slicked alleyway at night. Neon signs in crimson and cyan bleed into deep shadows. Detective Vance, featuring his exact visual signature, stands knee-deep in water reflecting the neon, chest heaving, his hand hovering over his service weapon. Ahead of him, a translucent, ethereal silhouette dissolves around a rain-streaked corner.",
+          "caption": "The rain didn't wash away the sins of the district; it just gave them a shiny coat of paint. Every puddle held a face I used to know.",
+          "dialogue": "Detective Vance: 'You’re just a ghost made of bad whiskey and cheap regrets... so why the hell won't you stay dead?'",
+          "speaker": "Detective Vance",
+          "dialogue_text": "You’re just a ghost made of bad whiskey and cheap regrets... so why the hell won't you stay dead?",
+          "sound_effect": "SPLASH...",
+          "image_prompt": "Cinematic wide shot, Dark Graphic Novel style, a weary 42-year-old investigator with a five o'clock shadow, deep dark tired eyes, soaked charcoal-grey trenchcoat, fedora casting shadows, silver lapel pin. Standing in a narrow neon-lit rain-slicked alleyway, puddles reflecting crimson and cyan light, a shadowy translucent figure vanishing around a corner, dramatic chiaroscuro lighting, heavy ink crosshatching., dark graphic novel noir style, dramatic chiaroscuro shadows, high contrast, gritty detailed line art, comic book panel, graphic novel quality, high detail, masterpiece",
+          "aspect_ratio": "1:1",
+          "is_hero_panel": false,
+          "image_url": "/static/outputs/comic_102acf4b47_panel_1.png",
+          "grid_span": "col-span-1",
+          "bubble_position": "bubble-top-left",
+          "badge_rotation": -12
+        },
+        {
+          "panel_number": 2,
+          "panel_title": "The Final Reflection",
+          "visual_description": "Dynamic low-angle close-up shot. Detective Vance, wearing his soaked charcoal-grey trenchcoat, fedora, and silver lapel pin, stares down into a shattered storefront window reflecting the alley. The glass shows not the phantom, but Vance's own bleeding past staring back at him with hollow eyes. A single tear mixes with the rain on his cheek.",
+          "caption": "The chase was never about the shadow running ahead. It was about the man who was too tired to stop running.",
+          "dialogue": "Detective Vance: '...It was always you.'",
+          "speaker": "Detective Vance",
+          "dialogue_text": "...It was always you.",
+          "sound_effect": "CRACK...",
+          "image_prompt": "Dramatic low-angle close-up, Dark Graphic Novel style, a weary 42-year-old investigator with dark tired eyes, five o'clock shadow, soaked charcoal-grey trenchcoat, fedora, silver lapel pin. Looking down into a cracked, rain-streaked glass window reflecting a haunting, distorted version of his own face, volumetric neon rim lighting, high contrast shadows, gritty comic book inking., dark graphic novel noir style, dramatic chiaroscuro shadows, high contrast, gritty detailed line art, comic book panel, graphic novel quality, high detail, masterpiece",
+          "aspect_ratio": "1:1",
+          "is_hero_panel": false,
+          "image_url": "/static/outputs/comic_102acf4b47_panel_2.png",
+          "grid_span": "col-span-1",
+          "bubble_position": "bubble-top-right",
+          "badge_rotation": 8
+        }
+      ],
+      "pdf_url": "/static/outputs/comic_102acf4b47.pdf",
+      "created_at": "2026-09-29 20:03:09"
+    },
+    {
+      "id": "comic_2044197e50",
+      "title": "Neon Ghost",
+      "synopsis": "A weary detective pursues an elusive phantom through the rain-drenched neon veins of the city, only to discover the truth is closer than he thinks.",
+      "genre": "Neo-Noir Psychological Thriller",
+      "art_style": "Dark Graphic Novel",
+      "character_name": "Detective Vance",
+      "prompt": "Detective chasing a phantom through rain-slicked alleys",
+      "panel_count": 2,
+      "panels": [
+        {
+          "panel_number": 1,
+          "panel_title": "The Chilling Chase",
+          "visual_description": "Establishing cinematic wide shot of a claustrophobic, rain-slicked alleyway reflecting vibrant neon cyan and magenta signs. Detective Vance, wearing his signature soaked charcoal-grey trench coat and short salt-and-pepper hair, stands hunched with a five o'clock shadow and tired eyes, clutching his service revolver as steam rises from a manhole cover.",
+          "caption": "Rain doesn't wash away the sins in this district; it just makes them shine a little brighter under the neon.",
+          "dialogue": "Detective Vance: 'You've been running for three blocks, ghost. Let's not make it four.'",
+          "speaker": "Detective Vance",
+          "dialogue_text": "You've been running for three blocks, ghost. Let's not make it four.",
+          "sound_effect": "SPLASH...",
+          "image_prompt": "Cinematic wide shot, Dark Graphic Novel style, Detective Vance, a weary 40-year-old investigator with short salt-and-pepper hair, a five o'clock shadow, deep tired eyes, wearing a soaked charcoal-grey trench coat over a wrinkled white button-down shirt, standing in a rain-slicked neon-lit alleyway, moody chiaroscuro lighting, moody blue and magenta color palette, high contrast ink lines., dark graphic novel noir style, dramatic chiaroscuro shadows, high contrast, gritty detailed line art, comic book panel, graphic novel quality, high detail, masterpiece",
+          "aspect_ratio": "1:1",
+          "is_hero_panel": false,
+          "image_url": "/static/outputs/comic_2044197e50_panel_1.png",
+          "grid_span": "col-span-1",
+          "bubble_position": "bubble-top-left",
+          "badge_rotation": -12
+        },
+        {
+          "panel_number": 2,
+          "panel_title": "The Mirror's Edge",
+          "visual_description": "Dynamic low-angle action shot as Detective Vance cornering his target. Vance, with his soaked charcoal-grey trench coat and exhausted expression, reaches out a trembling hand toward a shattered, rain-streaked mirror reflecting his own tired eyes instead of a suspect.",
+          "caption": "The hardest monster to cuff is the one wearing your own face.",
+          "dialogue": "Detective Vance: '...Damn it. It was always just me.'",
+          "speaker": "Detective Vance",
+          "dialogue_text": "...Damn it. It was always just me.",
+          "sound_effect": "CRACK!",
+          "image_prompt": "Dynamic low-angle close-up, Dark Graphic Novel style, Detective Vance, a weary 40-year-old investigator with short salt-and-pepper hair, a five o'clock shadow, deep tired eyes, wearing a soaked charcoal-grey trench coat over a wrinkled white button-down shirt, staring in disbelief at a shattered rain-streaked mirror, dramatic harsh shadows, volumetric streetlamp light, heavy ink texture., dark graphic novel noir style, dramatic chiaroscuro shadows, high contrast, gritty detailed line art, comic book panel, graphic novel quality, high detail, masterpiece",
+          "aspect_ratio": "1:1",
+          "is_hero_panel": false,
+          "image_url": "/static/outputs/comic_2044197e50_panel_2.png",
+          "grid_span": "col-span-1",
+          "bubble_position": "bubble-top-right",
+          "badge_rotation": 8
+        }
+      ],
+      "pdf_url": "/static/outputs/comic_2044197e50.pdf",
+      "created_at": "2026-09-29 19:52:44"
+    },
+    {
+      "id": "comic_1ba27be270",
+      "title": "Hope and the Starlight Blossom",
+      "synopsis": "A brave little fox ventures into the perilous Whispering Woods to harvest the legendary Starlight Blossom and save her ailing family, facing the chilling shadows of the ancient canopy.",
+      "genre": "Fantasy Adventure",
+      "art_style": "Classic Comic Book",
+      "character_name": "Hope",
+      "prompt": "A brave little fox named Hope goes on an enchanted adventure into the mystical Whispering Woods to find the lost Starlight Blossom.",
+      "panel_count": 4,
+      "panels": [
+        {
+          "panel_number": 1,
+          "panel_title": "The Threshold of Whispering Woods",
+          "visual_description": "Establishing Cinematic Wide Shot. The towering, gnarled trees of the Whispering Woods loom under a twilit indigo sky, their branches twisting like arthritic fingers. In the foreground, a small, spirited red fox named Hope with expressive golden-amber eyes, creamy white chest fur, and a distinctive white-tipped bushy tail stands at the precipice of the dark trail, shivering slightly as a sudden gust of wind rustles the dead leaves.",
+          "caption": "The forest border exhaled a breath of ancient pine and damp earth—a cold warning whispered by branches that had swallowed a thousand travelers before.",
+          "dialogue": "Hope: 'It's colder than the elders said... but I can't turn back now. Mom is counting on this.'",
+          "speaker": "Hope",
+          "dialogue_text": "It's colder than the elders said... but I can't turn back now. Mom is counting on this.",
+          "sound_effect": "WHOOSH...",
+          "image_prompt": "Establishing Cinematic Wide Shot. A small, spirited red fox named Hope with expressive golden-amber eyes, creamy white chest fur, and a distinctive white-tipped bushy tail standing at the edge of a dark, mystical forest. Twisting gnarled trees, twilit indigo sky, volumetric moonlight, moody atmosphere. Classic Comic Book art style, crisp ink lines, rich watercolor wash textures., vintage 1980s American comic book style, bold ink lines, dynamic superhero comic coloring, halftone dots, comic book panel, graphic novel quality, high detail, masterpiece",
+          "aspect_ratio": "1:1",
+          "is_hero_panel": false,
+          "image_url": "/static/outputs/comic_1ba27be270_panel_1.png",
+          "grid_span": "col-span-1",
+          "bubble_position": "bubble-top-left",
+          "badge_rotation": -12
+        },
+        {
+          "panel_number": 2,
+          "panel_title": "The Tangled Roots",
+          "visual_description": "Medium Over-the-Shoulder / Dutch Angle Action Shot. Hope struggles to climb over a massive, moss-covered root system blocking the narrow path. Thick, thorny brambles wrap around her hind leg, snagging her fur. Her expression is a mix of panic and fierce determination as she looks deeper into the foggy abyss of the woods.",
+          "caption": "Every inch of the soil seemed alive, conspiring to trip the unwary and swallow the hopeful whole.",
+          "dialogue": "Hope: 'Ugh—these thorns are choking the trail! Move, you stupid branches!'",
+          "speaker": "Hope",
+          "dialogue_text": "Ugh—these thorns are choking the trail! Move, you stupid branches!",
+          "sound_effect": "SNAP!",
+          "image_prompt": "Medium Over-the-Shoulder Dutch Angle Action Shot. A small, spirited red fox named Hope with expressive golden-amber eyes, creamy white chest fur, and a distinctive white-tipped bushy tail struggling against thick thorny brambles and massive mossy roots. Dark foggy forest interior, dramatic side-lighting. Classic Comic Book style, bold outlines, dynamic cross-hatching., vintage 1980s American comic book style, bold ink lines, dynamic superhero comic coloring, halftone dots, comic book panel, graphic novel quality, high detail, masterpiece",
+          "aspect_ratio": "1:1",
+          "is_hero_panel": false,
+          "image_url": "/static/outputs/comic_1ba27be270_panel_2.png",
+          "grid_span": "col-span-1",
+          "bubble_position": "bubble-top-right",
+          "badge_rotation": 8
+        },
+        {
+          "panel_number": 3,
+          "panel_title": "The Guardian of the Clearing",
+          "visual_description": "Dynamic Low-Angle Climax / Splash Action. Hope emerges into a hidden glade where the legendary Starlight Blossom blooms atop a jagged stone pedestal, casting a brilliant azure glow. Suddenly, a towering shadow of glowing golden eyes materializes from the mist, blocking her path to the flower with an intimidating growl.",
+          "caption": "The air crackled with raw, untamed magic. The flower was within paw's reach, but the price of admission was a face-to-face meeting with the forest's wrath.",
+          "dialogue": "Hope: 'No... I've come too far to let you stop me! Get out of my way!'",
+          "speaker": "Hope",
+          "dialogue_text": "No... I've come too far to let you stop me! Get out of my way!",
+          "sound_effect": "GRRR-RUMBLE!",
+          "image_prompt": "Dynamic Low-Angle Climax Splash Action. A small, spirited red fox named Hope with expressive golden-amber eyes, creamy white chest fur, and a distinctive white-tipped bushy tail facing off against a towering shadowy creature with glowing golden eyes in a mystical glade. A radiant blue Starlight Blossom glows on a stone pedestal. Classic Comic Book style, high-contrast chiaroscuro lighting, vibrant magical glow effects., vintage 1980s American comic book style, bold ink lines, dynamic superhero comic coloring, halftone dots, comic book panel, graphic novel quality, high detail, masterpiece",
+          "aspect_ratio": "1:1",
+          "is_hero_panel": false,
+          "image_url": "/static/outputs/comic_1ba27be270_panel_3.png",
+          "grid_span": "col-span-1",
+          "bubble_position": "bubble-bottom-left",
+          "badge_rotation": -6
+        },
+        {
+          "panel_number": 4,
+          "panel_title": "The Radiant Aftermath",
+          "visual_description": "Emotional Close-up / Poignant Wide Resolution. Close-up on Hope's face, her golden-amber eyes wide and resolute as she gently cradles the luminous Starlight Blossom between her paws. The ethereal blue light reflects in her tears and fur, casting away the dark shadows of the woods and bathing her in a warm, triumphant glow.",
+          "caption": "In the palm of the dark, even the smallest spark could rewrite the fate of the forest.",
+          "dialogue": "Hope: 'We're going to be okay. I promised I'd bring the light back home.'",
+          "speaker": "Hope",
+          "dialogue_text": "We're going to be okay. I promised I'd bring the light back home.",
+          "sound_effect": "SHHHK...",
+          "image_prompt": "Emotional Close-up. A small, spirited red fox named Hope with expressive golden-amber eyes, creamy white chest fur, and a distinctive white-tipped bushy tail holding a glowing blue Starlight Blossom. Warm celestial light radiating outward, dissolving the dark background. Classic Comic Book style, tender emotional rendering, luminous color palette., vintage 1980s American comic book style, bold ink lines, dynamic superhero comic coloring, halftone dots, comic book panel, graphic novel quality, high detail, masterpiece",
+          "aspect_ratio": "1:1",
+          "is_hero_panel": false,
+          "image_url": "/static/outputs/comic_1ba27be270_panel_4.png",
+          "grid_span": "col-span-1",
+          "bubble_position": "bubble-bottom-right",
+          "badge_rotation": 14
+        }
+      ],
+      "pdf_url": "/static/outputs/comic_1ba27be270.pdf",
+      "created_at": "2026-09-29 18:11:37"
+    },
+    {
       "id": "test_script_update_comic",
       "title": "Script Test Comic",
       "character_name": "Hero",
@@ -16,7 +194,7 @@
           "dialogue": "Commander Nova: 'Shields at maximum capacity!'"
         }
       ],
-      "created_at": "2026-09-28 22:40:18"
+      "created_at": "2026-09-29 20:03:49"
     },
     {
       "id": "comic_5a5b9fa9f1",

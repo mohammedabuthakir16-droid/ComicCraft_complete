@@ -4,6 +4,54 @@
 
 {% block content %}
 <div class="studio-workspace-container">
+
+  <!-- TOP HERO BAR: Dynamic Comic Soundboard & Action Burst Strip -->
+  <div class="comic-soundboard-banner studio-card">
+    <div class="soundboard-header-row">
+      <div class="soundboard-title-group">
+        <span class="soundboard-icon">💥</span>
+        <div class="soundboard-title-col">
+          <span class="soundboard-main-title">ONOMA-SOUND FX BOARD</span>
+          <span class="soundboard-sub">Click for synthesized comic sound blasts & animated visual bursts</span>
+        </div>
+      </div>
+      <div class="soundboard-status-badge">
+        <span class="sfx-pulse"></span>
+        <span>WEB AUDIO SYNTH READY</span>
+      </div>
+    </div>
+    
+    <div class="soundboard-buttons-strip" id="soundboard-buttons">
+      <button type="button" class="sfx-blast-btn" data-sfx="BAM!" data-sound="punch" title="Heavy comic punch sound">
+        <span class="sfx-btn-icon">🥊</span>
+        <span class="sfx-btn-label">BAM!</span>
+      </button>
+      <button type="button" class="sfx-blast-btn" data-sfx="ZAP!" data-sound="laser" title="High-tech laser blast">
+        <span class="sfx-btn-icon">⚡</span>
+        <span class="sfx-btn-label">ZAP!</span>
+      </button>
+      <button type="button" class="sfx-blast-btn" data-sfx="POW!" data-sound="punch" title="Classic superhero smash">
+        <span class="sfx-btn-icon">💥</span>
+        <span class="sfx-btn-label">POW!</span>
+      </button>
+      <button type="button" class="sfx-blast-btn" data-sfx="WHOOSH!" data-sound="whoosh" title="Wind and speed dash">
+        <span class="sfx-btn-icon">🌪️</span>
+        <span class="sfx-btn-label">WHOOSH!</span>
+      </button>
+      <button type="button" class="sfx-blast-btn" data-sfx="BOOM!" data-sound="explosion" title="Sub-bass cinematic detonation">
+        <span class="sfx-btn-icon">🔥</span>
+        <span class="sfx-btn-label">BOOM!</span>
+      </button>
+      <button type="button" class="sfx-blast-btn" data-sfx="BZZZT!" data-sound="electric" title="Cybernetic electric spark">
+        <span class="sfx-btn-icon">🤖</span>
+        <span class="sfx-btn-label">BZZZT!</span>
+      </button>
+      <button type="button" class="sfx-blast-btn" data-sfx="SHZZZ!" data-sound="sparkle" title="Mystic celestial shimmer">
+        <span class="sfx-btn-icon">✨</span>
+        <span class="sfx-btn-label">SHZZZ!</span>
+      </button>
+    </div>
+  </div>
   
   <!-- Studio Main Row: Form Cockpit + Live Storyboard Preview -->
   <div class="studio-grid">
@@ -68,6 +116,41 @@
             <button type="button" class="preset-chip" data-char="Captain Nova" data-style="Cyberpunk Sci-Fi" data-panels="4" data-prompt="An interstellar explorer navigates through crystalline asteroid storms to rescue a dormant star creature.">
               🚀 Space Odyssey
             </button>
+          </div>
+
+          <!-- Interactive Story Sparks (Comic Premise Roulette) -->
+          <div class="story-sparks-box">
+            <div class="sparks-header-bar">
+              <div class="sparks-title-wrap">
+                <span class="sparks-tag">🎲 COMIC STORY SPARKS</span>
+                <span class="sparks-desc">Spin dynamic Hero + Quest + Twist archetypes</span>
+              </div>
+              <button type="button" id="btn-roll-sparks" class="btn-roll-sparks" title="Roll a randomized comic story premise">
+                <span class="dice-emoji">🎲</span>
+                <span>Roll Premise</span>
+              </button>
+            </div>
+            
+            <div class="sparks-reels-grid">
+              <div class="spark-reel-card" id="reel-hero">
+                <div class="reel-badge">PROTAGONIST</div>
+                <div class="reel-content" id="spark-hero-text">🦊 Hope (Spirited Fox)</div>
+              </div>
+              <div class="spark-reel-card" id="reel-quest">
+                <div class="reel-badge">QUEST / CONFLICT</div>
+                <div class="reel-content" id="spark-quest-text">Braves the Whispering Woods for the Starlight Blossom</div>
+              </div>
+              <div class="spark-reel-card" id="reel-twist">
+                <div class="reel-badge">COMIC TWIST</div>
+                <div class="reel-content" id="spark-twist-text">The ancient trees whisper secrets only foxes can decipher</div>
+              </div>
+            </div>
+
+            <div class="sparks-apply-row">
+              <button type="button" id="btn-apply-sparks" class="btn-apply-sparks-action">
+                <span>⚡ Load Story into Studio Prompt</span>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -194,18 +277,51 @@
 
           <div class="panel-count-selector">
             <button type="button" class="panel-btn" data-count="2">
+              <div class="blueprint-mini wireframe-2">
+                <span class="wf-box"></span>
+                <span class="wf-box"></span>
+              </div>
               <span class="p-num">2</span>
-              <span class="p-label">Quick Strip</span>
+              <span class="p-label">Dual Clash</span>
             </button>
             <button type="button" class="panel-btn" data-count="3">
+              <div class="blueprint-mini wireframe-3">
+                <span class="wf-box wf-full"></span>
+                <div class="wf-row">
+                  <span class="wf-box"></span>
+                  <span class="wf-box"></span>
+                </div>
+              </div>
               <span class="p-num">3</span>
               <span class="p-label">Triptych</span>
             </button>
             <button type="button" class="panel-btn active" data-count="4">
+              <div class="blueprint-mini wireframe-4">
+                <div class="wf-row">
+                  <span class="wf-box"></span>
+                  <span class="wf-box"></span>
+                </div>
+                <div class="wf-row">
+                  <span class="wf-box"></span>
+                  <span class="wf-box"></span>
+                </div>
+              </div>
               <span class="p-num">4</span>
-              <span class="p-label">Classic Arc ★</span>
+              <span class="p-label">Classic Quad ★</span>
             </button>
             <button type="button" class="panel-btn" data-count="6">
+              <div class="blueprint-mini wireframe-6">
+                <div class="wf-row">
+                  <span class="wf-box"></span>
+                  <span class="wf-box"></span>
+                  <span class="wf-box"></span>
+                </div>
+                <div class="wf-row">
+                  <span class="wf-box"></span>
+                  <span class="wf-box"></span>
+                  <span class="wf-box"></span>
+                </div>
+              </div>
               <span class="p-num">6</span>
               <span class="p-label">Deluxe Spread</span>
             </button>
@@ -273,7 +389,7 @@
         <div class="preview-metrics-grid">
           <div class="metric-item">
             <span class="metric-label">Gemini Engine</span>
-            <span class="metric-val text-blue">2.5 Flash</span>
+            <span class="metric-val text-blue">Neural Core</span>
           </div>
           <div class="metric-item">
             <span class="metric-label">Export Layout</span>
