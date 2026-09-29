@@ -1,6 +1,136 @@
 {
   "comics": [
     {
+      "id": "comic_c26096e02a",
+      "title": "Neon Ghost",
+      "synopsis": "A weary homicide detective chases a shifting, impossible suspect through the rain-slicked labyrinths of the lower district, only to confront a mirror image of his own guilt.",
+      "genre": "Neo-Noir Psychological Thriller",
+      "art_style": "Dark Graphic Novel",
+      "character_name": "Detective Vance",
+      "prompt": "Detective chasing a phantom through rain-slicked alleys",
+      "panel_count": 2,
+      "panels": [
+        {
+          "panel_number": 1,
+          "panel_title": "The Phantom Alley",
+          "visual_description": "Establishing cinematic wide shot of a claustrophobic, rain-slicked city alleyway reflecting neon pink and teal signs from above. Detective Vance stands in the foreground, boots splashing in puddles, pistol drawn and pointed toward the gloom. Steam rises from a cracked manhole cover. Heavy chiaroscuro lighting, deep shadows, and cinematic mist.",
+          "caption": "The rain doesn't wash away the filth down here; it just gives it a mirror to look into. Every puddle holds a face I tried to forget.",
+          "dialogue": "Detective Vance: 'You're leaving too many prints in the mud, ghost... nobody walks this clean through the lower ward.'",
+          "speaker": "Detective Vance",
+          "dialogue_text": "You're leaving too many prints in the mud, ghost... nobody walks this clean through the lower ward.",
+          "sound_effect": "SPLASH... DRIP-DRIP-DRIP",
+          "image_prompt": "Cinematic wide shot, Dark Graphic Novel style, Detective Vance, a weary 42-year-old male investigator with a heavy five-o'clock shadow, tired dark-rimmed eyes, wearing a soaked charcoal-grey trench coat with flipped collar, holding a service pistol in a rainy neon-lit alleyway, moody volumetric lighting, deep shadows, high-contrast ink work, dark graphic novel noir style, dramatic chiaroscuro shadows, high contrast, gritty detailed line art, comic book panel, graphic novel quality, high detail, masterpiece",
+          "aspect_ratio": "1:1",
+          "is_hero_panel": false,
+          "image_url": "/static/outputs/comic_c26096e02a_panel_1.png",
+          "grid_span": "col-span-1",
+          "bubble_position": "bubble-top-left",
+          "badge_rotation": -12
+        },
+        {
+          "panel_number": 2,
+          "panel_title": "The Reflection",
+          "visual_description": "Dynamic low-angle close-up shot as Detective Vance rounds the corner, halting abruptly. The alley dead-ends into a massive, cracked wall mirror reflecting not an empty street, but Vance's own back pointing a gun right back at him. Neon light shatters across the glass surface. Vance's eyes widen in stark, sudden realization.",
+          "caption": "The chase was never an escape. It was just a desperate race to catch the ghost I became.",
+          "dialogue": "Detective Vance: '...Wait. No. It's been me all along.'",
+          "speaker": "Detective Vance",
+          "dialogue_text": "...Wait. No. It's been me all along.",
+          "sound_effect": "SHHHK-CRACK!",
+          "image_prompt": "Dynamic low-angle close-up, Dark Graphic Novel style, Detective Vance, a weary 42-year-old male investigator with a heavy five-o'clock shadow, tired dark-rimmed eyes, wearing a soaked charcoal-grey trench coat with flipped collar, staring in absolute shock at a cracked mirror reflecting his own aimed gun, dramatic side lighting, harsh neon reflections, high-contrast inks, dark graphic novel noir style, dramatic chiaroscuro shadows, high contrast, gritty detailed line art, comic book panel, graphic novel quality, high detail, masterpiece",
+          "aspect_ratio": "1:1",
+          "is_hero_panel": false,
+          "image_url": "/static/outputs/comic_c26096e02a_panel_2.png",
+          "grid_span": "col-span-1",
+          "bubble_position": "bubble-top-right",
+          "badge_rotation": 8
+        }
+      ],
+      "pdf_url": "/static/outputs/comic_c26096e02a.pdf",
+      "created_at": "2026-09-29 20:42:10"
+    },
+    {
+      "id": "comic_021d89e326",
+      "title": "The Backward Tick of Westminster",
+      "synopsis": "Eccentric aerial inventor Baron Von Zinc races against a reality-warping temporal anomaly as Victorian London's great clocktower begins ticking backward, erasing the city's future second by agonizing second.",
+      "genre": "Steampunk Sci-Fi / Historical Fantasy",
+      "art_style": "Classic Comic Book",
+      "character_name": "Baron Von Zinc",
+      "prompt": "Eccentric aerial inventor Baron Von Zinc tracks a reality-warping glitch causing temporal echoes across Victorian London, when time begins moving backwards with each tick of the city clocktower.",
+      "panel_count": 4,
+      "panels": [
+        {
+          "panel_number": 1,
+          "panel_title": "The Chronometric Disruption",
+          "visual_description": "Establishing Cinematic Wide Shot of Victorian London at dusk, smoggy skies illuminated by gaslamps. In the foreground, Baron Von Zinc stands on a cobblestone rooftop, frantically tinkering with a brass temporal sextant. The majestic clocktower in the background shows its hands spinning counter-clockwise.",
+          "caption": "The air tasted of copper and ozone. In the fading twilight of 1888 London, time stopped being a river and became a collapsing undertow.",
+          "dialogue": "Baron Von Zinc: 'Fascinating... and deeply, catastrophically troubling. The seconds aren't just passing—they're unspooling.'",
+          "speaker": "Baron Von Zinc",
+          "dialogue_text": "Fascinating... and deeply, catastrophically troubling. The seconds aren't just passing—they're unspooling.",
+          "sound_effect": "TICK... TOCK... KACHUNK!",
+          "image_prompt": "Classic comic book style, wide establishing shot of Victorian London rooftops at dusk. Baron Von Zinc, an eccentric inventor with wild silver hair, heavy mutton-chop sideburns, piercing blue eyes, wearing a brass-trimmed aviator's leather duster and waistcoat, holds a glowing brass temporal sextant. Moody chiaroscuro lighting, volumetric smog, intricate ink lines., vintage 1980s American comic book style, bold ink lines, dynamic superhero comic coloring, halftone dots, comic book panel, graphic novel quality, high detail, masterpiece",
+          "aspect_ratio": "1:1",
+          "is_hero_panel": false,
+          "image_url": "/static/outputs/comic_021d89e326_panel_1.png",
+          "grid_span": "col-span-1",
+          "bubble_position": "bubble-top-left",
+          "badge_rotation": -12
+        },
+        {
+          "panel_number": 2,
+          "panel_title": "The Echoes of Tomorrow",
+          "visual_description": "Medium Over-the-Shoulder / Dutch Angle Action Shot. Ghostly, translucent spectral duplicates of pedestrians walk backward into the cobblestones as reality fractures. Von Zinc struggles against a violent wave of wind, holding onto his goggles as floating mechanical parts scatter into the air.",
+          "caption": "With every metallic heartbeat of the tower, yesterday violently cannibalized tomorrow.",
+          "dialogue": "Baron Von Zinc: 'Hold fast, old man! If the mainspring shatters at the meridian, we'll all un-happen before tea time!'",
+          "speaker": "Baron Von Zinc",
+          "dialogue_text": "Hold fast, old man! If the mainspring shatters at the meridian, we'll all un-happen before tea time!",
+          "sound_effect": "WHOOSH-SKRRRT!",
+          "image_prompt": "Classic comic book style, dynamic Dutch angle, medium over-the-shoulder shot. Baron Von Zinc with wild silver hair, brass goggles on his forehead, and leather duster bracing against a fierce temporal wind. Ghostly translucent figures of Victorians walk backward in the background. High contrast shadows, dramatic ink hatching., vintage 1980s American comic book style, bold ink lines, dynamic superhero comic coloring, halftone dots, comic book panel, graphic novel quality, high detail, masterpiece",
+          "aspect_ratio": "1:1",
+          "is_hero_panel": false,
+          "image_url": "/static/outputs/comic_021d89e326_panel_2.png",
+          "grid_span": "col-span-1",
+          "bubble_position": "bubble-top-right",
+          "badge_rotation": 8
+        },
+        {
+          "panel_number": 3,
+          "panel_title": "The Meridian Overload",
+          "visual_description": "Dynamic Low-Angle Climax / Splash Action. Baron Von Zinc leaps toward a massive, floating gear-shaped temporal rift in mid-air above the street, thrusting his modified chronometer into the anomaly. Sparks of azure and gold energy arc violently across his leather coat.",
+          "caption": "There was no room for hesitation, only the desperate defiance of a mortal mind against the collapse of eternity.",
+          "dialogue": "Baron Von Zinc: 'Stubborn mechanics! Meet an equally stubborn mechanic!'",
+          "speaker": "Baron Von Zinc",
+          "dialogue_text": "Stubborn mechanics! Meet an equally stubborn mechanic!",
+          "sound_effect": "KABOOM-ZAP!",
+          "image_prompt": "Classic comic book style, dynamic low-angle splash panel. Baron Von Zinc with wild silver hair, piercing blue eyes, and brass-trimmed aviator's leather duster leaping mid-air toward a glowing golden and azure temporal rift. Swirling gears, explosive energy arcs, bold ink work, vivid primary color highlights., vintage 1980s American comic book style, bold ink lines, dynamic superhero comic coloring, halftone dots, comic book panel, graphic novel quality, high detail, masterpiece",
+          "aspect_ratio": "1:1",
+          "is_hero_panel": false,
+          "image_url": "/static/outputs/comic_021d89e326_panel_3.png",
+          "grid_span": "col-span-1",
+          "bubble_position": "bubble-bottom-left",
+          "badge_rotation": -6
+        },
+        {
+          "panel_number": 4,
+          "panel_title": "The Rightward March",
+          "visual_description": "Emotional Close-up / Poignant Wide Resolution. Von Zinc sits exhausted on the edge of the stone parapet, soot-stained and breathing heavily, holding his pocket watch. The clocktower in the background now proudly ticks forward, its hands sweeping steadily clockwise.",
+          "caption": "Silence settled over the cobblestones. The clock resumed its steady, relentless march into the unknown, leaving only the quiet relief of a tomorrow earned.",
+          "dialogue": "Baron Von Zinc: 'There. Forward again. Though I suspect my nerves will take until next Tuesday to catch up.'",
+          "speaker": "Baron Von Zinc",
+          "dialogue_text": "There. Forward again. Though I suspect my nerves will take until next Tuesday to catch up.",
+          "sound_effect": "tick. tick. tick.",
+          "image_prompt": "Classic comic book style, emotional close-up shot. Baron Von Zinc looking weary with smudges of soot on his face, wild silver hair, piercing blue eyes, holding a ticking golden pocket watch. Soft warm sunrise lighting cutting through morning mist, detailed linework, poignant and quiet atmosphere., vintage 1980s American comic book style, bold ink lines, dynamic superhero comic coloring, halftone dots, comic book panel, graphic novel quality, high detail, masterpiece",
+          "aspect_ratio": "1:1",
+          "is_hero_panel": false,
+          "image_url": "/static/outputs/comic_021d89e326_panel_4.png",
+          "grid_span": "col-span-1",
+          "bubble_position": "bubble-bottom-right",
+          "badge_rotation": 14
+        }
+      ],
+      "pdf_url": "/static/outputs/comic_021d89e326.pdf",
+      "created_at": "2026-09-29 20:09:57"
+    },
+    {
       "id": "comic_102acf4b47",
       "title": "Neon Silt",
       "synopsis": "A weary detective pursuing an elusive phantom through the rain-drenched neon veins of the city confronts a terrifying reflection of his own guilt.",
@@ -194,7 +324,7 @@
           "dialogue": "Commander Nova: 'Shields at maximum capacity!'"
         }
       ],
-      "created_at": "2026-09-29 20:03:49"
+      "created_at": "2026-09-29 20:42:14"
     },
     {
       "id": "comic_5a5b9fa9f1",

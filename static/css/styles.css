@@ -2989,3 +2989,126 @@ body.comic-app-body {
   transform: translateY(-4px);
   box-shadow: 6px 6px 0px #0f172a;
 }
+
+/* ==========================================================================
+   16. Enhanced Storyboard Scene Stepper & Collapsible Preview Studio
+   ========================================================================== */
+.cockpit-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.btn-toggle-preview {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #ffffff;
+  border: 1.5px solid #0f172a;
+  box-shadow: 2px 2px 0px #0f172a;
+  padding: 6px 12px;
+  border-radius: 9px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 700;
+  color: #0f172a;
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background-color 0.15s ease;
+}
+
+.btn-toggle-preview:hover {
+  background: #fef08a;
+  transform: translateY(-1px);
+  box-shadow: 3px 3px 0px #0f172a;
+}
+
+.btn-toggle-preview:active {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0px #0f172a;
+}
+
+/* Collapsed Storyboard State - Expands Left Cockpit to 100% Full-Width */
+.studio-grid.preview-collapsed {
+  grid-template-columns: 1fr !important;
+}
+
+.studio-grid.preview-collapsed .studio-sidebar-preview {
+  display: none !important;
+}
+
+/* Multi-Scene Stepper Tabs in Preview Box */
+.storyboard-scene-stepper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 6px 8px;
+  margin-bottom: 14px;
+}
+
+.stepper-tabs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+}
+
+.scene-tab-btn {
+  flex: 1;
+  padding: 5px 8px;
+  border-radius: 8px;
+  border: 1.5px solid transparent;
+  background: transparent;
+  font-family: var(--font-ui);
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #64748b;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s ease;
+}
+
+.scene-tab-btn:hover {
+  color: #0f172a;
+  background: rgba(226, 232, 240, 0.6);
+}
+
+.scene-tab-btn.active {
+  background: #ffffff;
+  color: #0f172a;
+  border: 1.5px solid #0f172a;
+  box-shadow: 2px 2px 0px #0f172a;
+  font-weight: 800;
+}
+
+.stepper-nav-arrows {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-step-arrow {
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  border: 1.5px solid #cbd5e1;
+  background: #ffffff;
+  font-size: 10px;
+  cursor: pointer;
+  color: #0f172a;
+  transition: transform 0.1s ease, border-color 0.1s ease;
+}
+
+.btn-step-arrow:hover {
+  border-color: #0f172a;
+  background: #fef08a;
+  transform: translateY(-1px);
+}

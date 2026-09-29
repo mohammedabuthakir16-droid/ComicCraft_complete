@@ -29,4 +29,7 @@ Thumbs.db
 
 # Task & server logs
 *.log
+
+# Binaries
 cloudflared
+

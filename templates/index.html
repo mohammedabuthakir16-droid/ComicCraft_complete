@@ -59,11 +59,17 @@
     <!-- LEFT COLUMN: Creation Cockpit -->
     <div class="studio-card main-cockpit">
       
-      <!-- Card Title & Subtitle matching Reference UI -->
+      <!-- Card Title & Subtitle with Quick Storyboard Toggle -->
       <div class="cockpit-header">
-        <div class="card-header-title">
-          <span class="sparkle-icon">✨</span>
-          <span>Create Your Comic</span>
+        <div class="cockpit-title-row">
+          <div class="card-header-title">
+            <span class="sparkle-icon">✨</span>
+            <span>Create Your Comic</span>
+          </div>
+          <button type="button" id="btn-toggle-storyboard" class="btn-toggle-preview" title="Toggle between split-view and wide creator workspace">
+            <span id="toggle-icon">👁️</span>
+            <span id="toggle-text">Hide Storyboard</span>
+          </button>
         </div>
         <p class="card-header-subtitle">
           Enter your story prompt and let Gemini AI generate an illustrated multi-panel comic strip.
@@ -351,10 +357,24 @@
           <span id="preview-style-badge" class="preview-style-pill">Classic Comic Book</span>
         </div>
 
-        <!-- Mock Comic Panel 1 -->
+        <!-- Interactive Scene Stepper Tabs & Controls -->
+        <div class="storyboard-scene-stepper">
+          <div class="stepper-tabs" id="stepper-tabs">
+            <button type="button" class="scene-tab-btn active" data-scene="1">Scene 1</button>
+            <button type="button" class="scene-tab-btn" data-scene="2">Scene 2</button>
+            <button type="button" class="scene-tab-btn" data-scene="3">Scene 3</button>
+            <button type="button" class="scene-tab-btn" data-scene="4">Scene 4</button>
+          </div>
+          <div class="stepper-nav-arrows">
+            <button type="button" class="btn-step-arrow" id="btn-scene-prev" title="Previous scene">◀</button>
+            <button type="button" class="btn-step-arrow" id="btn-scene-next" title="Next scene">▶</button>
+          </div>
+        </div>
+
+        <!-- Mock Comic Panel -->
         <div class="live-panel-mock">
           <div class="mock-header">
-            <span>Panel 1: The Inciting Hook</span>
+            <span id="mock-panel-title">Panel 1: The Inciting Hook</span>
             <span id="mock-panel-meta">Scene 1 of 4</span>
           </div>
 
@@ -362,7 +382,7 @@
             <img src="/static/images/hope_fox.jpg" id="mock-art-image" alt="Artwork Preview" class="mock-art-img">
             <div id="mock-sound-badge" class="mock-sound-effect">RUSTLE...</div>
             <div class="art-overlay-gradient"></div>
-            <div class="camera-shot-tag">ESTABLISHING WIDE SHOT</div>
+            <div class="camera-shot-tag" id="mock-camera-shot">ESTABLISHING WIDE SHOT</div>
           </div>
 
           <!-- Narration Caption Box -->

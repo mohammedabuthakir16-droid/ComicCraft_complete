@@ -312,16 +312,146 @@ function initInspireMe() {
 }
 
 /* ==========================================================================
-   5. Live Storyboard Mock Synchronization
+   5. Enhanced Live Storyboard Multi-Scene Engine & Fullscreen Toggle
    ========================================================================== */
 function initLiveMockSync() {
-  const charInput = document.getElementById("character-input");
-  const speakerName = document.getElementById("mock-speaker-name");
+  // 1. Show/Hide Toggle Button
+  const btnToggle = document.getElementById("btn-toggle-storyboard");
+  const studioGrid = document.querySelector(".studio-grid");
+  const toggleText = document.getElementById("toggle-text");
+  const toggleIcon = document.getElementById("toggle-icon");
 
-  if (charInput && speakerName) {
-    charInput.addEventListener("input", () => {
-      const val = charInput.value.trim();
-      speakerName.innerText = val ? val.toUpperCase() : "HERO";
+  if (btnToggle && studioGrid) {
+    btnToggle.addEventListener("click", () => {
+      const isCollapsed = studioGrid.classList.toggle("preview-collapsed");
+      if (isCollapsed) {
+        if (toggleText) toggleText.innerText = "Show Storyboard";
+        if (toggleIcon) toggleIcon.innerText = "📐";
+        btnToggle.style.background = "#eff6ff";
+        showToast("🖥️ Wide Workspace: Storyboard Hidden");
+      } else {
+        if (toggleText) toggleText.innerText = "Hide Storyboard";
+        if (toggleIcon) toggleIcon.innerText = "👁️";
+        btnToggle.style.background = "";
+        showToast("👁️ Storyboard Preview Restored");
+      }
+      playPopSound(500);
+    });
+  }
+
+  // 2. Multi-Scene Storyboard Elements
+  const sceneElements = {
+    tabs: document.querySelectorAll(".scene-tab-btn"),
+    btnPrev: document.getElementById("btn-scene-prev"),
+    btnNext: document.getElementById("btn-scene-next"),
+    panelTitle: document.getElementById("mock-panel-title"),
+    panelMeta: document.getElementById("mock-panel-meta"),
+    artImg: document.getElementById("mock-art-image"),
+    soundBadge: document.getElementById("mock-sound-badge"),
+    cameraShot: document.getElementById("mock-camera-shot"),
+    narrationText: document.getElementById("mock-narration-text"),
+    speakerName: document.getElementById("mock-speaker-name"),
+    dialogueText: document.getElementById("mock-dialogue-text"),
+    charInput: document.getElementById("character-input"),
+    promptInput: document.getElementById("prompt-input")
+  };
+
+  const sceneTemplates = {
+    1: {
+      title: "Panel 1: The Inciting Hook",
+      shot: "ESTABLISHING WIDE SHOT",
+      sound: "RUSTLE...",
+      image: "/static/images/hope_fox.jpg",
+      narration: "Elders called it madness. But when the starlight blossoms began to wither, courage wasn't a choice—it was a necessity.",
+      dialogue: "The elders warned that no one returns from the Gloom... but I can feel the trees weeping."
+    },
+    2: {
+      title: "Panel 2: The Rising Tension",
+      shot: "DUTCH ANGLE / MEDIUM TENSION",
+      sound: "WHOOSH!",
+      image: "/static/images/hero_forest_bg.jpg",
+      narration: "Every whisper of the wind carried forgotten warnings. Shadows stretched along the mossy stone arches like reaching claws.",
+      dialogue: "Steady now. Fear is just mist—it only blinds you if you stop moving forward!"
+    },
+    3: {
+      title: "Panel 3: The Climax Splash",
+      shot: "DYNAMIC LOW-ANGLE SPLASH",
+      sound: "KABOOM!",
+      image: "/static/images/landscape_bg.jpg",
+      narration: "A blinding arc of celestial radiance tore through the canopy, illuminating the sacred blossom atop the obsidian monolith.",
+      dialogue: "There you are! Stand down, shadows—this light belongs to the stars!"
+    },
+    4: {
+      title: "Panel 4: The Poignant Resolution",
+      shot: "EMOTIONAL CLOSE-UP / WIDE HORIZON",
+      sound: "CHIRP...",
+      image: "/static/images/hope_fox.jpg",
+      narration: "The dawn crept quietly through the branches, bathing the restored forest in warm, golden tranquility.",
+      dialogue: "It's over. The grove breathes again. Tomorrow will come after all."
+    }
+  };
+
+  let currentSceneIdx = 1;
+
+  function renderScene(sceneNum) {
+    currentSceneIdx = sceneNum;
+    const data = sceneTemplates[sceneNum];
+    if (!data) return;
+
+    // Update active tab
+    sceneElements.tabs.forEach(tab => {
+      if (tab.getAttribute("data-scene") === sceneNum.toString()) {
+        tab.classList.add("active");
+      } else {
+        tab.classList.remove("active");
+      }
+    });
+
+    const charName = sceneElements.charInput ? sceneElements.charInput.value.trim() : "HERO";
+    const displayName = charName ? charName.toUpperCase() : "HERO";
+
+    if (sceneElements.panelTitle) sceneElements.panelTitle.innerText = data.title;
+    if (sceneElements.panelMeta) sceneElements.panelMeta.innerText = `Scene ${sceneNum} of 4`;
+    if (sceneElements.cameraShot) sceneElements.cameraShot.innerText = data.shot;
+    if (sceneElements.soundBadge) sceneElements.soundBadge.innerText = data.sound;
+    if (sceneElements.artImg) sceneElements.artImg.src = data.image;
+    if (sceneElements.narrationText) sceneElements.narrationText.innerText = `"${data.narration}"`;
+    if (sceneElements.speakerName) sceneElements.speakerName.innerText = displayName;
+    if (sceneElements.dialogueText) sceneElements.dialogueText.innerText = `"${data.dialogue}"`;
+
+    // Tactile sound
+    playPopSound(420 + sceneNum * 60);
+  }
+
+  // Bind tabs
+  sceneElements.tabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      const num = parseInt(tab.getAttribute("data-scene"), 10) || 1;
+      renderScene(num);
+    });
+  });
+
+  // Bind prev/next
+  if (sceneElements.btnPrev) {
+    sceneElements.btnPrev.addEventListener("click", () => {
+      const prev = currentSceneIdx > 1 ? currentSceneIdx - 1 : 4;
+      renderScene(prev);
+    });
+  }
+  if (sceneElements.btnNext) {
+    sceneElements.btnNext.addEventListener("click", () => {
+      const next = currentSceneIdx < 4 ? currentSceneIdx + 1 : 1;
+      renderScene(next);
+    });
+  }
+
+  // Dynamic character input update
+  if (sceneElements.charInput) {
+    sceneElements.charInput.addEventListener("input", () => {
+      const val = sceneElements.charInput.value.trim();
+      if (sceneElements.speakerName) {
+        sceneElements.speakerName.innerText = val ? val.toUpperCase() : "HERO";
+      }
     });
   }
 }
