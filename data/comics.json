@@ -1,6 +1,102 @@
 {
   "comics": [
     {
+      "id": "comic_c1097efc50",
+      "title": "Neon Ghost",
+      "synopsis": "A weary homicide detective chases a shifting silhouette through the neon-drenched, rain-slicked labyrinths of the lower district, only to discover the phantom is a manifestation of his own unpunished past.",
+      "genre": "Neo-Noir Psychological Thriller",
+      "art_style": "Dark Graphic Novel",
+      "character_name": "Detective Vance",
+      "prompt": "Detective chasing a phantom through rain-slicked alleys",
+      "panel_count": 2,
+      "panels": [
+        {
+          "panel_number": 1,
+          "panel_title": "The Scent of Rain and Blood",
+          "visual_description": "Establishing wide shot of a claustrophobic, rain-slicked alleyway at midnight. Neon signs in crimson and cyan reflect off the puddles. Detective Vance stands in the foreground, his trench coat soaked, pointing a heavy service revolver into the dense steam rising from a grate. In the mid-ground, a translucent, shifting silhouette darts around a corner.",
+          "caption": "The rain doesn't wash away the filth down here; it just gives it a mirror to dance in. Every puddle holds a face I tried to forget.",
+          "dialogue": "Detective Vance: 'I know you're just smoke... so why won't you stop bleeding?'",
+          "speaker": "Detective Vance",
+          "dialogue_text": "I know you're just smoke... so why won't you stop bleeding?",
+          "sound_effect": "PLIP... PLOP... WHOOSH...",
+          "image_prompt": "Cinematic wide shot in dark graphic novel style. Detective Vance, a weary 40-year-old investigator with a five-o'clock shadow, dark tired eyes, wearing a rain-soaked charcoal trench coat, loose tie, and fedora. He stands in a dark, narrow alleyway lit by vibrant crimson and cyan neon lights reflecting off puddles. Moody chiaroscuro lighting, heavy inks, and atmospheric rain., dark graphic novel noir style, dramatic chiaroscuro shadows, high contrast, gritty detailed line art, comic book panel, graphic novel quality, high detail, masterpiece",
+          "aspect_ratio": "1:1",
+          "is_hero_panel": false,
+          "image_url": "/static/outputs/comic_c1097efc50_panel_1.png",
+          "grid_span": "col-span-1",
+          "bubble_position": "bubble-top-left",
+          "badge_rotation": -12
+        },
+        {
+          "panel_number": 2,
+          "panel_title": "The Mirror's Edge",
+          "visual_description": "Dynamic low-angle close-up shot. Detective Vance corners the phantom against a dead-end brick wall covered in peeling graffiti. The figure turns, revealing Vance's own face beneath the hood, smiling coldly. Vance's eyes widen in stark realization as his revolver dips toward the wet concrete.",
+          "caption": "The chase was never about catching a ghost. It was about running fast enough so I wouldn't have to look in the mirror.",
+          "dialogue": "Detective Vance: 'Oh God... it's just me.'",
+          "speaker": "Detective Vance",
+          "dialogue_text": "Oh God... it's just me.",
+          "sound_effect": "CLATTER...",
+          "image_prompt": "Dynamic low-angle close-up shot in dark graphic novel style. Detective Vance, a weary 40-year-old investigator with a five-o'clock shadow, dark tired eyes, wearing a rain-soaked charcoal trench coat and fedora, stares in absolute horror at a shadowy reflection of himself against a brick wall. High-contrast chiaroscuro, dramatic shadows, moody neon rim lighting, gritty ink textures., dark graphic novel noir style, dramatic chiaroscuro shadows, high contrast, gritty detailed line art, comic book panel, graphic novel quality, high detail, masterpiece",
+          "aspect_ratio": "1:1",
+          "is_hero_panel": false,
+          "image_url": "/static/outputs/comic_c1097efc50_panel_2.png",
+          "grid_span": "col-span-1",
+          "bubble_position": "bubble-top-right",
+          "badge_rotation": 8
+        }
+      ],
+      "pdf_url": "/static/outputs/comic_c1097efc50.pdf",
+      "created_at": "2026-09-29 23:02:50"
+    },
+    {
+      "id": "comic_4a45705bea",
+      "title": "Shadows on the Wet Pavement",
+      "synopsis": "A weary detective pursues an elusive phantom through the rain-slicked, neon-drenched labyrinths of the lower district, only to discover the suspect is a reflection of his own unresolved past.",
+      "genre": "Noir Thriller / Psychological Mystery",
+      "art_style": "Dark Graphic Novel",
+      "character_name": "Detective Vance",
+      "prompt": "Detective chasing a phantom through rain-slicked alleys",
+      "panel_count": 2,
+      "panels": [
+        {
+          "panel_number": 1,
+          "panel_title": "The Ghost in the Alley",
+          "visual_description": "Establishing cinematic wide shot of a narrow, rain-slicked urban alleyway at midnight. Neon signs bleed red and cyan light into heavy fog reflecting off puddles. Detective Vance stands in the foreground, water dripping from his hat brim, gun drawn, staring down a distant shadowy figure vanishing around a rain-drenched corner.",
+          "caption": "The city wept in a relentless autumn downpour, each droplet a ticking clock counting down the hours until the truth finally bled through the pavement.",
+          "dialogue": "Detective Vance: 'I know you're tired... but so am I. Let's just end this before the rain washes the last of us away.'",
+          "speaker": "Detective Vance",
+          "dialogue_text": "I know you're tired... but so am I. Let's just end this before the rain washes the last of us away.",
+          "sound_effect": "SPLASH...",
+          "image_prompt": "Cinematic wide angle shot of Detective Vance, a weary 42-year-old investigator with salt-and-pepper stubble, intense tired dark eyes beneath a creased fedora, wearing a water-soaked charcoal trench coat over a rumpled suit tie. Standing in a dark, neon-lit alleyway reflecting red and cyan light in puddles, holding a service pistol. Moody chiaroscuro lighting, heavy rain, dark graphic novel style with heavy ink shadows and gritty textures., dark graphic novel noir style, dramatic chiaroscuro shadows, high contrast, gritty detailed line art, comic book panel, graphic novel quality, high detail, masterpiece",
+          "aspect_ratio": "1:1",
+          "is_hero_panel": false,
+          "image_url": "/static/outputs/comic_4a45705bea_panel_1.png",
+          "grid_span": "col-span-1",
+          "bubble_position": "bubble-top-left",
+          "badge_rotation": -12
+        },
+        {
+          "panel_number": 2,
+          "panel_title": "The Mirror's Edge",
+          "visual_description": "Dynamic low-angle action shot as Vance lunges around the wet corner, his trench coat billowing. He freezes instantly, lowering his weapon as the harsh streetlight reveals not a criminal, but his own fractured reflection staring back at him in a shattered storefront window.",
+          "caption": "Some monsters don't hide in the dark to hunt you. Sometimes, they've been wearing your coat the entire time.",
+          "dialogue": "Detective Vance: '...It was always just me.'",
+          "speaker": "Detective Vance",
+          "dialogue_text": "...It was always just me.",
+          "sound_effect": "SHHHK!",
+          "image_prompt": "Dynamic low-angle action shot of Detective Vance, a weary 42-year-old investigator with salt-and-pepper stubble, intense tired dark eyes beneath a creased fedora, wearing a water-soaked charcoal trench coat over a rumpled suit tie. He is staring in shock at his own reflection in a cracked, rain-streaked glass window. Dramatic volumetric lighting cutting through fog, dark graphic novel art style, deep blacks, high-contrast inks., dark graphic novel noir style, dramatic chiaroscuro shadows, high contrast, gritty detailed line art, comic book panel, graphic novel quality, high detail, masterpiece",
+          "aspect_ratio": "1:1",
+          "is_hero_panel": false,
+          "image_url": "/static/outputs/comic_4a45705bea_panel_2.png",
+          "grid_span": "col-span-1",
+          "bubble_position": "bubble-top-right",
+          "badge_rotation": 8
+        }
+      ],
+      "pdf_url": "/static/outputs/comic_4a45705bea.pdf",
+      "created_at": "2026-09-29 23:01:45"
+    },
+    {
       "id": "comic_0c9d10abdd",
       "title": "The Weight of the Jade",
       "synopsis": "A weary warrior monk confronts the perilous inner sanctum of a waterfall-veiled temple, forced to make a profound sacrifice to claim the legendary jade dragon scroll.",
@@ -652,7 +748,7 @@
           "dialogue": "Commander Nova: 'Shields at maximum capacity!'"
         }
       ],
-      "created_at": "2026-09-29 21:50:57"
+      "created_at": "2026-09-29 23:02:52"
     },
     {
       "id": "comic_5a5b9fa9f1",

@@ -2,7 +2,16 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "ComicCraft: Launch Server (Uvicorn)",
+      "name": "ComicCraft: Run Studio Server",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/main.py",
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "name": "ComicCraft: Launch via Uvicorn",
       "type": "debugpy",
       "request": "launch",
       "module": "uvicorn",
@@ -14,18 +23,15 @@
         "8000",
         "--reload"
       ],
-      "jinja": true,
-      "justMyCode": true,
       "envFile": "${workspaceFolder}/.env",
       "console": "integratedTerminal"
     },
     {
-      "name": "ComicCraft: Run Pytest",
+      "name": "ComicCraft: Run Pytest Suite",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
       "args": [
-        "tests/test_app.py",
         "-v"
       ],
       "envFile": "${workspaceFolder}/.env",

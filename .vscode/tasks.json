@@ -2,9 +2,9 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Start ComicCraft Server",
+      "label": "Start ComicCraft Studio Server",
       "type": "shell",
-      "command": "${workspaceFolder}/.venv/bin/uvicorn run:app --host 0.0.0.0 --port 8000 --reload",
+      "command": "${workspaceFolder}/.venv/bin/python main.py",
       "isBackground": true,
       "problemMatcher": [],
       "group": {
@@ -15,7 +15,7 @@
     {
       "label": "Run Tests",
       "type": "shell",
-      "command": "${workspaceFolder}/.venv/bin/pytest tests/test_app.py -v",
+      "command": "${workspaceFolder}/.venv/bin/pytest -v",
       "group": {
         "kind": "test",
         "isDefault": true
