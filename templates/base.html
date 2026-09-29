@@ -43,9 +43,67 @@
           <span class="nav-icon">⚡</span>
           <span>API Docs</span>
         </a>
+        <button type="button" class="btn-api-key-config" id="btn-open-api-modal" title="Configure or update Google Gemini API Key">
+          <span>🔑</span>
+          <span class="api-btn-label">API Key</span>
+        </button>
       </div>
     </div>
   </header>
+
+  <!-- Google Gemini API Key Configuration Modal -->
+  <div id="api-key-modal" class="api-key-modal">
+    <div class="api-modal-backdrop" onclick="closeApiKeyModal()"></div>
+    <div class="api-modal-dialog studio-card">
+      <div class="modal-dialog-header">
+        <div class="modal-dialog-title">
+          <span>🔑</span>
+          <span>Google Gemini API Key</span>
+        </div>
+        <button type="button" class="modal-close-btn" onclick="closeApiKeyModal()">✕</button>
+      </div>
+
+      <div class="modal-dialog-body">
+        <p class="api-modal-desc">
+          Add your Google Gemini API key to activate the live <strong>Gemini 2.5 Flash</strong> neural model for intelligent comic scriptwriting, dynamic character dialogue, and rich plot arcs.
+        </p>
+
+        <div class="api-key-status-banner" id="api-key-status-banner">
+          <span class="status-icon" id="api-status-icon">⚡</span>
+          <span class="status-text" id="api-status-text">Checking API status...</span>
+        </div>
+
+        <form id="api-key-form" onsubmit="saveApiKey(event)">
+          <div class="form-group">
+            <label class="form-label" for="gemini-key-input">Gemini API Key</label>
+            <div class="input-with-icon">
+              <span class="input-icon">🔐</span>
+              <input 
+                type="password" 
+                id="gemini-key-input" 
+                class="form-input has-icon" 
+                placeholder="AIzaSy..." 
+                autocomplete="off"
+                required
+              >
+            </div>
+            <span class="label-hint">
+              Don't have a key? Get one 100% free at 
+              <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" class="text-blue-link">Google AI Studio ↗</a>
+            </span>
+          </div>
+
+          <div class="modal-dialog-actions">
+            <button type="button" class="btn-action btn-outline" onclick="closeApiKeyModal()">Cancel</button>
+            <button type="submit" class="btn-action btn-blue" id="btn-save-api-key">
+              <span>⚡</span>
+              <span>Verify & Activate Key</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 
   <!-- Main Content View -->
   <main class="main-wrapper">

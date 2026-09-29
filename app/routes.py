@@ -1,10 +1,12 @@
 import asyncio
 import logging
+import os
+import re
 import uuid
 from pathlib import Path
 from typing import Optional, List
 from fastapi import APIRouter, Request, Form, HTTPException, BackgroundTasks
-from fastapi.responses import HTMLResponse, RedirectResponse, FileResponse
+from fastapi.responses import HTMLResponse, RedirectResponse, FileResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel, Field
 
@@ -44,6 +46,10 @@ class PanelTextUpdateRequest(BaseModel):
     dialogue: Optional[str] = None
     caption: Optional[str] = None
     sound_effect: Optional[str] = None
+
+class ApiKeyUpdateRequest(BaseModel):
+    api_key: str = Field(..., description="Google Gemini API key")
+
 
 
 @router.get("/", response_class=HTMLResponse)
@@ -342,6 +348,90 @@ async def api_update_panel_text(payload: PanelTextUpdateRequest):
         "comic_id": payload.comic_id,
         "panel_number": payload.panel_number,
         "panel": target_panel
+    }
+
+@router.post("/api/settings/gemini-key")
+async def update_gemini_api_key(payload: ApiKeyUpdateRequest):
+    """Validates the Gemini API key and updates server config and .env file."""
+    candidate_key = payload.api_key.strip()
+    if not candidate_key:
+        raise HTTPException(status_code=400, detail="API key cannot be empty")
+
+    # Validate against Gemini API
+    verification_passed = False
+    error_msg = ""
+
+    try:
+        from google import genai
+        client = genai.Client(api_key=candidate_key)
+        test_res = client.models.generate_content(
+            model=config.TEXT_MODEL,
+            contents=["Respond with only the word 'VALID'"]
+        )
+        if test_res and test_res.text:
+            verification_passed = True
+    except Exception as e:
+        error_msg = str(e)
+        logger.warning(f"google.genai verification failed: {e}. Trying fallback client...")
+
+    if not verification_passed:
+        try:
+            import google.generativeai as genai_legacy
+            genai_legacy.configure(api_key=candidate_key)
+            model = genai_legacy.GenerativeModel("gemini-1.5-flash")
+            test_res = model.generate_content("Respond with only the word 'VALID'")
+            if test_res and test_res.text:
+                verification_passed = True
+        except Exception as e2:
+            error_msg = f"{error_msg}; {str(e2)}"
+            logger.warning(f"Legacy Gemini verification failed: {e2}")
+
+    if not verification_passed:
+        return JSONResponse(
+            status_code=400,
+            content={
+                "status": "error",
+                "message": f"Verification failed. Please check your Gemini API key: {error_msg}"
+            }
+        )
+
+    # Key is verified! Update runtime configuration
+    config.GEMINI_API_KEY = candidate_key
+    os.environ["GEMINI_API_KEY"] = candidate_key
+
+    # Persist into .env file safely
+    env_path = config.BASE_DIR / ".env"
+    try:
+        content = ""
+        if env_path.exists():
+            content = env_path.read_text(encoding="utf-8")
+        if re.search(r"^GEMINI_API_KEY=.*", content, flags=re.MULTILINE):
+            new_content = re.sub(r"^GEMINI_API_KEY=.*", f"GEMINI_API_KEY={candidate_key}", content, flags=re.MULTILINE)
+        else:
+            new_content = content.strip() + f"\nGEMINI_API_KEY={candidate_key}\n"
+        env_path.write_text(new_content, encoding="utf-8")
+    except Exception as err:
+        logger.warning(f"Could not persist GEMINI_API_KEY to .env: {err}")
+
+    return {
+        "status": "success",
+        "message": "Google Gemini 2.5 Flash API Key verified and activated successfully!",
+        "model": config.TEXT_MODEL,
+        "masked_key": candidate_key[:6] + "..." + candidate_key[-4:]
+    }
+
+@router.get("/api/settings/status")
+async def get_settings_status():
+    """Returns whether Gemini API is active, masking the key."""
+    has_key = bool(config.GEMINI_API_KEY)
+    masked_key = ""
+    if has_key:
+        masked_key = config.GEMINI_API_KEY[:6] + "..." + config.GEMINI_API_KEY[-4:]
+    return {
+        "gemini_api_configured": has_key,
+        "masked_key": masked_key,
+        "model": config.TEXT_MODEL,
+        "image_provider": config.IMAGE_PROVIDER
     }
 
 @router.get("/health")

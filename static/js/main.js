@@ -36,7 +36,10 @@ document.addEventListener("DOMContentLoaded", () => {
   initScriptEditor();
   initStripExport();
 
-  // 11. Share & Toast Notifications
+  // 11. API Key Configuration Modal
+  initApiKeyModal();
+
+  // 12. Share & Toast Notifications
   initShareButton();
 });
 
@@ -1331,4 +1334,105 @@ function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
   if (fill) ctx.fill();
   if (stroke) ctx.stroke();
 }
+
+/* ==========================================================================
+   18. Google Gemini API Key Management Modal
+   ========================================================================== */
+function initApiKeyModal() {
+  const openBtn = document.getElementById("btn-open-api-modal");
+  if (!openBtn) return;
+
+  openBtn.addEventListener("click", () => {
+    openApiKeyModal();
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      closeApiKeyModal();
+    }
+  });
+}
+
+async function openApiKeyModal() {
+  const modal = document.getElementById("api-key-modal");
+  if (!modal) return;
+
+  modal.classList.add("open");
+  const banner = document.getElementById("api-key-status-banner");
+  const statusIcon = document.getElementById("api-status-icon");
+  const statusText = document.getElementById("api-status-text");
+
+  try {
+    const res = await fetch("/api/settings/status");
+    if (res.ok) {
+      const data = await res.json();
+      if (data.gemini_api_configured) {
+        if (banner) {
+          banner.className = "api-key-status-banner active";
+        }
+        if (statusIcon) statusIcon.innerText = "✅";
+        if (statusText) statusText.innerText = `Active: ${data.model} (${data.masked_key})`;
+      } else {
+        if (banner) {
+          banner.className = "api-key-status-banner inactive";
+        }
+        if (statusIcon) statusIcon.innerText = "⚡";
+        if (statusText) statusText.innerText = "No Gemini API key set (Running in creative fallback engine)";
+      }
+    }
+  } catch (err) {}
+
+  const keyInput = document.getElementById("gemini-key-input");
+  if (keyInput) keyInput.focus();
+}
+
+function closeApiKeyModal() {
+  const modal = document.getElementById("api-key-modal");
+  if (modal) modal.classList.remove("open");
+}
+
+async function saveApiKey(e) {
+  e.preventDefault();
+  const keyInput = document.getElementById("gemini-key-input");
+  const submitBtn = document.getElementById("btn-save-api-key");
+  if (!keyInput || !submitBtn) return;
+
+  const candidateKey = keyInput.value.trim();
+  if (!candidateKey) return;
+
+  submitBtn.disabled = true;
+  const origHtml = submitBtn.innerHTML;
+  submitBtn.innerHTML = `<span>⏳</span> Verifying Key...`;
+
+  try {
+    const res = await fetch("/api/settings/gemini-key", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ api_key: candidateKey })
+    });
+
+    const data = await res.json();
+    if (res.ok && data.status === "success") {
+      showToast("✨ Gemini API Key verified & activated for peak performance!");
+      playPopSound(640);
+      keyInput.value = "";
+      closeApiKeyModal();
+
+      const badge = document.querySelector(".badge-gemini span:last-child");
+      if (badge) badge.innerText = "✨ Gemini 2.5 Flash (Verified)";
+    } else {
+      showToast(`⚠️ ${data.message || "Failed to verify Gemini API key"}`);
+    }
+  } catch (err) {
+    showToast(`⚠️ Error: ${err.message}`);
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = origHtml;
+  }
+}
+
+window.openApiKeyModal = openApiKeyModal;
+window.closeApiKeyModal = closeApiKeyModal;
+window.saveApiKey = saveApiKey;
+
 
