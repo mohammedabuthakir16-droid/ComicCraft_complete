@@ -17,7 +17,7 @@ load_dotenv(BASE_DIR / ".env")
 
 # Settings
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip()
-TEXT_MODEL = os.getenv("TEXT_MODEL", "gemini-2.5-flash").strip()
+TEXT_MODEL = os.getenv("TEXT_MODEL", "gemini-3.5-flash-lite").strip()
 IMAGE_PROVIDER = os.getenv("IMAGE_PROVIDER", "pollinations").strip().lower()
 HF_API_KEY = os.getenv("HF_API_KEY", "").strip()
 HOST = os.getenv("HOST", "0.0.0.0")

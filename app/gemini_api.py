@@ -326,19 +326,29 @@ Strict Storytelling Rules:
 7. **Image Prompts**: Extremely detailed prompts specifying character visual signature, camera angle (wide shot, Dutch angle, dramatic close-up, splash), environmental lighting, and the '{art_style}' style.
 """
 
-    # Try official google.genai SDK
+    # Try official google.genai SDK with multi-model fallback sequence
+    models_to_try = [config.TEXT_MODEL, "gemini-3.5-flash-lite", "gemini-3.8-flash", "gemini-flash-latest", "gemini-3.1-flash-lite"]
+    seen = set()
+    ordered_models = [m for m in models_to_try if m and not (m in seen or seen.add(m))]
+
     try:
         from google import genai
         client = genai.Client(api_key=api_key)
-        response = client.models.generate_content(
-            model=config.TEXT_MODEL,
-            contents=[SYSTEM_PROMPT, user_instructions],
-        )
-        cleaned = _clean_json_response(response.text)
-        data = json.loads(cleaned)
-        return data
+        for m in ordered_models:
+            try:
+                response = client.models.generate_content(
+                    model=m,
+                    contents=[SYSTEM_PROMPT, user_instructions],
+                )
+                if response and response.text:
+                    cleaned = _clean_json_response(response.text)
+                    data = json.loads(cleaned)
+                    logger.info(f"Successfully generated comic story with Gemini model: {m}")
+                    return data
+            except Exception as e_m:
+                logger.warning(f"Gemini model {m} attempt failed: {e_m}. Trying next candidate...")
     except Exception as e_new:
-        logger.warning(f"google.genai call attempt failed: {e_new}. Trying fallback SDK or direct extraction...")
+        logger.warning(f"google.genai setup failed: {e_new}. Trying legacy SDK...")
 
     # Fallback to legacy google.generativeai if available
     try:
@@ -364,6 +374,10 @@ async def enhance_story_prompt(
     """Takes a brief user idea and expands it into an evocative, multi-dimensional comic book premise with rich sensory detail, atmosphere, stakes, and emotional drive."""
     api_key = config.GEMINI_API_KEY
     if api_key:
+        models_to_try = [config.TEXT_MODEL, "gemini-3.5-flash-lite", "gemini-3.8-flash", "gemini-flash-latest", "gemini-3.1-flash-lite"]
+        seen = set()
+        ordered_models = [m for m in models_to_try if m and not (m in seen or seen.add(m))]
+
         try:
             from google import genai
             client = genai.Client(api_key=api_key)
@@ -374,12 +388,16 @@ async def enhance_story_prompt(
                 f"Premise: '{prompt}' | Protagonist: '{character_name}' | Art Style: '{art_style}'\n"
                 f"Return ONLY the enhanced story premise text without extra commentary or quotes."
             )
-            response = client.models.generate_content(
-                model=config.TEXT_MODEL,
-                contents=[prompt_instruction]
-            )
-            if response.text and len(response.text.strip()) > 15:
-                return response.text.strip().strip('"')
+            for m in ordered_models:
+                try:
+                    response = client.models.generate_content(
+                        model=m,
+                        contents=[prompt_instruction]
+                    )
+                    if response and response.text and len(response.text.strip()) > 15:
+                        return response.text.strip().strip('"')
+                except Exception as e_m:
+                    logger.warning(f"Model {m} enhancement attempt failed: {e_m}")
         except Exception as e:
             logger.warning(f"Gemini prompt enhancement failed: {e}. Using algorithmic enhancer.")
 
