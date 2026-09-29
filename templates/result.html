@@ -52,26 +52,89 @@
     </div>
   </div>
 
+  <!-- Enhanced Studio Interactive Toolbar: Audio Narrator + Live Visual Shaders + Image Strip Export -->
+  <div class="interactive-toolbar studio-card">
+    
+    <!-- Audio Narration Controls -->
+    <div class="narrator-control-group">
+      <div class="narrator-badge">
+        <span class="narrator-icon">🎙️</span>
+        <span class="narrator-title">Voice Narrator</span>
+      </div>
+      <div class="narrator-buttons">
+        <button type="button" class="btn-narrator" id="btn-narrate-play" title="Play voiced comic narration with character voices">
+          <span id="narrate-play-icon">▶</span>
+          <span id="narrate-play-text">Narrate Story</span>
+        </button>
+        <button type="button" class="btn-narrator btn-narrator-stop" id="btn-narrate-stop" title="Stop speech synthesis">
+          <span>⏹ Stop</span>
+        </button>
+      </div>
+      <div class="narrator-status-text" id="narrator-status">Click to listen to comic story</div>
+    </div>
+
+    <!-- Live Comic Art Filters / Shaders -->
+    <div class="shader-control-group">
+      <span class="shader-label">🎨 Art FX:</span>
+      <div class="shader-chips-row" id="shader-chips">
+        <button type="button" class="shader-chip active" data-shader="original" title="Original Raw Artwork">
+          ✨ Original
+        </button>
+        <button type="button" class="shader-chip" data-shader="halftone" title="1980s Halftone Comic Print with Dot Matrix">
+          🗞️ Halftone
+        </button>
+        <button type="button" class="shader-chip" data-shader="noir" title="Gritty High-Contrast Noir Black & White">
+          🕵️ Noir
+        </button>
+        <button type="button" class="shader-chip" data-shader="neon" title="Cyberpunk Neon Glow and High Saturation">
+          🌆 Neon
+        </button>
+        <button type="button" class="shader-chip" data-shader="sepia" title="Golden Age Vintage Newsprint">
+          📜 Sepia
+        </button>
+      </div>
+    </div>
+
+    <!-- Social Image Strip Export -->
+    <div class="strip-export-group">
+      <button type="button" class="btn-action btn-gold" id="btn-export-strip" title="Generate and download a single continuous image strip for Instagram, Reddit, or Twitter">
+        <span>🖼️</span>
+        <span>Export PNG Strip</span>
+      </button>
+    </div>
+
+  </div>
+
   <!-- Prologue / Synopsis Card -->
   {% if comic.synopsis %}
   <div class="narration-prologue-card studio-card">
     <div class="prologue-label">PROLOGUE:</div>
-    <p class="prologue-text">"{{ comic.synopsis }}"</p>
+    <p class="prologue-text" id="prologue-synopsis-text">"{{ comic.synopsis }}"</p>
   </div>
   {% endif %}
 
   <!-- Comic Panels Container (Switches between .layout-classic and .layout-webtoon) -->
-  <div class="panels-container layout-classic" id="panels-wrapper">
+  <div class="panels-container layout-classic shader-original" id="panels-wrapper">
     {% for panel in comic.panels %}
-    <div class="panel-display-item studio-card" id="panel-card-{{ panel.panel_number }}" data-panel-idx="{{ loop.index0 }}">
+    <div class="panel-display-item studio-card" id="panel-card-{{ panel.panel_number }}" data-panel-idx="{{ loop.index0 }}" data-panel-number="{{ panel.panel_number }}">
       
       <!-- Panel Header Bar -->
       <div class="panel-title-header">
         <div class="panel-title-left">
           <span class="panel-num-tag">PANEL {{ panel.panel_number }}</span>
-          <span class="panel-name">{{ panel.panel_title }}</span>
+          <span class="panel-name" id="panel-title-text-{{ panel.panel_number }}">{{ panel.panel_title }}</span>
         </div>
-        <span class="panel-counter">Scene {{ panel.panel_number }} of {{ comic.panels|length }}</span>
+        <div class="panel-header-actions">
+          <button 
+            type="button" 
+            class="btn-edit-script-chip" 
+            onclick="openScriptEditor({{ panel.panel_number }})"
+            title="Edit speech bubble, speaker, or caption"
+          >
+            <span>✏️ Edit Script</span>
+          </button>
+          <span class="panel-counter">Scene {{ panel.panel_number }} of {{ comic.panels|length }}</span>
+        </div>
       </div>
 
       <!-- Content Grid: Image Frame on Left + Story & Dialogue on Right -->
@@ -87,29 +150,41 @@
             loading="lazy"
           >
           
-          {% if panel.sound_effect %}
           <button 
             type="button" 
-            class="sound-badge-interactive" 
+            class="sound-badge-interactive {% if not panel.sound_effect %}hidden-badge{% endif %}" 
+            id="sound-badge-{{ panel.panel_number }}"
             data-sound="{{ panel.sound_effect }}" 
-            title="Click to hear comic sound effect!"
+            title="Click to hear synthesized comic sound effect!"
+            onclick="playComicSfx('{{ panel.sound_effect }}', event)"
           >
-            {{ panel.sound_effect }}
+            <span class="sound-text">{{ panel.sound_effect }}</span>
             <span class="sound-sparkle">💥</span>
           </button>
-          {% endif %}
 
-          <!-- One-click Regenerate Art button -->
-          <button 
-            type="button" 
-            class="btn-regen-panel" 
-            id="btn-regen-{{ panel.panel_number }}"
-            onclick="regeneratePanel('{{ comic.id }}', {{ panel.panel_number }})"
-            title="Re-roll or regenerate this panel's AI illustration"
-          >
-            <span class="regen-icon">🔄</span>
-            <span class="regen-label">Regenerate</span>
-          </button>
+          <!-- Action Buttons Overlay -->
+          <div class="panel-action-overlay">
+            <button 
+              type="button" 
+              class="btn-panel-action btn-regen-panel" 
+              id="btn-regen-{{ panel.panel_number }}"
+              onclick="regeneratePanel('{{ comic.id }}', {{ panel.panel_number }})"
+              title="Re-roll or regenerate this panel's AI illustration"
+            >
+              <span class="regen-icon">🔄</span>
+              <span class="regen-label">Regenerate</span>
+            </button>
+            <button 
+              type="button" 
+              class="btn-panel-action btn-edit-panel" 
+              id="btn-edit-{{ panel.panel_number }}"
+              onclick="openScriptEditor({{ panel.panel_number }})"
+              title="Edit dialogue, caption, or sound effect for this panel"
+            >
+              <span>✏️</span>
+              <span class="edit-label">Edit Script</span>
+            </button>
+          </div>
 
           <div class="panel-art-sheen"></div>
         </div>
@@ -118,25 +193,21 @@
         <div class="panel-text-wrapper">
           
           <!-- Narration Caption Box -->
-          {% if panel.caption %}
-          <div class="narration-caption-card">
+          <div class="narration-caption-card {% if not panel.caption %}hidden-caption{% endif %}" id="caption-card-{{ panel.panel_number }}">
             <div class="narration-sub">NARRATION:</div>
-            <p class="narration-body">{{ panel.caption }}</p>
+            <p class="narration-body" id="caption-text-{{ panel.panel_number }}">{{ panel.caption }}</p>
           </div>
-          {% endif %}
 
           <!-- Realistic Speech Balloon -->
-          {% if panel.dialogue %}
-          <div class="speech-bubble-card">
+          <div class="speech-bubble-card {% if not panel.dialogue_text %}hidden-bubble{% endif %}" id="bubble-card-{{ panel.panel_number }}">
             <div class="speech-speaker">
               <span class="speaker-bubble-icon">💬</span>
-              <span>{{ panel.speaker }}</span>
+              <span id="speaker-text-{{ panel.panel_number }}">{{ panel.speaker }}</span>
             </div>
-            <div class="speech-text">
+            <div class="speech-text" id="dialogue-text-{{ panel.panel_number }}">
               "{{ panel.dialogue_text }}"
             </div>
           </div>
-          {% endif %}
 
         </div>
 
@@ -207,6 +278,53 @@
       </button>
     </div>
 
+  </div>
+</div>
+
+<!-- Interactive Script & Dialogue Editor Modal -->
+<div id="script-edit-modal" class="script-edit-modal">
+  <div class="script-modal-backdrop" onclick="closeScriptEditor()"></div>
+  <div class="script-modal-dialog studio-card">
+    <div class="modal-dialog-header">
+      <div class="modal-dialog-title">
+        <span>✏️</span>
+        <span id="modal-panel-title-label">Edit Script for Panel 1</span>
+      </div>
+      <button type="button" class="modal-close-btn" onclick="closeScriptEditor()">✕</button>
+    </div>
+
+    <form id="script-edit-form" class="modal-dialog-body" onsubmit="saveScriptEdit(event)">
+      <input type="hidden" id="edit-panel-number" value="1">
+      <input type="hidden" id="edit-comic-id" value="{{ comic.id }}">
+
+      <div class="form-group">
+        <label class="form-label" for="edit-speaker-input">Speaker Character Name</label>
+        <input type="text" id="edit-speaker-input" class="form-input" placeholder="e.g. Hope, Detective Vance">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="edit-dialogue-input">Spoken Dialogue Text</label>
+        <textarea id="edit-dialogue-input" class="form-textarea" rows="2" placeholder="What does the character say?"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="edit-caption-input">Narration Caption</label>
+        <textarea id="edit-caption-input" class="form-textarea" rows="2" placeholder="Atmospheric scene description or thoughts"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="edit-sfx-input">Comic Sound Effect (Onomatopoeia)</label>
+        <input type="text" id="edit-sfx-input" class="form-input" placeholder="e.g. POW!, WHOOSH!, BZZT!">
+      </div>
+
+      <div class="modal-dialog-actions">
+        <button type="button" class="btn-action btn-outline" onclick="closeScriptEditor()">Cancel</button>
+        <button type="submit" class="btn-action btn-blue" id="btn-save-script">
+          <span>💾</span>
+          <span>Save Changes & Refresh PDF</span>
+        </button>
+      </div>
+    </form>
   </div>
 </div>
 

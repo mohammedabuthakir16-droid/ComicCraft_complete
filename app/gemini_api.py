@@ -354,3 +354,61 @@ Strict Storytelling Rules:
     except Exception as e_legacy:
         logger.error(f"Gemini API calls failed: {e_legacy}. Using enhanced narrative engine.")
         return _generate_enhanced_story(prompt, character_name, art_style, panel_count)
+
+
+async def enhance_story_prompt(
+    prompt: str,
+    character_name: str = "Hero",
+    art_style: str = "Classic Comic Book"
+) -> str:
+    """Takes a brief user idea and expands it into an evocative, multi-dimensional comic book premise with rich sensory detail, atmosphere, stakes, and emotional drive."""
+    api_key = config.GEMINI_API_KEY
+    if api_key:
+        try:
+            from google import genai
+            client = genai.Client(api_key=api_key)
+            prompt_instruction = (
+                f"You are a master comic book editor and creative director. "
+                f"Transform this simple comic premise into a vivid, cinematic, high-stakes comic story idea "
+                f"in 2-3 sentences. Focus on sensory atmosphere, protagonist motivation, conflict, and visual spectacle. "
+                f"Premise: '{prompt}' | Protagonist: '{character_name}' | Art Style: '{art_style}'\n"
+                f"Return ONLY the enhanced story premise text without extra commentary or quotes."
+            )
+            response = client.models.generate_content(
+                model=config.TEXT_MODEL,
+                contents=[prompt_instruction]
+            )
+            if response.text and len(response.text.strip()) > 15:
+                return response.text.strip().strip('"')
+        except Exception as e:
+            logger.warning(f"Gemini prompt enhancement failed: {e}. Using algorithmic enhancer.")
+
+    # Algorithmic creative enhancement
+    base = prompt.strip().rstrip(".")
+    style_lower = art_style.lower()
+
+    if "cyberpunk" in style_lower or "sci-fi" in style_lower:
+        enhancements = [
+            f"Under the blinding holographic billboards and rain-slicked towers of Neo-Veridia, {character_name} uncovers a forbidden chronos-fragment tied to: {base}. As biomechanical enforcers descend through the neon haze, every ticking second threatens to destabilize the neural network of the entire metropolis.",
+            f"In the shadow of the orbital spires, {character_name} navigates a treacherous cyber-underworld sparked by: {base}. Armed with an experimental pulse blade and a fractured memory chip, the truth will cost more than credits—it demands absolute rebellion."
+        ]
+    elif "noir" in style_lower or "graphic novel" in style_lower:
+        enhancements = [
+            f"Beneath the rusted streetlamps of 1940s Manhattan where the rain never truly washes away the blood, {character_name} takes on a case nobody else would touch: {base}. With shadows closing in from both corrupt city hall and the mob catacombs, survival depends on shooting first and trusting nobody.",
+            f"Midnight smells like wet asphalt, cheap tobacco, and danger. Weary investigator {character_name} tracks a dangerous trail born from: {base}. In a city ruled by chiaroscuro shadows and whispered betrayals, the light at the end of the tunnel is usually an oncoming locomotive."
+        ]
+    elif "manga" in style_lower or "anime" in style_lower:
+        enhancements = [
+            f"When ancient celestial seals shatter across the sky, {character_name} must unleash an untamed spiritual power triggered by: {base}. With rival warriors gathering on the horizon and time running out, a legendary showdown will decide the fate of both mortal and spirit realms!",
+            f"Driven by an unbroken promise and fiery determination, {character_name} charges into an epic trial after encountering: {base}. Dynamic elemental clashes, blazing willpower, and the bonds of camaraderie are pushed to their ultimate limits!"
+        ]
+    else:  # Classic Comic Book / Fantasy / Pop Art
+        enhancements = [
+            f"In an age of miraculous wonders and lurking perils, {character_name} embarks on an unforgettable odyssey: {base}. Facing treacherous trials through enchanted territory and guided by an unbreakable sense of purpose, an extraordinary destiny unfolds panel by panel.",
+            f"When a sudden cosmic anomaly shakes the foundation of the world, {character_name} springs into dynamic action: {base}. Bold heroics, breathtaking splash-page spectacle, and heart-pounding courage collide in this classic adventure!"
+        ]
+
+    import hashlib
+    idx = int(hashlib.md5(f"{base}_{character_name}".encode()).hexdigest(), 16) % len(enhancements)
+    return enhancements[idx]
+

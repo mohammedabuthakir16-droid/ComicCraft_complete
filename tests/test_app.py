@@ -132,3 +132,64 @@ def test_api_generate_endpoint():
     assert data["title"] is not None
     assert len(data["panels"]) == 2
     assert data["pdf_url"] is not None
+
+def test_api_enhance_prompt():
+    """Verify POST /api/enhance-prompt expands a simple premise into an evocative comic concept."""
+    payload = {
+        "prompt": "A young fox looking for magical glowing fruit",
+        "character_name": "Hope",
+        "art_style": "Classic Comic Book"
+    }
+    res = client.post("/api/enhance-prompt", json=payload)
+    assert res.status_code == 200
+    data = res.json()
+    assert data["status"] == "success"
+    assert "enhanced_prompt" in data
+    assert len(data["enhanced_prompt"]) > len(payload["prompt"])
+    assert "Hope" in data["enhanced_prompt"]
+
+def test_api_update_panel_text():
+    """Verify POST /api/update-panel-text updates dialogue and narration."""
+    # First create a mock comic in storage
+    from app.storage import save_comic, get_comic
+    comic_id = "test_script_update_comic"
+    comic_data = {
+        "id": comic_id,
+        "title": "Script Test Comic",
+        "character_name": "Hero",
+        "art_style": "Classic Comic Book",
+        "panels": [
+            {
+                "panel_number": 1,
+                "panel_title": "First Scene",
+                "speaker": "Hero",
+                "dialogue_text": "Old line",
+                "caption": "Old caption",
+                "sound_effect": "BAM!"
+            }
+        ]
+    }
+    save_comic(comic_data)
+
+    payload = {
+        "comic_id": comic_id,
+        "panel_number": 1,
+        "speaker": "Commander Nova",
+        "dialogue": "Shields at maximum capacity!",
+        "caption": "The sky burned with solar fire.",
+        "sound_effect": "BOOM!"
+    }
+    res = client.post("/api/update-panel-text", json=payload)
+    assert res.status_code == 200
+    data = res.json()
+    assert data["status"] == "success"
+    assert data["panel"]["speaker"] == "Commander Nova"
+    assert data["panel"]["dialogue_text"] == "Shields at maximum capacity!"
+    assert data["panel"]["caption"] == "The sky burned with solar fire."
+    assert data["panel"]["sound_effect"] == "BOOM!"
+
+    # Verify persisted in database
+    retrieved = get_comic(comic_id)
+    assert retrieved is not None
+    assert retrieved["panels"][0]["speaker"] == "Commander Nova"
+

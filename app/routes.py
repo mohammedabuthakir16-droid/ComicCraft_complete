@@ -9,7 +9,7 @@ from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel, Field
 
 from app import config
-from app.gemini_api import generate_comic_story
+from app.gemini_api import generate_comic_story, enhance_story_prompt
 from app.panel_gen import process_comic_panels
 from app.image_gen import generate_panel_image
 from app.layout import calculate_panel_layout
@@ -31,6 +31,20 @@ class PanelRegenerateRequest(BaseModel):
     comic_id: str
     panel_number: int
     prompt_override: Optional[str] = None
+
+class EnhancePromptRequest(BaseModel):
+    prompt: str = Field(..., description="Original raw prompt to enhance")
+    character_name: Optional[str] = Field("Hero", description="Main character name")
+    art_style: Optional[str] = Field("Classic Comic Book", description="Visual style")
+
+class PanelTextUpdateRequest(BaseModel):
+    comic_id: str
+    panel_number: int
+    speaker: Optional[str] = None
+    dialogue: Optional[str] = None
+    caption: Optional[str] = None
+    sound_effect: Optional[str] = None
+
 
 @router.get("/", response_class=HTMLResponse)
 async def home_page(request: Request):
@@ -271,6 +285,63 @@ async def api_regenerate_panel(payload: PanelRegenerateRequest):
         "comic_id": payload.comic_id,
         "panel_number": payload.panel_number,
         "image_url": new_img_url
+    }
+
+@router.post("/api/enhance-prompt")
+async def api_enhance_prompt(payload: EnhancePromptRequest):
+    """Enriches and expands a brief prompt into a vivid, cinematic comic premise."""
+    if not payload.prompt.strip():
+        raise HTTPException(status_code=400, detail="Prompt cannot be empty")
+    enhanced = await enhance_story_prompt(
+        prompt=payload.prompt,
+        character_name=payload.character_name or "Hero",
+        art_style=payload.art_style or "Classic Comic Book"
+    )
+    return {
+        "status": "success",
+        "original": payload.prompt,
+        "enhanced_prompt": enhanced
+    }
+
+@router.post("/api/update-panel-text")
+async def api_update_panel_text(payload: PanelTextUpdateRequest):
+    """Updates dialogue, speaker, caption, or sound effect for a specific panel and refreshes the PDF."""
+    comic = get_comic(payload.comic_id)
+    if not comic:
+        raise HTTPException(status_code=404, detail="Comic not found")
+
+    target_panel = None
+    for p in comic.get("panels", []):
+        if p.get("panel_number") == payload.panel_number:
+            target_panel = p
+            break
+
+    if not target_panel:
+        raise HTTPException(status_code=404, detail="Panel not found")
+
+    if payload.speaker is not None:
+        target_panel["speaker"] = payload.speaker.strip()
+    if payload.dialogue is not None:
+        target_panel["dialogue_text"] = payload.dialogue.strip()
+        speaker = target_panel.get("speaker", "Character")
+        target_panel["dialogue"] = f"{speaker}: '{payload.dialogue.strip()}'"
+    if payload.caption is not None:
+        target_panel["caption"] = payload.caption.strip()
+    if payload.sound_effect is not None:
+        target_panel["sound_effect"] = payload.sound_effect.strip().upper()
+
+    # Re-export PDF with the new text
+    try:
+        export_comic_to_pdf(comic)
+    except Exception as e:
+        logger.warning(f"PDF re-export failed during panel text update: {e}")
+
+    save_comic(comic)
+    return {
+        "status": "success",
+        "comic_id": payload.comic_id,
+        "panel_number": payload.panel_number,
+        "panel": target_panel
     }
 
 @router.get("/health")

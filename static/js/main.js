@@ -10,8 +10,10 @@ document.addEventListener("DOMContentLoaded", () => {
   // 3. Panel Count Buttons
   initPanelCountSelector();
 
-  // 4. Magic Inspiration Wand ("Inspire Me")
+  // 4. Magic Inspiration Wand ("Inspire Me") & Supercharge Polish
   initInspireMe();
+  initSuperchargePrompt();
+  initCharacterArchetypes();
 
   // 5. Live Storyboard Mock Synchronization
   initLiveMockSync();
@@ -28,7 +30,13 @@ document.addEventListener("DOMContentLoaded", () => {
   // 9. Fullscreen Cinema Mode Lightbox
   initCinemaMode();
 
-  // 10. Share & Toast Notifications
+  // 10. Voice Narrator, Shaders, Script Editor & Strip Export
+  initVoiceNarrator();
+  initComicShaders();
+  initScriptEditor();
+  initStripExport();
+
+  // 11. Share & Toast Notifications
   initShareButton();
 });
 
@@ -708,5 +716,619 @@ async function regeneratePanel(comicId, panelNumber) {
     btn.innerHTML = origHtml;
     btn.disabled = false;
   }
+}
+
+/* ==========================================================================
+   12. AI Prompt Supercharger & Character Archetypes
+   ========================================================================== */
+function initSuperchargePrompt() {
+  const btn = document.getElementById("btn-supercharge");
+  const promptInput = document.getElementById("prompt-input");
+  const charInput = document.getElementById("character-input");
+  const styleSelect = document.getElementById("art-style-select");
+  if (!btn || !promptInput) return;
+
+  btn.addEventListener("click", async () => {
+    const rawPrompt = promptInput.value.trim();
+    if (!rawPrompt) {
+      showToast("💡 Please enter a short story idea first!");
+      promptInput.focus();
+      return;
+    }
+
+    const origHtml = btn.innerHTML;
+    btn.innerHTML = `<span class="sparkle-rot">✨</span> Polishing...`;
+    btn.disabled = true;
+
+    try {
+      const res = await fetch("/api/enhance-prompt", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          prompt: rawPrompt,
+          character_name: charInput ? charInput.value.trim() : "Hero",
+          art_style: styleSelect ? styleSelect.value : "Classic Comic Book"
+        })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        const enhanced = data.enhanced_prompt;
+        // Animated typewriter insertion
+        promptInput.value = "";
+        let i = 0;
+        const timer = setInterval(() => {
+          if (i < enhanced.length) {
+            promptInput.value += enhanced.charAt(i);
+            i++;
+          } else {
+            clearInterval(timer);
+            promptInput.dispatchEvent(new Event("input"));
+            showToast("✨ Story premise elevated with cinematic atmosphere!");
+            playPopSound(620);
+          }
+        }, 12);
+      } else {
+        showToast("⚠️ Could not polish prompt at this time.");
+      }
+    } catch (err) {
+      showToast("⚠️ Error: " + err.message);
+    } finally {
+      btn.innerHTML = origHtml;
+      btn.disabled = false;
+    }
+  });
+}
+
+function initCharacterArchetypes() {
+  const charButtons = document.querySelectorAll(".char-tag-btn");
+  const charInput = document.getElementById("character-input");
+  if (!charButtons.length || !charInput) return;
+
+  charButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const name = btn.dataset.charName;
+      const styleName = btn.dataset.charStyle;
+      charInput.value = name;
+      charInput.dispatchEvent(new Event("input"));
+
+      // Sync with style button
+      const styleCard = document.querySelector(`.style-choice-card[data-style="${styleName}"]`);
+      if (styleCard) {
+        styleCard.click();
+      }
+
+      showToast(`Selected protagonist: ${name}`);
+      playPopSound(520);
+    });
+  });
+}
+
+/* ==========================================================================
+   13. Voice Narrator (Web Speech API)
+   ========================================================================== */
+let narrationController = {
+  isSpeaking: false,
+  currentIndex: 0,
+  speechQueue: [],
+  activeUtterance: null
+};
+
+function initVoiceNarrator() {
+  const playBtn = document.getElementById("btn-narrate-play");
+  const stopBtn = document.getElementById("btn-narrate-stop");
+  const statusText = document.getElementById("narrator-status");
+  if (!playBtn) return;
+
+  if (!("speechSynthesis" in window)) {
+    if (statusText) statusText.innerText = "Voice speech not supported in this browser.";
+    playBtn.disabled = true;
+    return;
+  }
+
+  playBtn.addEventListener("click", () => {
+    if (narrationController.isSpeaking) {
+      stopNarration();
+    } else {
+      startNarration();
+    }
+  });
+
+  if (stopBtn) {
+    stopBtn.addEventListener("click", () => {
+      stopNarration();
+    });
+  }
+}
+
+function startNarration() {
+  const playBtn = document.getElementById("btn-narrate-play");
+  const icon = document.getElementById("narrate-play-icon");
+  const label = document.getElementById("narrate-play-text");
+
+  const dataScript = document.getElementById("comic-data-json");
+  let comic = null;
+  if (dataScript) {
+    try { comic = JSON.parse(dataScript.textContent); } catch (e) {}
+  }
+
+  if (!comic) return;
+
+  window.speechSynthesis.cancel();
+  narrationController.speechQueue = [];
+  narrationController.currentIndex = 0;
+  narrationController.isSpeaking = true;
+
+  if (playBtn) playBtn.classList.add("speaking");
+  if (icon) icon.innerText = "⏸";
+  if (label) label.innerText = "Pause Story";
+
+  // Step 0: Title & Prologue
+  if (comic.title) {
+    narrationController.speechQueue.push({
+      text: comic.title + (comic.synopsis ? ". " + comic.synopsis : ""),
+      panelNumber: null,
+      desc: "Title & Prologue"
+    });
+  }
+
+  // Step 1..N: Each panel
+  (comic.panels || []).forEach(p => {
+    let panelScript = `Panel ${p.panel_number}: ${p.panel_title}. `;
+    if (p.caption) panelScript += `Narration: ${p.caption}. `;
+    if (p.dialogue_text) panelScript += `${p.speaker || "Hero"} says: "${p.dialogue_text}". `;
+    if (p.sound_effect) panelScript += `${p.sound_effect}! `;
+
+    narrationController.speechQueue.push({
+      text: panelScript,
+      panelNumber: p.panel_number,
+      desc: `Panel ${p.panel_number}: ${p.panel_title}`
+    });
+  });
+
+  speakNextQueueItem();
+}
+
+function speakNextQueueItem() {
+  if (!narrationController.isSpeaking) return;
+
+  if (narrationController.currentIndex >= narrationController.speechQueue.length) {
+    stopNarration();
+    showToast("🏁 Story narration complete!");
+    return;
+  }
+
+  const item = narrationController.speechQueue[narrationController.currentIndex];
+  const statusText = document.getElementById("narrator-status");
+  if (statusText) statusText.innerText = `Narrating: ${item.desc}`;
+
+  // Highlight active panel in viewer
+  document.querySelectorAll(".panel-display-item").forEach(el => el.classList.remove("active-narrating-panel"));
+  if (item.panelNumber) {
+    const activeCard = document.getElementById(`panel-card-${item.panelNumber}`);
+    if (activeCard) {
+      activeCard.classList.add("active-narrating-panel");
+      activeCard.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }
+
+  const utterance = new SpeechSynthesisUtterance(item.text);
+  utterance.rate = 0.98;
+  utterance.pitch = 1.0;
+
+  const voices = window.speechSynthesis.getVoices();
+  const englishVoice = voices.find(v => v.lang.startsWith("en") && !v.name.includes("Bad") && !v.name.includes("Whisper"));
+  if (englishVoice) utterance.voice = englishVoice;
+
+  utterance.onend = () => {
+    narrationController.currentIndex++;
+    speakNextQueueItem();
+  };
+
+  utterance.onerror = () => {
+    narrationController.currentIndex++;
+    speakNextQueueItem();
+  };
+
+  narrationController.activeUtterance = utterance;
+  window.speechSynthesis.speak(utterance);
+}
+
+function stopNarration() {
+  window.speechSynthesis.cancel();
+  narrationController.isSpeaking = false;
+  narrationController.currentIndex = 0;
+  narrationController.activeUtterance = null;
+
+  const playBtn = document.getElementById("btn-narrate-play");
+  const icon = document.getElementById("narrate-play-icon");
+  const label = document.getElementById("narrate-play-text");
+  const statusText = document.getElementById("narrator-status");
+
+  if (playBtn) playBtn.classList.remove("speaking");
+  if (icon) icon.innerText = "▶";
+  if (label) label.innerText = "Narrate Story";
+  if (statusText) statusText.innerText = "Narration stopped.";
+
+  document.querySelectorAll(".panel-display-item").forEach(el => el.classList.remove("active-narrating-panel"));
+}
+
+/* ==========================================================================
+   14. Live Visual Shaders / Filters
+   ========================================================================== */
+function initComicShaders() {
+  const chips = document.querySelectorAll(".shader-chip");
+  const wrapper = document.getElementById("panels-wrapper");
+  if (!chips.length || !wrapper) return;
+
+  chips.forEach(chip => {
+    chip.addEventListener("click", () => {
+      const shader = chip.dataset.shader;
+      chips.forEach(c => c.classList.remove("active"));
+      chip.classList.add("active");
+
+      wrapper.className = wrapper.className.replace(/\bshader-\w+\b/g, "").trim();
+      wrapper.classList.add(`shader-${shader}`);
+
+      showToast(`Applied ${chip.innerText.trim()} visual filter!`);
+      playPopSound(480);
+    });
+  });
+}
+
+/* ==========================================================================
+   15. Interactive Script & Dialogue Editor
+   ========================================================================== */
+function initScriptEditor() {
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      closeScriptEditor();
+    }
+  });
+}
+
+function openScriptEditor(panelNumber) {
+  const modal = document.getElementById("script-edit-modal");
+  if (!modal) return;
+
+  const titleLabel = document.getElementById("modal-panel-title-label");
+  const panelNumInput = document.getElementById("edit-panel-number");
+  const speakerInput = document.getElementById("edit-speaker-input");
+  const dialogueInput = document.getElementById("edit-dialogue-input");
+  const captionInput = document.getElementById("edit-caption-input");
+  const sfxInput = document.getElementById("edit-sfx-input");
+
+  if (titleLabel) titleLabel.innerText = `Edit Script for Panel ${panelNumber}`;
+  if (panelNumInput) panelNumInput.value = panelNumber;
+
+  const curSpeaker = document.getElementById(`speaker-text-${panelNumber}`)?.innerText.trim() || "";
+  const curDialogue = document.getElementById(`dialogue-text-${panelNumber}`)?.innerText.replace(/^"|"$/g, "").trim() || "";
+  const curCaption = document.getElementById(`caption-text-${panelNumber}`)?.innerText.trim() || "";
+  const curSfx = document.getElementById(`sound-badge-${panelNumber}`)?.querySelector(".sound-text")?.innerText.trim() || "";
+
+  if (speakerInput) speakerInput.value = curSpeaker;
+  if (dialogueInput) dialogueInput.value = curDialogue;
+  if (captionInput) captionInput.value = curCaption;
+  if (sfxInput) sfxInput.value = curSfx;
+
+  modal.classList.add("open");
+  if (dialogueInput) dialogueInput.focus();
+}
+
+function closeScriptEditor() {
+  const modal = document.getElementById("script-edit-modal");
+  if (modal) modal.classList.remove("open");
+}
+
+async function saveScriptEdit(e) {
+  e.preventDefault();
+  const comicIdInput = document.getElementById("edit-comic-id");
+  const panelNumInput = document.getElementById("edit-panel-number");
+  const speakerInput = document.getElementById("edit-speaker-input");
+  const dialogueInput = document.getElementById("edit-dialogue-input");
+  const captionInput = document.getElementById("edit-caption-input");
+  const sfxInput = document.getElementById("edit-sfx-input");
+  const submitBtn = document.getElementById("btn-save-script");
+
+  if (!comicIdInput || !panelNumInput) return;
+
+  const comicId = comicIdInput.value;
+  const panelNumber = parseInt(panelNumInput.value, 10);
+  const speaker = speakerInput?.value.trim() || "";
+  const dialogue = dialogueInput?.value.trim() || "";
+  const caption = captionInput?.value.trim() || "";
+  const soundEffect = sfxInput?.value.trim() || "";
+
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = `<span>⏳</span> Saving...`;
+  }
+
+  try {
+    const res = await fetch("/api/update-panel-text", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        comic_id: comicId,
+        panel_number: panelNumber,
+        speaker: speaker,
+        dialogue: dialogue,
+        caption: caption,
+        sound_effect: soundEffect
+      })
+    });
+
+    if (res.ok) {
+      const speakerEl = document.getElementById(`speaker-text-${panelNumber}`);
+      const dialogueEl = document.getElementById(`dialogue-text-${panelNumber}`);
+      const bubbleCard = document.getElementById(`bubble-card-${panelNumber}`);
+      const captionEl = document.getElementById(`caption-text-${panelNumber}`);
+      const captionCard = document.getElementById(`caption-card-${panelNumber}`);
+      const soundBadge = document.getElementById(`sound-badge-${panelNumber}`);
+
+      if (speakerEl) speakerEl.innerText = speaker;
+      if (dialogueEl) dialogueEl.innerText = `"${dialogue}"`;
+      if (bubbleCard) {
+        if (dialogue) bubbleCard.classList.remove("hidden-bubble");
+        else bubbleCard.classList.add("hidden-bubble");
+      }
+
+      if (captionEl) captionEl.innerText = caption;
+      if (captionCard) {
+        if (caption) captionCard.classList.remove("hidden-caption");
+        else captionCard.classList.add("hidden-caption");
+      }
+
+      if (soundBadge) {
+        const textSpan = soundBadge.querySelector(".sound-text");
+        if (textSpan) textSpan.innerText = soundEffect;
+        soundBadge.dataset.sound = soundEffect;
+        if (soundEffect) soundBadge.classList.remove("hidden-badge");
+        else soundBadge.classList.add("hidden-badge");
+      }
+
+      const dataScript = document.getElementById("comic-data-json");
+      if (dataScript) {
+        try {
+          const comicData = JSON.parse(dataScript.textContent);
+          const p = comicData.panels.find(x => x.panel_number === panelNumber);
+          if (p) {
+            p.speaker = speaker;
+            p.dialogue_text = dialogue;
+            p.dialogue = `${speaker}: '${dialogue}'`;
+            p.caption = caption;
+            p.sound_effect = soundEffect;
+            dataScript.textContent = JSON.stringify(comicData);
+          }
+        } catch (e) {}
+      }
+
+      closeScriptEditor();
+      showToast(`💾 Panel ${panelNumber} script updated and PDF refreshed!`);
+      playPopSound(560);
+    } else {
+      showToast("⚠️ Failed to update script.");
+    }
+  } catch (err) {
+    showToast("⚠️ Error: " + err.message);
+  } finally {
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = `<span>💾</span> <span>Save Changes & Refresh PDF</span>`;
+    }
+  }
+}
+
+window.openScriptEditor = openScriptEditor;
+window.closeScriptEditor = closeScriptEditor;
+window.saveScriptEdit = saveScriptEdit;
+
+/* ==========================================================================
+   16. Web Audio API Comic Sound Effects Synthesizer
+   ========================================================================== */
+function playComicSfx(sfxText, event) {
+  if (!sfxText) return;
+
+  if (event && event.pageX) {
+    const burst = document.createElement("div");
+    burst.className = "sfx-particle-blast";
+    burst.innerText = sfxText;
+    burst.style.left = `${event.pageX}px`;
+    burst.style.top = `${event.pageY}px`;
+    document.body.appendChild(burst);
+    setTimeout(() => burst.remove(), 700);
+  }
+
+  try {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return;
+    const ctx = new AudioCtx();
+    const now = ctx.currentTime;
+    const upper = sfxText.toUpperCase();
+
+    if (upper.includes("BOOM") || upper.includes("POW") || upper.includes("BANG") || upper.includes("CRASH")) {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sawtooth";
+      osc.frequency.setValueAtTime(140, now);
+      osc.frequency.exponentialRampToValueAtTime(32, now + 0.35);
+
+      gain.gain.setValueAtTime(0.35, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.4);
+    } else if (upper.includes("BZZT") || upper.includes("ZAP") || upper.includes("CRACKLE")) {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "square";
+      osc.frequency.setValueAtTime(750, now);
+      osc.frequency.linearRampToValueAtTime(180, now + 0.25);
+
+      gain.gain.setValueAtTime(0.25, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.25);
+    } else if (upper.includes("WHOOSH") || upper.includes("SWOOSH") || upper.includes("SHHHK")) {
+      const bufferSize = ctx.sampleRate * 0.3;
+      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = Math.random() * 2 - 1;
+      }
+      const noise = ctx.createBufferSource();
+      noise.buffer = buffer;
+
+      const filter = ctx.createBiquadFilter();
+      filter.type = "bandpass";
+      filter.frequency.setValueAtTime(400, now);
+      filter.frequency.exponentialRampToValueAtTime(1800, now + 0.15);
+      filter.frequency.exponentialRampToValueAtTime(200, now + 0.3);
+
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(0.3, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+
+      noise.connect(filter);
+      filter.connect(gain);
+      gain.connect(ctx.destination);
+      noise.start(now);
+    } else {
+      playPopSound(580);
+    }
+  } catch (err) {
+    console.warn("Web audio playback error:", err);
+  }
+}
+window.playComicSfx = playComicSfx;
+
+/* ==========================================================================
+   17. High-Res Comic Strip Image Export (HTML5 Canvas Composite)
+   ========================================================================== */
+function initStripExport() {
+  const btn = document.getElementById("btn-export-strip");
+  if (!btn) return;
+
+  btn.addEventListener("click", async () => {
+    const panels = document.querySelectorAll(".panel-display-item");
+    if (!panels.length) return;
+
+    btn.disabled = true;
+    const origHtml = btn.innerHTML;
+    btn.innerHTML = `<span>⏳</span> Rendering Strip...`;
+    showToast("🎨 Compositing continuous comic strip image...");
+
+    try {
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+
+      const stripWidth = 900;
+      const headerHeight = 160;
+      const panelHeight = 700;
+      const gap = 30;
+      const totalHeight = headerHeight + panels.length * (panelHeight + gap) + 40;
+
+      canvas.width = stripWidth;
+      canvas.height = totalHeight;
+
+      ctx.fillStyle = "#0f172a";
+      ctx.fillRect(0, 0, stripWidth, totalHeight);
+
+      const titleEl = document.querySelector(".comic-main-title");
+      const comicTitle = titleEl ? titleEl.innerText : "ComicCraft Story";
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 44px Bangers, cursive, sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText(comicTitle, stripWidth / 2, 75);
+
+      ctx.fillStyle = "#94a3b8";
+      ctx.font = "16px Plus Jakarta Sans, sans-serif";
+      ctx.fillText("CREATED WITH COMICCRAFT AI STUDIO", stripWidth / 2, 115);
+
+      for (let i = 0; i < panels.length; i++) {
+        const p = panels[i];
+        const yTop = headerHeight + i * (panelHeight + gap);
+
+        ctx.fillStyle = "#ffffff";
+        ctx.strokeStyle = "#e2e8f0";
+        ctx.lineWidth = 4;
+        roundRect(ctx, 40, yTop, stripWidth - 80, panelHeight, 16, true, true);
+
+        const imgEl = p.querySelector(".panel-main-img");
+        if (imgEl && imgEl.src) {
+          const img = new Image();
+          img.crossOrigin = "anonymous";
+          await new Promise((resolve) => {
+            img.onload = () => {
+              const imgW = stripWidth - 120;
+              const imgH = 460;
+              ctx.drawImage(img, 60, yTop + 20, imgW, imgH);
+              resolve();
+            };
+            img.onerror = () => resolve();
+            img.src = imgEl.src;
+          });
+        }
+
+        const caption = p.querySelector(".narration-body")?.innerText || "";
+        const speaker = p.querySelector(".speech-speaker span:last-child")?.innerText || "Hero";
+        const dialogue = p.querySelector(".speech-text")?.innerText || "";
+
+        ctx.textAlign = "left";
+        let textY = yTop + 510;
+
+        if (caption) {
+          ctx.fillStyle = "#fef9c3";
+          ctx.fillRect(60, textY, stripWidth - 120, 50);
+          ctx.fillStyle = "#713f12";
+          ctx.font = "italic 15px Comic Neue, cursive, sans-serif";
+          ctx.fillText(`NARRATION: ${caption.slice(0, 110)}...`, 75, textY + 30);
+          textY += 65;
+        }
+
+        if (dialogue) {
+          ctx.fillStyle = "#f1f5f9";
+          roundRect(ctx, 60, textY, stripWidth - 120, 55, 12, true, false);
+          ctx.fillStyle = "#1e293b";
+          ctx.font = "bold 15px Plus Jakarta Sans, sans-serif";
+          ctx.fillText(`${speaker}: ${dialogue.slice(0, 95)}`, 75, textY + 32);
+        }
+      }
+
+      const a = document.createElement("a");
+      a.download = `comic_strip_${Date.now()}.png`;
+      a.href = canvas.toDataURL("image/png");
+      a.click();
+
+      showToast("🎉 Comic strip downloaded as high-res PNG!");
+      playPopSound(600);
+    } catch (err) {
+      showToast("⚠️ Could not generate image strip: " + err.message);
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = origHtml;
+    }
+  });
+}
+
+function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
+  ctx.beginPath();
+  ctx.moveTo(x + radius, y);
+  ctx.lineTo(x + width - radius, y);
+  ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+  ctx.lineTo(x + width, y + height - radius);
+  ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+  ctx.lineTo(x + radius, y + height);
+  ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+  ctx.lineTo(x, y + radius);
+  ctx.quadraticCurveTo(x, y, x + radius, y);
+  ctx.closePath();
+  if (fill) ctx.fill();
+  if (stroke) ctx.stroke();
 }
 

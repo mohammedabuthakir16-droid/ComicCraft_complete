@@ -1,6 +1,120 @@
 {
   "comics": [
     {
+      "id": "test_script_update_comic",
+      "title": "Script Test Comic",
+      "character_name": "Hero",
+      "art_style": "Classic Comic Book",
+      "panels": [
+        {
+          "panel_number": 1,
+          "panel_title": "First Scene",
+          "speaker": "Commander Nova",
+          "dialogue_text": "Shields at maximum capacity!",
+          "caption": "The sky burned with solar fire.",
+          "sound_effect": "BOOM!",
+          "dialogue": "Commander Nova: 'Shields at maximum capacity!'"
+        }
+      ],
+      "created_at": "2026-09-28 22:40:18"
+    },
+    {
+      "id": "comic_5a5b9fa9f1",
+      "title": "Detective Vance: The Manhattan Nocturne",
+      "synopsis": "When a string of strange midnight murders leaves Manhattan's underworld paralyzed, weary investigator Detective Vance uncovers a conspiratorial secret lurking right beneath the city's cobblestones.",
+      "genre": "Noir Mystery",
+      "art_style": "Dark Graphic Novel",
+      "character_name": "Detective Vance",
+      "prompt": "Detective chasing a phantom through rain-slicked alleys",
+      "panel_count": 2,
+      "panels": [
+        {
+          "panel_number": 1,
+          "panel_title": "Rain on 5th Avenue",
+          "visual_description": "Detective Vance stands under the rusted awning of a Manhattan diner at 2:00 AM, examining a tarnished brass lighter inscribed with a strange celestial symbol.",
+          "caption": "Midnight in Manhattan always smelled the same: cold rain, exhaust, and secrets that paid better than honest work.",
+          "dialogue": "Detective Vance: 'Three dead informants in three nights. And all of them carried the same brass lighter.'",
+          "speaker": "Detective Vance",
+          "dialogue_text": "Three dead informants in three nights. And all of them carried the same brass lighter.",
+          "sound_effect": "DRIP-DROP...",
+          "image_prompt": "cinematic noir comic panel, establishing shot, Detective Vance, a weary private investigator in a wrinkled beige trenchcoat, fedora tilted forward, sharp grey eyes, and cigarette smoke curling into the dim light standing under neon diner sign in pouring rain, steam rising from sewer grate, chiaroscuro lighting, black and white with amber accents, Dark Graphic Novel, masterpiece comic book art, clean bold line art, expressive character emotion, professional coloring, high resolution, dark graphic novel noir style, dramatic chiaroscuro shadows, high contrast, gritty detailed line art, comic book panel, graphic novel quality, high detail, masterpiece",
+          "aspect_ratio": "1:1",
+          "is_hero_panel": false,
+          "image_url": "/static/outputs/comic_5a5b9fa9f1_panel_1.png",
+          "grid_span": "col-span-1",
+          "bubble_position": "bubble-top-left",
+          "badge_rotation": -12
+        },
+        {
+          "panel_number": 2,
+          "panel_title": "The Underground Society",
+          "visual_description": "In the catacombs beneath an abandoned speakeasy, Detective Vance peers through iron grates at hooded figures gathered around a pool of glowing emerald liquid.",
+          "caption": "Some doors are meant to stay locked. But thirty dollars a day plus expenses doesn\\'t buy ignorance.",
+          "dialogue": "Detective Vance: 'The brass isn\\'t running this city. Something older is pulling the strings.'",
+          "speaker": "Detective Vance",
+          "dialogue_text": "The brass isn\\'t running this city. Something older is pulling the strings.",
+          "sound_effect": "ECHO...",
+          "image_prompt": "suspenseful medium comic panel, Detective Vance, a weary private investigator in a wrinkled beige trenchcoat, fedora tilted forward, sharp grey eyes, and cigarette smoke curling into the dim light peering through rusted iron bars into dimly lit subterranean vault, mysterious hooded cultists around glowing emerald font, high contrast shadow, Dark Graphic Novel, masterpiece comic book art, clean bold line art, expressive character emotion, professional coloring, high resolution, dark graphic novel noir style, dramatic chiaroscuro shadows, high contrast, gritty detailed line art, comic book panel, graphic novel quality, high detail, masterpiece",
+          "aspect_ratio": "1:1",
+          "is_hero_panel": false,
+          "image_url": "/static/outputs/comic_5a5b9fa9f1_panel_2.png",
+          "grid_span": "col-span-1",
+          "bubble_position": "bubble-top-right",
+          "badge_rotation": 8
+        }
+      ],
+      "pdf_url": "/static/outputs/comic_5a5b9fa9f1.pdf",
+      "created_at": "2026-09-28 22:40:18"
+    },
+    {
+      "id": "comic_5e0e2d54ca",
+      "title": "Detective Vance: The Manhattan Nocturne",
+      "synopsis": "When a string of strange midnight murders leaves Manhattan's underworld paralyzed, weary investigator Detective Vance uncovers a conspiratorial secret lurking right beneath the city's cobblestones.",
+      "genre": "Noir Mystery",
+      "art_style": "Dark Graphic Novel",
+      "character_name": "Detective Vance",
+      "prompt": "Detective chasing a phantom through rain-slicked alleys",
+      "panel_count": 2,
+      "panels": [
+        {
+          "panel_number": 1,
+          "panel_title": "Rain on 5th Avenue",
+          "visual_description": "Detective Vance stands under the rusted awning of a Manhattan diner at 2:00 AM, examining a tarnished brass lighter inscribed with a strange celestial symbol.",
+          "caption": "Midnight in Manhattan always smelled the same: cold rain, exhaust, and secrets that paid better than honest work.",
+          "dialogue": "Detective Vance: 'Three dead informants in three nights. And all of them carried the same brass lighter.'",
+          "speaker": "Detective Vance",
+          "dialogue_text": "Three dead informants in three nights. And all of them carried the same brass lighter.",
+          "sound_effect": "DRIP-DROP...",
+          "image_prompt": "cinematic noir comic panel, establishing shot, Detective Vance, a weary private investigator in a wrinkled beige trenchcoat, fedora tilted forward, sharp grey eyes, and cigarette smoke curling into the dim light standing under neon diner sign in pouring rain, steam rising from sewer grate, chiaroscuro lighting, black and white with amber accents, Dark Graphic Novel, masterpiece comic book art, clean bold line art, expressive character emotion, professional coloring, high resolution, dark graphic novel noir style, dramatic chiaroscuro shadows, high contrast, gritty detailed line art, comic book panel, graphic novel quality, high detail, masterpiece",
+          "aspect_ratio": "1:1",
+          "is_hero_panel": false,
+          "image_url": "/static/outputs/comic_5e0e2d54ca_panel_1.png",
+          "grid_span": "col-span-1",
+          "bubble_position": "bubble-top-left",
+          "badge_rotation": -12
+        },
+        {
+          "panel_number": 2,
+          "panel_title": "The Underground Society",
+          "visual_description": "In the catacombs beneath an abandoned speakeasy, Detective Vance peers through iron grates at hooded figures gathered around a pool of glowing emerald liquid.",
+          "caption": "Some doors are meant to stay locked. But thirty dollars a day plus expenses doesn\\'t buy ignorance.",
+          "dialogue": "Detective Vance: 'The brass isn\\'t running this city. Something older is pulling the strings.'",
+          "speaker": "Detective Vance",
+          "dialogue_text": "The brass isn\\'t running this city. Something older is pulling the strings.",
+          "sound_effect": "ECHO...",
+          "image_prompt": "suspenseful medium comic panel, Detective Vance, a weary private investigator in a wrinkled beige trenchcoat, fedora tilted forward, sharp grey eyes, and cigarette smoke curling into the dim light peering through rusted iron bars into dimly lit subterranean vault, mysterious hooded cultists around glowing emerald font, high contrast shadow, Dark Graphic Novel, masterpiece comic book art, clean bold line art, expressive character emotion, professional coloring, high resolution, dark graphic novel noir style, dramatic chiaroscuro shadows, high contrast, gritty detailed line art, comic book panel, graphic novel quality, high detail, masterpiece",
+          "aspect_ratio": "1:1",
+          "is_hero_panel": false,
+          "image_url": "/static/outputs/comic_5e0e2d54ca_panel_2.png",
+          "grid_span": "col-span-1",
+          "bubble_position": "bubble-top-right",
+          "badge_rotation": 8
+        }
+      ],
+      "pdf_url": "/static/outputs/comic_5e0e2d54ca.pdf",
+      "created_at": "2026-09-28 22:34:56"
+    },
+    {
       "id": "comic_0ceffe2681",
       "title": "Detective Vance: The Manhattan Nocturne",
       "synopsis": "When a string of strange midnight murders leaves Manhattan's underworld paralyzed, weary investigator Detective Vance uncovers a conspiratorial secret lurking right beneath the city's cobblestones.",

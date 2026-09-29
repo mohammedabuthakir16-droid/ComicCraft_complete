@@ -24,16 +24,22 @@
 
       <form action="/generate" method="POST" id="comic-create-form" class="form-grid">
         
-        <!-- 1. Story Prompt with Magic Inspiration Wand -->
+        <!-- 1. Story Prompt with Magic Inspiration Wand & AI Supercharge -->
         <div class="form-group">
           <div class="label-row">
             <label class="form-label" for="prompt-input">
               <span>Story Prompt</span>
             </label>
-            <button type="button" id="btn-inspire" class="btn-magic-inspire" title="Generate a random creative comic premise">
-              <span>🪄</span>
-              <span>Inspire Me</span>
-            </button>
+            <div class="prompt-action-btns">
+              <button type="button" id="btn-inspire" class="btn-magic-inspire" title="Generate a random creative comic premise">
+                <span>🪄</span>
+                <span>Inspire Me</span>
+              </button>
+              <button type="button" id="btn-supercharge" class="btn-supercharge-prompt" title="Expand your idea into a cinematic high-stakes comic premise">
+                <span class="sparkle-rot">✨</span>
+                <span>AI Polish</span>
+              </button>
+            </div>
           </div>
 
           <textarea 
@@ -65,11 +71,14 @@
           </div>
         </div>
 
-        <!-- 2. Main Character Name -->
+        <!-- 2. Main Character Name & Archetype Tags -->
         <div class="form-group">
-          <label class="form-label" for="character-input">
-            <span>Main Character Name</span>
-          </label>
+          <div class="label-row">
+            <label class="form-label" for="character-input">
+              <span>Main Character Name</span>
+            </label>
+            <span class="label-hint">Pick an archetype or name your hero</span>
+          </div>
           <div class="input-with-icon">
             <span class="input-icon">👤</span>
             <input 
@@ -81,6 +90,13 @@
               value="Hope"
               required
             >
+          </div>
+          <div class="character-tags-row">
+            <button type="button" class="char-tag-btn" data-char-name="Hope" data-char-style="Classic Comic Book">🦊 Hope (Spirited Fox)</button>
+            <button type="button" class="char-tag-btn" data-char-name="Jack Vance" data-char-style="Dark Graphic Novel">🕵️ Jack Vance (Noir P.I.)</button>
+            <button type="button" class="char-tag-btn" data-char-name="Aria Volt" data-char-style="Cyberpunk Sci-Fi">⚡ Aria Volt (Netrunner)</button>
+            <button type="button" class="char-tag-btn" data-char-name="Kaelen" data-char-style="Manga / Anime">🗡️ Kaelen (Blade Mystic)</button>
+            <button type="button" class="char-tag-btn" data-char-name="Dr. Luna" data-char-style="Indie Watercolor Comic">🔭 Dr. Luna (Astronomer)</button>
           </div>
         </div>
 
