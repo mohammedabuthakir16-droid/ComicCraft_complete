@@ -71,7 +71,7 @@
         </div>
 
         <p class="shelf-synopsis">
-          {{ comic.synopsis[:110] }}{% if comic.synopsis|length > 110 %}...{% endif %}
+          {{ (comic.synopsis[:110] if comic.get('synopsis') else (comic.get('prompt', '')[:110] if comic.get('prompt') else 'An illustrated comic story.')) }}{% if comic.get('synopsis') and comic.get('synopsis')|length > 110 %}...{% endif %}
         </p>
       </div>
 
