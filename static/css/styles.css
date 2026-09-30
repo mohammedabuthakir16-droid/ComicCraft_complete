@@ -33,19 +33,19 @@
   --card-shadow: inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.95), 0 16px 36px -6px rgba(15, 23, 42, 0.14), 0 4px 12px rgba(31, 38, 135, 0.06);
   --card-radius: 22px;
 
-  /* Apple Liquid Glass Design System Tokens */
-  --liquid-glass-bg: rgba(255, 255, 255, 0.78);
-  --liquid-glass-bg-subtle: rgba(255, 255, 255, 0.60);
-  --liquid-glass-bg-hover: rgba(255, 255, 255, 0.92);
-  --liquid-glass-bg-active: rgba(255, 255, 255, 0.97);
-  --liquid-glass-border: rgba(255, 255, 255, 0.75);
-  --liquid-glass-border-subtle: rgba(226, 232, 240, 0.75);
-  --liquid-glass-border-hover: rgba(255, 255, 255, 0.98);
-  --liquid-glass-blur: blur(28px) saturate(190%);
-  --liquid-glass-specular: inset 0 1px 1px 0 rgba(255, 255, 255, 0.98);
-  --liquid-glass-shadow-sm: inset 0 1px 1px rgba(255, 255, 255, 0.95), 0 4px 12px rgba(15, 23, 42, 0.05);
-  --liquid-glass-shadow-md: inset 0 1px 1.5px rgba(255, 255, 255, 0.95), 0 14px 34px -4px rgba(15, 23, 42, 0.12), 0 4px 10px rgba(0, 0, 0, 0.03);
-  --liquid-glass-shadow-lg: inset 0 1px 2px rgba(255, 255, 255, 0.98), 0 24px 50px -8px rgba(15, 23, 42, 0.18), 0 8px 16px rgba(0, 0, 0, 0.04);
+  /* macOS 27 & iOS 27 Spatial Liquid Glass Design System Tokens */
+  --liquid-glass-bg: rgba(255, 255, 255, 0.74);
+  --liquid-glass-bg-subtle: rgba(255, 255, 255, 0.55);
+  --liquid-glass-bg-hover: rgba(255, 255, 255, 0.94);
+  --liquid-glass-bg-active: rgba(255, 255, 255, 0.98);
+  --liquid-glass-border: rgba(255, 255, 255, 0.86);
+  --liquid-glass-border-subtle: rgba(226, 232, 240, 0.78);
+  --liquid-glass-border-hover: rgba(255, 255, 255, 1);
+  --liquid-glass-blur: blur(36px) saturate(210%) brightness(105%);
+  --liquid-glass-specular: inset 0 1.5px 2px 0 rgba(255, 255, 255, 1), inset 0 -1px 1px 0 rgba(0, 0, 0, 0.03);
+  --liquid-glass-shadow-sm: inset 0 1px 1.5px rgba(255, 255, 255, 0.95), 0 4px 14px rgba(15, 23, 42, 0.06);
+  --liquid-glass-shadow-md: inset 0 1.5px 2px rgba(255, 255, 255, 1), inset 0 -1px 1px rgba(0, 0, 0, 0.03), 0 18px 42px -6px rgba(15, 23, 42, 0.12), 0 4px 16px rgba(59, 130, 246, 0.08);
+  --liquid-glass-shadow-lg: inset 0 2px 3px rgba(255, 255, 255, 1), inset 0 -1.5px 1.5px rgba(0, 0, 0, 0.04), 0 28px 65px -10px rgba(15, 23, 42, 0.20), 0 8px 24px -4px rgba(59, 130, 246, 0.14);
 
   --font-ui: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
   --font-comic-title: 'Bangers', cursive;
@@ -59,19 +59,44 @@
   padding: 0;
 }
 
+/* macOS 27 / iOS 27 Fluid Spatial Scrollbar */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(8px);
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.6);
+}
+
 html {
   scroll-behavior: smooth;
 }
 
 body.comic-app-body {
   font-family: var(--font-ui);
-  background: 
-    radial-gradient(ellipse at 15% 10%, rgba(59, 130, 246, 0.32) 0%, transparent 50%),
-    radial-gradient(ellipse at 85% 15%, rgba(139, 92, 246, 0.28) 0%, transparent 45%),
-    radial-gradient(ellipse at 50% 85%, rgba(6, 182, 212, 0.22) 0%, transparent 55%),
-    linear-gradient(rgba(15, 23, 42, 0.32), rgba(15, 23, 42, 0.52)),
-    url('/static/images/landscape_bg.jpg') no-repeat center center fixed;
+  background-color: #0b0f19;
+  background-image: 
+    radial-gradient(circle at 12% 16%, rgba(99, 102, 241, 0.42) 0%, transparent 48%),
+    radial-gradient(circle at 88% 14%, rgba(236, 72, 153, 0.35) 0%, transparent 44%),
+    radial-gradient(circle at 50% 85%, rgba(6, 182, 212, 0.32) 0%, transparent 52%),
+    radial-gradient(circle at 80% 88%, rgba(168, 85, 247, 0.34) 0%, transparent 45%),
+    linear-gradient(rgba(11, 15, 25, 0.32), rgba(15, 23, 42, 0.54)),
+    url('/static/images/landscape_bg.jpg');
+  background-attachment: fixed;
   background-size: cover;
+  background-position: center;
   color: var(--slate-900);
   min-height: 100vh;
   display: flex;
@@ -89,10 +114,10 @@ body.comic-app-body {
   height: 100vh;
   pointer-events: none;
   z-index: 1;
-  opacity: 0.65;
+  opacity: 0.75;
 }
 
-/* Common Studio Card - Apple Liquid Glass Container */
+/* Common Studio Card - macOS 27 Spatial Glass Container */
 .studio-card {
   background: var(--liquid-glass-bg);
   backdrop-filter: var(--liquid-glass-blur);
@@ -102,36 +127,86 @@ body.comic-app-body {
   box-shadow: var(--liquid-glass-shadow-md);
   position: relative;
   z-index: 2;
-  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease;
+  overflow: hidden;
+  transition: transform 0.28s cubic-bezier(0.19, 1, 0.22, 1), box-shadow 0.28s cubic-bezier(0.19, 1, 0.22, 1), border-color 0.25s ease;
+}
+
+.studio-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(115deg, transparent 20%, rgba(255, 255, 255, 0.28) 45%, rgba(199, 210, 254, 0.22) 55%, transparent 75%);
+  background-size: 250% 250%;
+  background-position: -120% 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease, background-position 0.75s ease;
 }
 
 .studio-card:hover {
   border-color: var(--liquid-glass-border-hover);
   box-shadow: var(--liquid-glass-shadow-lg);
+  transform: translateY(-2px);
+}
+
+.studio-card:hover::after {
+  opacity: 1;
+  background-position: 220% 0;
 }
 
 /* ==========================================================================
-   Header Navigation Bar - Apple Liquid Glass Floating Bar
+   Header Navigation Bar - macOS 27 / iOS 27 Floating Dynamic Spatial Island
    ========================================================================== */
 .app-header {
-  background: rgba(255, 255, 255, 0.78);
-  backdrop-filter: blur(28px) saturate(190%);
-  -webkit-backdrop-filter: blur(28px) saturate(190%);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.70);
-  box-shadow: 0 4px 28px rgba(31, 38, 135, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.95);
   position: sticky;
-  top: 0;
+  top: 14px;
   z-index: 50;
+  max-width: 1240px;
+  width: calc(100% - 32px);
+  margin: 12px auto 0;
+  background: transparent;
+  pointer-events: none;
 }
 
 .header-container {
-  max-width: 1240px;
-  margin: 0 auto;
-  padding: 12px 24px;
+  pointer-events: auto;
+  background: rgba(255, 255, 255, 0.76);
+  backdrop-filter: blur(40px) saturate(220%) brightness(106%);
+  -webkit-backdrop-filter: blur(40px) saturate(220%) brightness(106%);
+  border: 1.5px solid rgba(255, 255, 255, 0.9);
+  border-radius: 9999px;
+  padding: 8px 22px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
+  box-shadow: 
+    inset 0 1.5px 2px 0 rgba(255, 255, 255, 1),
+    inset 0 -1px 1px 0 rgba(0, 0, 0, 0.03),
+    0 16px 40px -6px rgba(15, 23, 42, 0.16),
+    0 0 24px -4px rgba(59, 130, 246, 0.12);
+  transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.header-container:hover {
+  border-color: rgba(255, 255, 255, 1);
+  box-shadow: 
+    inset 0 2px 3px 0 rgba(255, 255, 255, 1),
+    0 22px 50px -8px rgba(15, 23, 42, 0.20),
+    0 0 32px -4px rgba(99, 102, 241, 0.22);
+}
+
+@media (max-width: 768px) {
+  .app-header {
+    top: 6px;
+    width: calc(100% - 16px);
+    margin: 6px auto 0;
+  }
+  .header-container {
+    padding: 6px 14px;
+    border-radius: 18px;
+  }
 }
 
 .brand-logo {
@@ -142,20 +217,22 @@ body.comic-app-body {
 }
 
 .brand-icon {
-  background: linear-gradient(135deg, var(--primary-blue), #3b82f6);
+  background: linear-gradient(135deg, #ef4444 0%, #f59e0b 50%, #7c3aed 100%);
   color: #ffffff;
   font-family: var(--font-comic-title);
   font-size: 21px;
-  padding: 4px 11px;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px var(--primary-blue-glow);
+  padding: 4px 13px;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.65), 0 4px 16px rgba(239, 68, 68, 0.35);
   letter-spacing: 0.5px;
   transform: rotate(-2deg);
-  transition: transform 0.2s ease;
+  transition: all 0.25s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
 .brand-logo:hover .brand-icon {
-  transform: rotate(2deg) scale(1.05);
+  transform: rotate(3deg) scale(1.08);
+  box-shadow: inset 0 1.5px 2px rgba(255, 255, 255, 0.8), 0 8px 22px rgba(239, 68, 68, 0.45);
 }
 
 .brand-title-wrap {
@@ -173,7 +250,9 @@ body.comic-app-body {
 }
 
 .brand-text span {
-  color: var(--primary-blue);
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .brand-sub {
@@ -186,53 +265,75 @@ body.comic-app-body {
 .header-nav {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .badge-gemini {
-  background: linear-gradient(135deg, rgba(37, 99, 235, 0.1), rgba(124, 58, 237, 0.1));
-  border: 1px solid rgba(124, 58, 237, 0.25);
+  background: linear-gradient(135deg, rgba(238, 242, 255, 0.88), rgba(245, 243, 255, 0.88));
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(165, 180, 252, 0.65);
   color: #4338ca;
   font-size: 12px;
-  font-weight: 700;
-  padding: 6px 12px;
+  font-weight: 800;
+  letter-spacing: -0.2px;
+  padding: 6px 14px;
   border-radius: 9999px;
   display: flex;
   align-items: center;
-  gap: 7px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  gap: 8px;
+  box-shadow: inset 0 1px 1px #ffffff, 0 2px 8px rgba(99, 102, 241, 0.12);
+  transition: all 0.2s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.badge-gemini:hover {
+  transform: translateY(-1px);
+  box-shadow: inset 0 1px 1.5px #ffffff, 0 4px 14px rgba(99, 102, 241, 0.2);
 }
 
 .pulse-indicator {
-  width: 7px;
-  height: 7px;
-  background: #10b981;
+  width: 8px;
+  height: 8px;
+  background: linear-gradient(135deg, #06b6d4, #10b981);
   border-radius: 50%;
-  box-shadow: 0 0 8px #10b981;
-  animation: pulse-dot 1.8s infinite;
+  box-shadow: 0 0 10px #06b6d4, 0 0 4px #10b981;
+  animation: pulse-dot 1.6s infinite ease-in-out;
 }
 
 @keyframes pulse-dot {
   0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.4; transform: scale(1.2); }
+  50% { opacity: 0.45; transform: scale(1.25); }
 }
 
 .nav-link {
-  font-size: 13.5px;
+  font-size: 13px;
   font-weight: 700;
   color: var(--slate-600);
   text-decoration: none;
-  padding: 7px 14px;
-  border-radius: 10px;
+  padding: 6px 14px;
+  border-radius: 9999px;
   display: flex;
   align-items: center;
   gap: 6px;
-  transition: all 0.18s ease;
+  border: 1.2px solid transparent;
+  transition: all 0.25s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
-.nav-link:hover, .nav-link.active {
+.nav-link:hover {
   color: var(--primary-blue);
-  background: var(--primary-blue-light);
+  background: rgba(255, 255, 255, 0.85);
+  border-color: rgba(255, 255, 255, 0.95);
+  box-shadow: inset 0 1px 1px #fff, 0 4px 12px rgba(15, 23, 42, 0.06);
+  transform: translateY(-1px);
+}
+
+.nav-link.active {
+  color: var(--primary-blue);
+  background: rgba(239, 246, 255, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-color: rgba(191, 219, 254, 0.85);
+  box-shadow: inset 0 1px 1.5px #ffffff, 0 4px 12px rgba(37, 99, 235, 0.15);
 }
 
 /* Main Layout Wrapper */
@@ -474,37 +575,65 @@ body.comic-app-body {
 
 .style-card {
   background: rgba(255, 255, 255, 0.68);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1.5px solid rgba(255, 255, 255, 0.85);
-  border-radius: 16px;
+  backdrop-filter: blur(24px) saturate(200%);
+  -webkit-backdrop-filter: blur(24px) saturate(200%);
+  border: 1.5px solid rgba(255, 255, 255, 0.88);
+  border-radius: 18px;
   padding: 13px 15px;
   display: flex;
   align-items: center;
   gap: 12px;
   cursor: pointer;
-  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.28s cubic-bezier(0.19, 1, 0.22, 1);
   position: relative;
-  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.95), 0 4px 12px rgba(15, 23, 42, 0.05);
+  overflow: hidden;
+  box-shadow: 
+    inset 0 1.5px 2px rgba(255, 255, 255, 1),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.03),
+    0 4px 14px rgba(15, 23, 42, 0.05);
+}
+
+.style-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  transition: left 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+  pointer-events: none;
+}
+
+.style-card:hover::after {
+  left: 100%;
 }
 
 .style-card:hover {
-  background: rgba(255, 255, 255, 0.90);
-  border-color: #93c5fd;
-  transform: translateY(-2px);
-  box-shadow: inset 0 1px 1px #ffffff, 0 8px 24px rgba(37, 99, 235, 0.16);
+  background: rgba(255, 255, 255, 0.94);
+  border-color: rgba(147, 197, 253, 0.9);
+  transform: translateY(-2.5px) scale(1.01);
+  box-shadow: 
+    inset 0 1.5px 2px #ffffff,
+    0 12px 28px rgba(37, 99, 235, 0.18),
+    0 0 16px rgba(59, 130, 246, 0.12);
 }
 
 .style-card.active {
   border-color: var(--primary-blue);
-  background: rgba(255, 255, 255, 0.96);
-  box-shadow: 0 0 0 2px var(--primary-blue), 0 10px 28px rgba(37, 99, 235, 0.26), inset 0 1px 1.5px #ffffff;
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 
+    0 0 0 2.5px var(--primary-blue),
+    0 12px 32px rgba(37, 99, 235, 0.28),
+    0 0 24px rgba(99, 102, 241, 0.25),
+    inset 0 1.5px 2px #ffffff;
   transform: translateY(-2px);
 }
 
 .style-icon-badge {
   font-size: 24px;
   flex-shrink: 0;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.08));
 }
 
 .style-card-info {
@@ -532,7 +661,7 @@ body.comic-app-body {
   font-size: 12px;
   font-weight: 900;
   color: #ffffff;
-  background: var(--primary-blue);
+  background: linear-gradient(135deg, var(--primary-blue), #4338ca);
   width: 20px;
   height: 20px;
   border-radius: 50%;
@@ -540,13 +669,14 @@ body.comic-app-body {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4);
 }
 
 .style-card.active .style-check {
   display: flex;
 }
 
-/* Panel Count Buttons - Apple Liquid Glass Tiles */
+/* Panel Count Buttons - macOS 27 Spatial Glass Tiles */
 .panel-count-selector {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -555,10 +685,10 @@ body.comic-app-body {
 
 .panel-btn {
   background: rgba(255, 255, 255, 0.68);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1.5px solid rgba(255, 255, 255, 0.85);
-  border-radius: 14px;
+  backdrop-filter: blur(24px) saturate(200%);
+  -webkit-backdrop-filter: blur(24px) saturate(200%);
+  border: 1.5px solid rgba(255, 255, 255, 0.88);
+  border-radius: 16px;
   padding: 10px 6px;
   display: flex;
   flex-direction: column;
@@ -566,8 +696,13 @@ body.comic-app-body {
   gap: 3px;
   cursor: pointer;
   font-family: var(--font-ui);
-  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.95), 0 4px 12px rgba(15, 23, 42, 0.05);
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 
+    inset 0 1.5px 2px rgba(255, 255, 255, 1),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.03),
+    0 4px 12px rgba(15, 23, 42, 0.05);
+  transition: all 0.28s cubic-bezier(0.19, 1, 0.22, 1);
+  position: relative;
+  overflow: hidden;
 }
 
 .panel-btn .p-num {
@@ -583,16 +718,23 @@ body.comic-app-body {
 }
 
 .panel-btn:hover {
-  background: rgba(255, 255, 255, 0.90);
-  border-color: #93c5fd;
+  background: rgba(255, 255, 255, 0.94);
+  border-color: rgba(147, 197, 253, 0.9);
   transform: translateY(-2px);
-  box-shadow: inset 0 1px 1px #ffffff, 0 8px 20px rgba(37, 99, 235, 0.14);
+  box-shadow: 
+    inset 0 1.5px 2px #ffffff,
+    0 10px 24px rgba(37, 99, 235, 0.16),
+    0 0 14px rgba(59, 130, 246, 0.1);
 }
 
 .panel-btn.active {
   border-color: var(--primary-blue);
-  background: rgba(255, 255, 255, 0.96);
-  box-shadow: 0 0 0 2px var(--primary-blue), 0 10px 28px rgba(37, 99, 235, 0.25), inset 0 1px 1.5px #ffffff;
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 
+    0 0 0 2.5px var(--primary-blue),
+    0 12px 30px rgba(37, 99, 235, 0.28),
+    0 0 20px rgba(99, 102, 241, 0.22),
+    inset 0 1.5px 2px #ffffff;
   transform: translateY(-2px);
 }
 
@@ -605,18 +747,21 @@ body.comic-app-body {
   font-weight: 700;
 }
 
-/* Action Button: Apple Liquid Glass Blue Power Button */
+/* Action Button: macOS 27 / iOS 27 Quantum Spatial Glass Button */
 .btn-generate {
-  background: linear-gradient(135deg, rgba(37, 99, 235, 0.95), rgba(29, 78, 216, 0.95));
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  position: relative;
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 45%, #4f46e5 80%, #06b6d4 100%);
+  background-size: 200% 200%;
+  animation: quantumGlow 8s ease infinite;
+  backdrop-filter: blur(24px) saturate(220%);
+  -webkit-backdrop-filter: blur(24px) saturate(220%);
   color: #ffffff;
   font-family: var(--font-ui);
-  font-size: 16px;
+  font-size: 16.5px;
   font-weight: 800;
   letter-spacing: -0.2px;
-  padding: 16px 24px;
-  border: 1.5px solid rgba(255, 255, 255, 0.40);
+  padding: 16px 28px;
+  border: 1.5px solid rgba(255, 255, 255, 0.50);
   border-radius: 9999px;
   cursor: pointer;
   width: 100%;
@@ -624,20 +769,51 @@ body.comic-app-body {
   align-items: center;
   justify-content: center;
   gap: 10px;
-  box-shadow: inset 0 1px 1.5px rgba(255, 255, 255, 0.5), 0 10px 28px rgba(37, 99, 235, 0.38), 0 2px 6px rgba(0, 0, 0, 0.08);
-  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 
+    inset 0 1.5px 2px rgba(255, 255, 255, 0.7),
+    inset 0 -1.5px 2px rgba(0, 0, 0, 0.2),
+    0 12px 34px rgba(37, 99, 235, 0.42),
+    0 4px 16px rgba(79, 70, 229, 0.3);
+  transition: all 0.28s cubic-bezier(0.19, 1, 0.22, 1);
   margin-top: 6px;
+  overflow: hidden;
+}
+
+@keyframes quantumGlow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.btn-generate::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.38), transparent);
+  transition: left 0.65s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.btn-generate:hover::before {
+  left: 100%;
 }
 
 .btn-generate:hover {
-  background: linear-gradient(135deg, rgba(29, 78, 216, 0.98), rgba(30, 64, 175, 0.98));
-  border-color: rgba(255, 255, 255, 0.6);
-  transform: translateY(-2px);
-  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.65), 0 14px 36px rgba(37, 99, 235, 0.5);
+  transform: translateY(-2.5px) scale(1.012);
+  border-color: rgba(255, 255, 255, 0.75);
+  box-shadow: 
+    inset 0 2px 3px rgba(255, 255, 255, 0.85),
+    0 20px 45px rgba(37, 99, 235, 0.52),
+    0 6px 20px rgba(79, 70, 229, 0.38);
 }
 
 .btn-generate:active {
-  transform: translateY(1px);
+  transform: translateY(1px) scale(0.985);
+  box-shadow: 
+    inset 0 1px 1.5px rgba(255, 255, 255, 0.5),
+    0 4px 14px rgba(37, 99, 235, 0.35);
 }
 
 .btn-sparkle {
@@ -2482,10 +2658,16 @@ body.comic-app-body {
   z-index: 10;
   width: 100%;
   max-width: 540px;
-  background: #ffffff;
-  border-radius: 20px;
-  border: 1px solid rgba(226, 232, 240, 0.95);
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+  background: rgba(255, 255, 255, 0.84);
+  backdrop-filter: blur(36px) saturate(210%);
+  -webkit-backdrop-filter: blur(36px) saturate(210%);
+  border-radius: 26px;
+  border: 1.5px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 
+    inset 0 1.5px 2px rgba(255, 255, 255, 1),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.03),
+    0 32px 70px -15px rgba(15, 23, 42, 0.3),
+    0 12px 28px rgba(15, 23, 42, 0.08);
   overflow: hidden;
   animation: modalPopIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -2598,26 +2780,26 @@ body.comic-app-body {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: rgba(255, 255, 255, 0.75);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1.5px solid rgba(203, 213, 225, 0.8);
-  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.9), 0 2px 5px rgba(0, 0, 0, 0.04);
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1.5px solid rgba(226, 232, 240, 0.85);
+  box-shadow: inset 0 1px 1.5px rgba(255, 255, 255, 0.95), 0 2px 8px rgba(15, 23, 42, 0.05);
   color: var(--slate-700);
   font-size: 12.5px;
   font-weight: 700;
-  padding: 6px 12px;
-  border-radius: 10px;
+  padding: 6px 14px;
+  border-radius: 9999px;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.25s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
 .btn-api-key-config:hover {
-  background: rgba(239, 246, 255, 0.9);
-  border-color: var(--primary-blue);
+  background: rgba(239, 246, 255, 0.95);
+  border-color: rgba(37, 99, 235, 0.4);
   color: var(--primary-blue);
   transform: translateY(-1.5px);
-  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 1), 0 4px 12px rgba(37, 99, 235, 0.15);
+  box-shadow: inset 0 1px 2px #ffffff, 0 6px 16px rgba(37, 99, 235, 0.18);
 }
 
 .api-key-modal {

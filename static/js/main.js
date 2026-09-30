@@ -65,17 +65,24 @@ function initAmbientParticles() {
   });
 
   const particles = [];
-  const particleCount = Math.min(38, Math.floor(width / 35));
+  const particleCount = Math.min(45, Math.floor(width / 30));
 
   for (let i = 0; i < particleCount; i++) {
+    const paletteChoice = Math.random();
+    const color = paletteChoice > 0.65 
+      ? "192, 132, 252"  // Celestial Nebula Violet
+      : (paletteChoice > 0.30 ? "56, 189, 248" : "244, 114, 182"); // Solar Cyan or Rose Quartz
+
     particles.push({
       x: Math.random() * width,
       y: Math.random() * height,
-      radius: Math.random() * 2.2 + 0.8,
-      dx: (Math.random() - 0.5) * 0.45,
-      dy: -Math.random() * 0.45 - 0.15,
-      alpha: Math.random() * 0.5 + 0.25,
-      color: Math.random() > 0.4 ? "59, 130, 246" : "245, 158, 11" // Blue or Amber
+      radius: Math.random() * 3.2 + 1.2,
+      dx: (Math.random() - 0.5) * 0.35,
+      dy: -Math.random() * 0.35 - 0.12,
+      alpha: Math.random() * 0.45 + 0.25,
+      pulseSpeed: Math.random() * 0.02 + 0.01,
+      pulsePhase: Math.random() * Math.PI * 2,
+      color: color
     });
   }
 
@@ -85,19 +92,23 @@ function initAmbientParticles() {
     for (let p of particles) {
       p.x += p.dx;
       p.y += p.dy;
+      p.pulsePhase += p.pulseSpeed;
 
-      if (p.y < -10) {
-        p.y = height + 10;
+      if (p.y < -15) {
+        p.y = height + 15;
         p.x = Math.random() * width;
       }
-      if (p.x < -10) p.x = width + 10;
-      if (p.x > width + 10) p.x = -10;
+      if (p.x < -15) p.x = width + 15;
+      if (p.x > width + 15) p.x = -15;
+
+      const currentAlpha = p.alpha * (0.8 + 0.2 * Math.sin(p.pulsePhase));
+      const currentRadius = p.radius * (0.9 + 0.1 * Math.sin(p.pulsePhase));
 
       ctx.beginPath();
-      ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(${p.color}, ${p.alpha})`;
-      ctx.shadowBlur = 8;
-      ctx.shadowColor = `rgba(${p.color}, 0.8)`;
+      ctx.arc(p.x, p.y, currentRadius, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${p.color}, ${currentAlpha})`;
+      ctx.shadowBlur = 14;
+      ctx.shadowColor = `rgba(${p.color}, 0.85)`;
       ctx.fill();
     }
 
