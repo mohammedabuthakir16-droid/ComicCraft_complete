@@ -28,10 +28,20 @@
   --slate-100: #f1f5f9;
   --slate-50:  #f8fafc;
 
-  --card-bg: rgba(255, 255, 255, 0.98);
-  --card-border: rgba(226, 232, 240, 0.95);
-  --card-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.22), 0 0 0 1px rgba(0, 0, 0, 0.04);
+  --card-bg: rgba(255, 255, 255, 0.90);
+  --card-border: rgba(255, 255, 255, 0.80);
+  --card-shadow: inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.95), 0 20px 40px -15px rgba(15, 23, 42, 0.15), 0 0 0 1px rgba(226, 232, 240, 0.6);
   --card-radius: 20px;
+
+  /* Glassmorphism Design Tokens */
+  --glass-surface: rgba(255, 255, 255, 0.82);
+  --glass-surface-subtle: rgba(255, 255, 255, 0.65);
+  --glass-surface-hover: rgba(255, 255, 255, 0.92);
+  --glass-border: rgba(255, 255, 255, 0.75);
+  --glass-border-subtle: rgba(226, 232, 240, 0.7);
+  --glass-highlight: rgba(255, 255, 255, 0.95);
+  --glass-blur: 20px;
+  --glass-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.95), 0 12px 32px 0 rgba(31, 38, 135, 0.08);
 
   --font-ui: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
   --font-comic-title: 'Bangers', cursive;
@@ -92,11 +102,11 @@ body.comic-app-body {
    Header Navigation Bar
    ========================================================================== */
 .app-header {
-  background: rgba(255, 255, 255, 0.94);
+  background: rgba(255, 255, 255, 0.82);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(226, 232, 240, 0.85);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: 0 4px 24px 0 rgba(31, 38, 135, 0.08), inset 0 -1px 0 0 rgba(226, 232, 240, 0.6);
   position: sticky;
   top: 0;
   z-index: 50;
@@ -2358,8 +2368,10 @@ body.comic-app-body {
   align-items: center;
   justify-content: space-between;
   padding: 18px 24px;
-  background: #f8fafc;
-  border-bottom: 1px solid #e2e8f0;
+  background: rgba(248, 250, 252, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.7);
 }
 
 .modal-dialog-title {
@@ -2448,22 +2460,26 @@ body.comic-app-body {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid #cbd5e1;
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1.5px solid rgba(203, 213, 225, 0.8);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.9), 0 2px 5px rgba(0, 0, 0, 0.04);
   color: var(--slate-700);
   font-size: 12.5px;
   font-weight: 700;
   padding: 6px 12px;
   border-radius: 10px;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .btn-api-key-config:hover {
-  background: var(--primary-blue-light);
+  background: rgba(239, 246, 255, 0.9);
   border-color: var(--primary-blue);
   color: var(--primary-blue);
-  transform: translateY(-1px);
+  transform: translateY(-1.5px);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 1), 0 4px 12px rgba(37, 99, 235, 0.15);
 }
 
 .api-key-modal {
@@ -2483,9 +2499,9 @@ body.comic-app-body {
 .api-modal-backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(15, 23, 42, 0.72);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .api-modal-dialog {
@@ -2493,10 +2509,15 @@ body.comic-app-body {
   z-index: 10;
   width: 100%;
   max-width: 520px;
-  background: #ffffff;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
   border-radius: 20px;
-  border: 1px solid rgba(226, 232, 240, 0.95);
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+  border: 1.5px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 
+    inset 0 1px 2px rgba(255, 255, 255, 0.95),
+    0 24px 50px -10px rgba(15, 23, 42, 0.28),
+    5px 5px 0px #0f172a;
   overflow: hidden;
   animation: modalPopIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -2513,13 +2534,16 @@ body.comic-app-body {
   align-items: center;
   gap: 10px;
   padding: 10px 14px;
-  border-radius: 10px;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: rgba(248, 250, 252, 0.8);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(226, 232, 240, 0.9);
   font-size: 12.5px;
   font-weight: 600;
   color: var(--slate-700);
   margin-bottom: 16px;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.8);
 }
 
 .api-key-status-banner.active {
@@ -2544,9 +2568,11 @@ body.comic-app-body {
    13. Unique Comic Soundboard & Onomatopoeia Action Bursts
    ========================================================================== */
 .comic-soundboard-banner {
-  background: linear-gradient(135deg, #ffffff 0%, #fffdf0 50%, #eff6ff 100%);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.92) 0%, rgba(255, 253, 240, 0.9) 50%, rgba(239, 246, 255, 0.9) 100%);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border: 2.5px solid #0f172a;
-  box-shadow: 5px 5px 0px #0f172a;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.95), 5px 5px 0px #0f172a;
   border-radius: 18px;
   padding: 16px 22px;
   margin-bottom: 24px;
@@ -2724,13 +2750,16 @@ body.comic-app-body {
    14. Interactive Comic Story Sparks (Premise Roulette)
    ========================================================================== */
 .story-sparks-box {
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  background: linear-gradient(135deg, rgba(248, 250, 252, 0.85) 0%, rgba(241, 245, 249, 0.85) 100%);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 2px dashed #94a3b8;
   border-radius: 16px;
   padding: 14px 16px;
   margin-top: 14px;
   position: relative;
   transition: border-color 0.2s ease, background 0.2s ease;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.9);
 }
 
 .story-sparks-box:hover {
@@ -3044,11 +3073,14 @@ body.comic-app-body {
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  background: #f8fafc;
-  border: 1.5px solid #e2e8f0;
+  background: rgba(248, 250, 252, 0.82);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1.5px solid rgba(226, 232, 240, 0.85);
   border-radius: 12px;
   padding: 6px 8px;
   margin-bottom: 14px;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.8);
 }
 
 .stepper-tabs {
@@ -3127,23 +3159,26 @@ body.comic-app-body {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 7px 15px;
-  background: linear-gradient(135deg, #0f172a, #1e293b);
+  padding: 7px 16px;
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.92), rgba(30, 41, 59, 0.9));
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   color: #ffffff;
-  border: 1.5px solid #0f172a;
+  border: 1.5px solid rgba(255, 255, 255, 0.35);
   border-radius: 9999px;
   font-family: var(--font-ui);
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 2px 2px 0px #0f172a;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.35), 2px 2px 0px #0f172a;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .btn-auth-signin:hover {
-  background: linear-gradient(135deg, #1e293b, #334155);
-  transform: translateY(-1px);
-  box-shadow: 3px 3px 0px #0f172a;
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(51, 65, 85, 0.95));
+  border-color: rgba(255, 255, 255, 0.55);
+  transform: translateY(-1.5px);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.45), 3px 3px 0px #0f172a;
 }
 
 .btn-auth-signin:active {
@@ -3169,19 +3204,21 @@ body.comic-app-body {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 4px 10px 4px 5px;
-  background: #ffffff;
-  border: 1.5px solid #0f172a;
+  padding: 4px 11px 4px 5px;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1.5px solid rgba(15, 23, 42, 0.85);
   border-radius: 9999px;
   cursor: pointer;
-  box-shadow: 2px 2px 0px #0f172a;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.95), 2px 2px 0px #0f172a;
   transition: all 0.2s ease;
 }
 
 .btn-user-profile:hover {
-  background: #f8fafc;
+  background: rgba(255, 255, 255, 0.95);
   transform: translateY(-1px);
-  box-shadow: 3px 3px 0px #0f172a;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 1), 3px 3px 0px #0f172a;
 }
 
 .user-avatar-img {
@@ -3219,6 +3256,14 @@ body.comic-app-body {
 .provider-pill-badge.provider-apple {
   background: #000000;
   color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.apple-badge-icon {
+  display: inline-block;
+  vertical-align: -1px;
 }
 
 .dropdown-chevron {
@@ -3234,10 +3279,15 @@ body.comic-app-body {
   top: calc(100% + 8px);
   right: 0;
   width: 260px;
-  background: #ffffff;
-  border: 2px solid #0f172a;
-  border-radius: 14px;
-  box-shadow: 4px 4px 0px #0f172a;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1.5px solid rgba(255, 255, 255, 0.9);
+  border-radius: 16px;
+  box-shadow: 
+    inset 0 1px 2px rgba(255, 255, 255, 0.95),
+    0 16px 36px -8px rgba(15, 23, 42, 0.18),
+    4px 4px 0px #0f172a;
   z-index: 1000;
   padding: 14px;
   animation: dropdownFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
@@ -3397,8 +3447,8 @@ body.comic-app-body {
   width: 100%;
   height: 100%;
   background: rgba(15, 23, 42, 0.65);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   animation: modalBackdropFadeIn 0.25s ease;
 }
 
@@ -3407,10 +3457,15 @@ body.comic-app-body {
   width: 100%;
   max-width: 440px;
   margin: 16px;
-  background: #ffffff;
-  border: 2.5px solid #0f172a;
-  border-radius: 18px;
-  box-shadow: 6px 6px 0px #0f172a;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 2px solid rgba(255, 255, 255, 0.85);
+  border-radius: 20px;
+  box-shadow: 
+    inset 0 1px 2px rgba(255, 255, 255, 0.95),
+    0 24px 50px -10px rgba(15, 23, 42, 0.28),
+    6px 6px 0px #0f172a;
   overflow: hidden;
   z-index: 10;
   animation: modalScaleUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
@@ -3428,9 +3483,12 @@ body.comic-app-body {
   text-align: center;
   margin-bottom: 22px;
   padding: 16px;
-  background: linear-gradient(135deg, #f0fdf4 0%, #ecfeff 100%);
-  border: 1.5px dashed #6ee7b7;
-  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(240, 253, 244, 0.8) 0%, rgba(236, 254, 255, 0.8) 100%);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1.5px dashed rgba(110, 231, 183, 0.9);
+  border-radius: 14px;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.8);
 }
 
 .auth-hero-badge {
@@ -3476,7 +3534,7 @@ body.comic-app-body {
   align-items: center;
   justify-content: center;
   gap: 12px;
-  border-radius: 10px;
+  border-radius: 12px;
   font-family: var(--font-ui);
   font-size: 14.5px;
   font-weight: 700;
@@ -3486,17 +3544,19 @@ body.comic-app-body {
 }
 
 .btn-oauth-google {
-  background: #ffffff;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   color: #1e293b;
-  border: 1.5px solid #cbd5e1;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  border: 1.5px solid rgba(203, 213, 225, 0.85);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.9), 0 2px 5px rgba(0, 0, 0, 0.04);
 }
 
 .btn-oauth-google:hover {
-  background: #f8fafc;
+  background: rgba(248, 250, 252, 0.95);
   border-color: #0f172a;
   transform: translateY(-1.5px);
-  box-shadow: 3px 3px 0px #0f172a;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 1), 3px 3px 0px #0f172a;
 }
 
 .btn-oauth-google:active {
@@ -3505,17 +3565,19 @@ body.comic-app-body {
 }
 
 .btn-oauth-apple {
-  background: #000000;
+  background: rgba(0, 0, 0, 0.92);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   color: #ffffff;
-  border: 1.5px solid #000000;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.25), 0 2px 8px rgba(0, 0, 0, 0.25);
 }
 
 .btn-oauth-apple:hover {
-  background: #18181b;
-  border-color: #0f172a;
+  background: #000000;
+  border-color: rgba(255, 255, 255, 0.45);
   transform: translateY(-1.5px);
-  box-shadow: 3px 3px 0px #0f172a;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.35), 3px 3px 0px #0f172a;
 }
 
 .btn-oauth-apple:active {
@@ -3561,14 +3623,17 @@ body.comic-app-body {
 
 /* Instant Demo Note */
 .auth-instant-note {
-  background: #fffbeb;
-  border: 1.5px solid #fde68a;
-  border-radius: 10px;
+  background: rgba(254, 243, 199, 0.78);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1.5px solid rgba(253, 230, 138, 0.9);
+  border-radius: 12px;
   padding: 12px 14px;
   font-size: 12px;
   line-height: 1.5;
   color: #92400e;
   margin-bottom: 14px;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.8);
 }
 
 .auth-instant-note p {
@@ -3711,12 +3776,15 @@ body.comic-app-body {
 /* Authentication Tabs Navigation */
 .auth-tabs-header {
   display: flex;
-  background: #f1f5f9;
-  border: 1.5px solid #cbd5e1;
-  border-radius: 12px;
+  background: rgba(241, 245, 249, 0.72);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1.5px solid rgba(203, 213, 225, 0.65);
+  border-radius: 14px;
   padding: 4px;
   gap: 4px;
   margin-bottom: 18px;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 .auth-tab-btn {
@@ -3726,7 +3794,7 @@ body.comic-app-body {
   justify-content: center;
   gap: 7px;
   padding: 8px 10px;
-  border-radius: 8px;
+  border-radius: 10px;
   border: 1.5px solid transparent;
   background: transparent;
   color: #64748b;
@@ -3739,14 +3807,16 @@ body.comic-app-body {
 
 .auth-tab-btn:hover {
   color: #0f172a;
-  background: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.65);
 }
 
 .auth-tab-btn.active {
-  background: #ffffff;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   color: #0f172a;
   border-color: #0f172a;
-  box-shadow: 2px 2px 0px #0f172a;
+  box-shadow: inset 0 1px 1px #ffffff, 2px 2px 0px #0f172a;
 }
 
 .oauth-tab-icon {
