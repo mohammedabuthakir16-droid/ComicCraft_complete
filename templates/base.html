@@ -47,6 +47,55 @@
           <span>🔑</span>
           <span class="api-btn-label">API Key</span>
         </button>
+
+        <!-- Google & Apple Auth Navigation Widget -->
+        <div id="auth-nav-widget" class="auth-nav-widget">
+          {% if current_user %}
+          <div class="user-profile-menu" id="user-profile-menu">
+            <button type="button" class="btn-user-profile" id="btn-user-profile" onclick="toggleUserDropdown(event)" aria-expanded="false" title="{{ current_user.name }} ({{ current_user.provider }})">
+              <img src="{{ current_user.avatar_url }}" alt="{{ current_user.name }}" class="user-avatar-img" onerror="this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=160&auto=format&fit=crop&q=80'">
+              <span class="user-display-name">{{ current_user.name.split(' ')[0] }}</span>
+              <span class="provider-pill-badge provider-{{ current_user.provider_id }}">
+                {% if current_user.provider_id == 'google' %}G{% else %}{% endif %}
+              </span>
+              <span class="dropdown-chevron">▼</span>
+            </button>
+            <div class="user-dropdown-panel" id="user-dropdown-panel">
+              <div class="user-dropdown-header">
+                <img src="{{ current_user.avatar_url }}" alt="{{ current_user.name }}" class="dropdown-avatar-large" onerror="this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=160&auto=format&fit=crop&q=80'">
+                <div class="user-dropdown-info">
+                  <div class="user-dropdown-name">{{ current_user.name }}</div>
+                  <div class="user-dropdown-email">{{ current_user.email }}</div>
+                  <span class="user-provider-tag provider-tag-{{ current_user.provider_id }}">
+                    Signed in with {{ current_user.provider }}
+                  </span>
+                </div>
+              </div>
+              <div class="user-dropdown-divider"></div>
+              <div class="user-dropdown-links">
+                <a href="/gallery" class="user-dropdown-item">
+                  <span class="item-icon">📚</span>
+                  <span>My Comic Library</span>
+                </a>
+                <a href="/" class="user-dropdown-item">
+                  <span class="item-icon">🎨</span>
+                  <span>Studio Workspace</span>
+                </a>
+              </div>
+              <div class="user-dropdown-divider"></div>
+              <button type="button" class="user-dropdown-logout-btn" onclick="logoutUser()">
+                <span class="item-icon">🚪</span>
+                <span>Sign Out</span>
+              </button>
+            </div>
+          </div>
+          {% else %}
+          <button type="button" class="btn-auth-signin" id="btn-open-auth-modal" onclick="openAuthModal()" title="Sign in with Google or Apple">
+            <span class="auth-icon-badge">✨</span>
+            <span class="auth-btn-label">Sign In</span>
+          </button>
+          {% endif %}
+        </div>
       </div>
     </div>
   </header>
@@ -101,6 +150,86 @@
             </button>
           </div>
         </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Google & Apple Authentication Modal -->
+  <div id="auth-modal" class="auth-modal">
+    <div class="auth-modal-backdrop" onclick="closeAuthModal()"></div>
+    <div class="auth-modal-dialog studio-card">
+      <div class="modal-dialog-header">
+        <div class="modal-dialog-title">
+          <span class="auth-title-icon">💥</span>
+          <span>Sign In to ComicCraft</span>
+        </div>
+        <button type="button" class="modal-close-btn" onclick="closeAuthModal()" title="Close dialog">✕</button>
+      </div>
+
+      <div class="modal-dialog-body auth-modal-content">
+        <div class="auth-hero-banner">
+          <div class="auth-hero-badge">POW!</div>
+          <h3 class="auth-hero-title">Unlock Your Creative Superhero</h3>
+          <p class="auth-hero-sub">
+            Sign in with your Google or Apple ID to personalize your studio, track comics in your library, and access multi-panel PDF exports.
+          </p>
+        </div>
+
+        <div class="oauth-buttons-stack">
+          <!-- Google Sign-In Button -->
+          <button type="button" class="btn-oauth-provider btn-oauth-google" id="btn-login-google" onclick="handleGoogleLogin()">
+            <svg class="oauth-icon-svg" viewBox="0 0 24 24" width="22" height="22">
+              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+            </svg>
+            <span class="oauth-btn-text">Continue with Google</span>
+            <span class="oauth-spinner" id="google-spinner" style="display:none;">⏳</span>
+          </button>
+
+          <!-- Apple Sign-In Button -->
+          <button type="button" class="btn-oauth-provider btn-oauth-apple" id="btn-login-apple" onclick="handleAppleLogin()">
+            <svg class="oauth-icon-svg" viewBox="0 0 170 170" width="20" height="20">
+              <path fill="currentColor" d="M150.37 130.25c-2.45 5.66-5.35 10.87-8.71 15.66-4.58 6.53-8.33 11.05-11.22 13.56-4.48 4.12-9.28 6.23-14.42 6.35-3.69 0-8.14-1.05-13.32-3.18-5.19-2.12-9.97-3.17-14.34-3.17-4.58 0-9.49 1.05-14.75 3.17-5.26 2.13-9.5 3.24-12.74 3.35-4.35.13-9.16-1.9-14.42-6.08-3.69-3.08-7.73-7.97-12.1-14.67-6.19-9.5-10.9-20.2-14.12-32.08-3.23-11.89-4.85-23.01-4.85-33.38 0-14.37 3.52-26.4 10.56-36.08 7.05-9.68 15.93-14.61 26.65-14.79 4.89 0 10.19 1.25 15.9 3.75 5.71 2.5 9.77 3.78 12.17 3.84 1.74 0 5.87-1.33 12.38-3.99 6.51-2.66 12.08-3.86 16.71-3.6 12.4.98 22.31 5.68 29.74 14.12-10.89 6.54-16.22 15.79-16.01 27.75.22 9.47 3.91 17.51 11.08 24.12 7.16 6.61 15.67 10.22 25.52 10.83-2.18 6.54-4.89 13.17-8.13 19.88zM119.22 33.15c0-6.75 2.5-13.29 7.51-19.62 5.01-6.33 11.21-10.49 18.6-12.48.98 4.9 1.04 9.61.16 14.12-.87 4.52-2.94 9.17-6.2 13.96-3.26 4.79-7.39 8.23-12.38 10.33-4.99 2.1-9.66 3.03-14.01 2.78-.11-1.3-.17-2.6-.17-3.9z"/>
+            </svg>
+            <span class="oauth-btn-text">Continue with Apple</span>
+            <span class="oauth-spinner" id="apple-spinner" style="display:none;">⏳</span>
+          </button>
+        </div>
+
+        <div class="auth-divider-wrap">
+          <span class="auth-divider-line"></span>
+          <span class="auth-divider-text">Demo & Presentation Ready</span>
+          <span class="auth-divider-line"></span>
+        </div>
+
+        <div class="auth-instant-note">
+          <div class="instant-badge">⚡ Instant 1-Click Verification</div>
+          <p>
+            Ready for live video recording! Click either button above to sign in immediately with realistic test accounts (Alex Rivera / Jordan Vance), setting persistent cookies and updating your session in real time.
+          </p>
+        </div>
+
+        <div class="auth-custom-profile-toggle">
+          <button type="button" class="btn-text-link" onclick="toggleCustomProfileFields()">
+            <span id="custom-profile-toggle-text">+ Customize Demo Persona (Optional)</span>
+          </button>
+          <div id="custom-profile-fields" class="custom-profile-fields" style="display:none;">
+            <div class="form-group mb-2">
+              <label class="form-label-xs" for="demo-custom-name">Display Name</label>
+              <input type="text" id="demo-custom-name" class="form-input form-input-sm" placeholder="e.g. Tony Stark">
+            </div>
+            <div class="form-group mb-2">
+              <label class="form-label-xs" for="demo-custom-email">Email Address</label>
+              <input type="email" id="demo-custom-email" class="form-input form-input-sm" placeholder="e.g. tony@starkindustries.com">
+            </div>
+          </div>
+        </div>
+
+        <div class="auth-modal-footer-note">
+          By signing in, you agree to ComicCraft's Creative Terms and AI Generation Guidelines.
+        </div>
       </div>
     </div>
   </div>

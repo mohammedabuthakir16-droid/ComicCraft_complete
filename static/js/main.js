@@ -43,6 +43,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // 12. Share & Toast Notifications
   initShareButton();
+
+  // 13. Google & Apple Authentication Engine
+  initAuth();
 });
 
 /* ==========================================================================
@@ -1806,5 +1809,239 @@ async function saveApiKey(e) {
 window.openApiKeyModal = openApiKeyModal;
 window.closeApiKeyModal = closeApiKeyModal;
 window.saveApiKey = saveApiKey;
+
+/* ==========================================================================
+   13. Google & Apple Authentication Engine (OAuth, Session, Nav State)
+   ========================================================================== */
+
+function escapeHtml(str) {
+  if (!str) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function initAuth() {
+  // Close user dropdown if clicking outside
+  document.addEventListener("click", (e) => {
+    const menu = document.getElementById("user-profile-menu");
+    const panel = document.getElementById("user-dropdown-panel");
+    if (panel && panel.classList.contains("open")) {
+      if (menu && !menu.contains(e.target)) {
+        panel.classList.remove("open");
+        const btn = document.getElementById("btn-user-profile");
+        if (btn) btn.setAttribute("aria-expanded", "false");
+      }
+    }
+  });
+
+  // Close auth modal on Escape key
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      closeAuthModal();
+      const panel = document.getElementById("user-dropdown-panel");
+      if (panel) panel.classList.remove("open");
+    }
+  });
+
+  // Verify and hydrate session state from API
+  checkAuthSession();
+}
+
+async function checkAuthSession() {
+  try {
+    const res = await fetch("/api/auth/me");
+    if (res.ok) {
+      const data = await res.json();
+      if (data.authenticated && data.user) {
+        renderUserInNav(data.user);
+      }
+    }
+  } catch (err) {
+    console.debug("Auth session check skipped:", err);
+  }
+}
+
+function openAuthModal() {
+  const modal = document.getElementById("auth-modal");
+  if (modal) {
+    modal.classList.add("open");
+    playPopSound(540);
+  }
+}
+
+function closeAuthModal() {
+  const modal = document.getElementById("auth-modal");
+  if (modal) {
+    modal.classList.remove("open");
+  }
+}
+
+function toggleUserDropdown(e) {
+  if (e) e.stopPropagation();
+  const panel = document.getElementById("user-dropdown-panel");
+  const btn = document.getElementById("btn-user-profile");
+  if (!panel) return;
+
+  const isOpen = panel.classList.contains("open");
+  if (isOpen) {
+    panel.classList.remove("open");
+    if (btn) btn.setAttribute("aria-expanded", "false");
+  } else {
+    panel.classList.add("open");
+    if (btn) btn.setAttribute("aria-expanded", "true");
+    playPopSound(520);
+  }
+}
+
+function toggleCustomProfileFields() {
+  const fields = document.getElementById("custom-profile-fields");
+  const text = document.getElementById("custom-profile-toggle-text");
+  if (!fields) return;
+
+  if (fields.style.display === "none" || !fields.style.display) {
+    fields.style.display = "block";
+    if (text) text.innerText = "− Hide Demo Persona Fields";
+  } else {
+    fields.style.display = "none";
+    if (text) text.innerText = "+ Customize Demo Persona (Optional)";
+  }
+}
+
+async function handleGoogleLogin() {
+  await performAuthLogin("google", "google-spinner", "btn-login-google");
+}
+
+async function handleAppleLogin() {
+  await performAuthLogin("apple", "apple-spinner", "btn-login-apple");
+}
+
+async function performAuthLogin(provider, spinnerId, buttonId) {
+  const spinner = document.getElementById(spinnerId);
+  const button = document.getElementById(buttonId);
+  const customNameInput = document.getElementById("demo-custom-name");
+  const customEmailInput = document.getElementById("demo-custom-email");
+
+  const customName = customNameInput ? customNameInput.value.trim() : "";
+  const customEmail = customEmailInput ? customEmailInput.value.trim() : "";
+
+  if (spinner) spinner.style.display = "inline-block";
+  if (button) button.style.pointerEvents = "none";
+
+  try {
+    const payload = {
+      provider: provider,
+      name: customName || null,
+      email: customEmail || null
+    };
+
+    const res = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await res.json();
+    if (res.ok && data.status === "success") {
+      closeAuthModal();
+      renderUserInNav(data.user);
+      playPopSound(720);
+
+      const providerLabel = data.user.provider === "Google" ? "Google" : "Apple ID";
+      showToast(`✨ Welcome back, ${data.user.name}! Signed in with ${providerLabel}`);
+    } else {
+      showToast(`⚠️ Sign in failed: ${data.detail || data.message || "Unknown error"}`);
+    }
+  } catch (err) {
+    showToast(`⚠️ Authentication error: ${err.message}`);
+  } finally {
+    if (spinner) spinner.style.display = "none";
+    if (button) button.style.pointerEvents = "auto";
+  }
+}
+
+function renderUserInNav(user) {
+  const widget = document.getElementById("auth-nav-widget");
+  if (!widget) return;
+
+  const firstName = (user.name || "Hero").split(" ")[0];
+  const providerIcon = user.provider_id === "google" ? "G" : "";
+  const avatarUrl = user.avatar_url || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=160&auto=format&fit=crop&q=80";
+
+  widget.innerHTML = `
+    <div class="user-profile-menu" id="user-profile-menu">
+      <button type="button" class="btn-user-profile" id="btn-user-profile" onclick="toggleUserDropdown(event)" aria-expanded="false" title="${escapeHtml(user.name)} (${escapeHtml(user.provider)})">
+        <img src="${escapeHtml(avatarUrl)}" alt="${escapeHtml(user.name)}" class="user-avatar-img" onerror="this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=160&auto=format&fit=crop&q=80'">
+        <span class="user-display-name">${escapeHtml(firstName)}</span>
+        <span class="provider-pill-badge provider-${escapeHtml(user.provider_id)}">${providerIcon}</span>
+        <span class="dropdown-chevron">▼</span>
+      </button>
+      <div class="user-dropdown-panel" id="user-dropdown-panel">
+        <div class="user-dropdown-header">
+          <img src="${escapeHtml(avatarUrl)}" alt="${escapeHtml(user.name)}" class="dropdown-avatar-large" onerror="this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=160&auto=format&fit=crop&q=80'">
+          <div class="user-dropdown-info">
+            <div class="user-dropdown-name">${escapeHtml(user.name)}</div>
+            <div class="user-dropdown-email">${escapeHtml(user.email)}</div>
+            <span class="user-provider-tag provider-tag-${escapeHtml(user.provider_id)}">
+              Signed in with ${escapeHtml(user.provider)}
+            </span>
+          </div>
+        </div>
+        <div class="user-dropdown-divider"></div>
+        <div class="user-dropdown-links">
+          <a href="/gallery" class="user-dropdown-item">
+            <span class="item-icon">📚</span>
+            <span>My Comic Library</span>
+          </a>
+          <a href="/" class="user-dropdown-item">
+            <span class="item-icon">🎨</span>
+            <span>Studio Workspace</span>
+          </a>
+        </div>
+        <div class="user-dropdown-divider"></div>
+        <button type="button" class="user-dropdown-logout-btn" onclick="logoutUser()">
+          <span class="item-icon">🚪</span>
+          <span>Sign Out</span>
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+async function logoutUser() {
+  try {
+    const res = await fetch("/api/auth/logout", { method: "POST" });
+    if (res.ok) {
+      renderLoggedOutNav();
+      playPopSound(420);
+      showToast("🚪 Signed out of ComicCraft successfully");
+    }
+  } catch (err) {
+    showToast(`⚠️ Logout error: ${err.message}`);
+  }
+}
+
+function renderLoggedOutNav() {
+  const widget = document.getElementById("auth-nav-widget");
+  if (!widget) return;
+  widget.innerHTML = `
+    <button type="button" class="btn-auth-signin" id="btn-open-auth-modal" onclick="openAuthModal()" title="Sign in with Google or Apple">
+      <span class="auth-icon-badge">✨</span>
+      <span class="auth-btn-label">Sign In</span>
+    </button>
+  `;
+}
+
+// Global window bindings for inline HTML handlers
+window.openAuthModal = openAuthModal;
+window.closeAuthModal = closeAuthModal;
+window.toggleUserDropdown = toggleUserDropdown;
+window.toggleCustomProfileFields = toggleCustomProfileFields;
+window.handleGoogleLogin = handleGoogleLogin;
+window.handleAppleLogin = handleAppleLogin;
+window.logoutUser = logoutUser;
 
 

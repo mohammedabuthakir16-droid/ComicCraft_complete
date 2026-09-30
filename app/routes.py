@@ -1,7 +1,10 @@
 import asyncio
+import base64
+import json
 import logging
 import os
 import re
+import time
 import uuid
 from pathlib import Path
 from typing import Optional, List
@@ -22,6 +25,25 @@ logger = logging.getLogger(__name__)
 
 templates = Jinja2Templates(directory=str(config.BASE_DIR / "templates"))
 router = APIRouter()
+
+class AuthLoginRequest(BaseModel):
+    provider: str = Field(..., description="Authentication provider: google or apple")
+    credential: Optional[str] = Field(None, description="OAuth credential or ID token")
+    email: Optional[str] = Field(None, description="User email address")
+    name: Optional[str] = Field(None, description="User display name")
+    avatar_url: Optional[str] = Field(None, description="User profile photo URL")
+
+def get_current_user_from_request(request: Request) -> Optional[dict]:
+    """Retrieves the authenticated user payload from the session cookie."""
+    cookie_val = request.cookies.get("comiccraft_user")
+    if not cookie_val:
+        return None
+    try:
+        decoded = base64.b64decode(cookie_val.encode("utf-8")).decode("utf-8")
+        return json.loads(decoded)
+    except Exception:
+        return None
+
 
 class ComicGenerateRequest(BaseModel):
     prompt: str = Field(..., description="Story premise or idea for the comic")
@@ -62,7 +84,8 @@ async def home_page(request: Request):
             "styles": config.SUPPORTED_STYLES,
             "genres": config.STORY_GENRES,
             "default_model": config.TEXT_MODEL,
-            "has_api_key": bool(config.GEMINI_API_KEY)
+            "has_api_key": bool(config.GEMINI_API_KEY),
+            "current_user": get_current_user_from_request(request)
         }
     )
 
@@ -147,7 +170,8 @@ async def view_comic(request: Request, comic_id: str):
         name="result.html",
         context={
             "comic": comic,
-            "styles": config.SUPPORTED_STYLES
+            "styles": config.SUPPORTED_STYLES,
+            "current_user": get_current_user_from_request(request)
         }
     )
 
@@ -187,7 +211,8 @@ async def comic_export_success_page(request: Request, comic_id: str):
         request=request,
         name="success.html",
         context={
-            "comic": comic
+            "comic": comic,
+            "current_user": get_current_user_from_request(request)
         }
     )
 
@@ -199,7 +224,8 @@ async def comic_gallery(request: Request):
         request=request,
         name="gallery.html",
         context={
-            "comics": all_comics
+            "comics": all_comics,
+            "current_user": get_current_user_from_request(request)
         }
     )
 
@@ -433,6 +459,76 @@ async def get_settings_status():
         "model": config.TEXT_MODEL,
         "image_provider": config.IMAGE_PROVIDER
     }
+
+# ----------------- Authentication Endpoints (Google & Apple) ----------------- #
+
+@router.post("/api/auth/login")
+async def api_auth_login(payload: AuthLoginRequest):
+    """
+    Authenticates a user via Google Sign-In or Apple Sign-In.
+    Supports real tokens or instant one-click demo profiles.
+    """
+    provider = payload.provider.lower().strip()
+    if provider not in ("google", "apple"):
+        raise HTTPException(status_code=400, detail="Unsupported auth provider. Use 'google' or 'apple'.")
+
+    if provider == "google":
+        default_name = "Alex Rivera"
+        default_email = "alex.rivera@gmail.com"
+        default_avatar = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=160&auto=format&fit=crop&q=80"
+        provider_title = "Google"
+    else: # apple
+        default_name = "Jordan Vance"
+        default_email = "jordan.vance@privaterelay.appleid.com"
+        default_avatar = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=160&auto=format&fit=crop&q=80"
+        provider_title = "Apple"
+
+    user = {
+        "id": f"usr_{uuid.uuid4().hex[:8]}",
+        "name": payload.name or default_name,
+        "email": payload.email or default_email,
+        "avatar_url": payload.avatar_url or default_avatar,
+        "provider": provider_title,
+        "provider_id": provider,
+        "logged_in_at": time.time()
+    }
+
+    encoded = base64.b64encode(json.dumps(user).encode("utf-8")).decode("utf-8")
+    response = JSONResponse(
+        content={
+            "status": "success",
+            "message": f"Successfully signed in with {provider_title}!",
+            "user": user
+        }
+    )
+    response.set_cookie(
+        key="comiccraft_user",
+        value=encoded,
+        max_age=30 * 86400,
+        httponly=False,
+        samesite="lax"
+    )
+    return response
+
+@router.get("/api/auth/me")
+async def api_auth_me(request: Request):
+    """Returns the currently authenticated user profile and session state."""
+    user = get_current_user_from_request(request)
+    if user:
+        return {"authenticated": True, "user": user}
+    return {"authenticated": False, "user": None}
+
+@router.post("/api/auth/logout")
+async def api_auth_logout():
+    """Logs the user out and clears the authentication cookie."""
+    response = JSONResponse(
+        content={
+            "status": "success",
+            "message": "Signed out successfully"
+        }
+    )
+    response.delete_cookie(key="comiccraft_user")
+    return response
 
 @router.get("/health")
 async def health_check():

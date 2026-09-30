@@ -193,3 +193,51 @@ def test_api_update_panel_text():
     assert retrieved is not None
     assert retrieved["panels"][0]["speaker"] == "Commander Nova"
 
+
+def test_google_auth_login():
+    """Verify Google authentication sets cookie and returns user profile."""
+    res = client.post("/api/auth/login", json={"provider": "google"})
+    assert res.status_code == 200
+    data = res.json()
+    assert data["status"] == "success"
+    assert data["user"]["provider"] == "Google"
+    assert "comiccraft_user" in res.cookies
+
+
+def test_apple_auth_login():
+    """Verify Apple authentication sets cookie and returns user profile."""
+    res = client.post("/api/auth/login", json={"provider": "apple", "name": "Bruce Wayne"})
+    assert res.status_code == 200
+    data = res.json()
+    assert data["status"] == "success"
+    assert data["user"]["provider"] == "Apple"
+    assert data["user"]["name"] == "Bruce Wayne"
+    assert "comiccraft_user" in res.cookies
+
+
+def test_auth_me_and_logout():
+    """Verify session checking with cookie and logout workflow."""
+    # First sign in with Google
+    login_res = client.post("/api/auth/login", json={"provider": "google"})
+    assert login_res.status_code == 200
+    cookie_val = login_res.cookies.get("comiccraft_user")
+    assert cookie_val is not None
+
+    # Check /api/auth/me with cookie
+    me_res = client.get("/api/auth/me", cookies={"comiccraft_user": cookie_val})
+    assert me_res.status_code == 200
+    me_data = me_res.json()
+    assert me_data["authenticated"] is True
+    assert me_data["user"]["provider"] == "Google"
+
+    # Logout
+    logout_res = client.post("/api/auth/logout")
+    assert logout_res.status_code == 200
+    assert logout_res.json()["status"] == "success"
+
+
+def test_invalid_auth_provider():
+    """Verify invalid provider returns 400 Bad Request."""
+    res = client.post("/api/auth/login", json={"provider": "unsupported_oauth"})
+    assert res.status_code == 400
+
