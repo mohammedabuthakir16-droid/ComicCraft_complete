@@ -196,17 +196,18 @@ def test_api_update_panel_text():
 
 def test_google_auth_login():
     """Verify Google authentication sets cookie and returns user profile."""
-    res = client.post("/api/auth/login", json={"provider": "google"})
+    res = client.post("/api/auth/login", json={"provider": "google", "email": "alex@gmail.com", "name": "Alex Rivera"})
     assert res.status_code == 200
     data = res.json()
     assert data["status"] == "success"
     assert data["user"]["provider"] == "Google"
+    assert data["user"]["email"] == "alex@gmail.com"
     assert "comiccraft_user" in res.cookies
 
 
 def test_apple_auth_login():
     """Verify Apple authentication sets cookie and returns user profile."""
-    res = client.post("/api/auth/login", json={"provider": "apple", "name": "Bruce Wayne"})
+    res = client.post("/api/auth/login", json={"provider": "apple", "name": "Bruce Wayne", "email": "bruce@icloud.com"})
     assert res.status_code == 200
     data = res.json()
     assert data["status"] == "success"
@@ -218,7 +219,7 @@ def test_apple_auth_login():
 def test_auth_me_and_logout():
     """Verify session checking with cookie and logout workflow."""
     # First sign in with Google
-    login_res = client.post("/api/auth/login", json={"provider": "google"})
+    login_res = client.post("/api/auth/login", json={"provider": "google", "email": "tester@gmail.com", "name": "Tester"})
     assert login_res.status_code == 200
     cookie_val = login_res.cookies.get("comiccraft_user")
     assert cookie_val is not None
@@ -238,7 +239,7 @@ def test_auth_me_and_logout():
 
 def test_invalid_auth_provider():
     """Verify invalid provider returns 400 Bad Request."""
-    res = client.post("/api/auth/login", json={"provider": "unsupported_oauth"})
+    res = client.post("/api/auth/login", json={"provider": "unsupported_oauth", "email": "test@test.com"})
     assert res.status_code == 400
 
 
@@ -259,4 +260,11 @@ def test_personal_auth_login():
     assert data["user"]["email"] == "mohammed@comiccraft.ai"
     assert "Mohammed" in data["user"]["avatar_url"]
     assert "comiccraft_user" in res.cookies
+
+
+def test_empty_auth_fails():
+    """Verify login without credentials or user info fails with 400."""
+    res = client.post("/api/auth/login", json={"provider": "google"})
+    assert res.status_code == 400
+
 

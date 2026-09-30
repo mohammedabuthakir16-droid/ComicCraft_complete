@@ -1897,79 +1897,98 @@ function toggleUserDropdown(e) {
   }
 }
 
-function quickFillDemoUser() {
-  const nameInput = document.getElementById("auth-user-name");
-  const emailInput = document.getElementById("auth-user-email");
-  if (nameInput) nameInput.value = "Mohammed";
-  if (emailInput) emailInput.value = "mohammed@comiccraft.ai";
-  showToast("⚡ Pre-filled test creator profile! Click 'Sign In as Myself' or Continue with Google.");
+let currentActiveAuthTab = "google";
+
+function switchAuthTab(tab) {
+  currentActiveAuthTab = tab;
+  const tabs = ["google", "apple", "email"];
+  tabs.forEach(t => {
+    const btn = document.getElementById(`tab-btn-${t}`);
+    const pane = document.getElementById(`pane-${t}`);
+    if (btn) btn.classList.toggle("active", t === tab);
+    if (pane) {
+      pane.style.display = t === tab ? "block" : "none";
+      pane.classList.toggle("active", t === tab);
+    }
+  });
+  playPopSound(480);
 }
 
-async function handlePersonalLogin(e) {
+function quickFillActiveTab() {
+  const tab = currentActiveAuthTab || "google";
+  if (tab === "google") {
+    const email = document.getElementById("google-auth-email");
+    const name = document.getElementById("google-auth-name");
+    if (email) email.value = "mohammed@gmail.com";
+    if (name) name.value = "Mohammed";
+    showToast("⚡ Pre-filled test Google ID (mohammed@gmail.com)! Click Continue with Google.");
+  } else if (tab === "apple") {
+    const email = document.getElementById("apple-auth-email");
+    const name = document.getElementById("apple-auth-name");
+    if (email) email.value = "mohammed@icloud.com";
+    if (name) name.value = "Mohammed";
+    showToast("⚡ Pre-filled test Apple ID (mohammed@icloud.com)! Click Continue with Apple ID.");
+  } else {
+    const email = document.getElementById("direct-auth-email");
+    const name = document.getElementById("direct-auth-name");
+    if (email) email.value = "mohammed@comiccraft.ai";
+    if (name) name.value = "Mohammed";
+    showToast("⚡ Pre-filled test Creator ID! Click Sign In to Studio.");
+  }
+}
+
+async function submitGoogleAuth(e) {
   if (e) e.preventDefault();
-  const nameInput = document.getElementById("auth-user-name");
-  const emailInput = document.getElementById("auth-user-email");
-  const submitBtn = document.getElementById("btn-login-personal");
-
-  const name = nameInput ? nameInput.value.trim() : "";
+  const emailInput = document.getElementById("google-auth-email");
+  const nameInput = document.getElementById("google-auth-name");
   const email = emailInput ? emailInput.value.trim() : "";
+  const name = nameInput ? nameInput.value.trim() : "";
 
-  if (!name || !email) {
-    showToast("⚠️ Please enter both your name and email address.");
+  if (!email && !name) {
+    showToast("⚠️ Please enter your Google email / ID to sign in.");
     return;
   }
+  await performAuthLogin("google", "google-tab-spinner", "btn-submit-google", name, email);
+}
 
-  if (submitBtn) {
-    submitBtn.disabled = true;
-    submitBtn.innerHTML = `<span>⏳</span><span>Signing in...</span>`;
+async function submitAppleAuth(e) {
+  if (e) e.preventDefault();
+  const emailInput = document.getElementById("apple-auth-email");
+  const nameInput = document.getElementById("apple-auth-name");
+  const email = emailInput ? emailInput.value.trim() : "";
+  const name = nameInput ? nameInput.value.trim() : "";
+
+  if (!email && !name) {
+    showToast("⚠️ Please enter your Apple ID to sign in.");
+    return;
   }
+  await performAuthLogin("apple", "apple-tab-spinner", "btn-submit-apple", name, email);
+}
 
-  try {
-    const res = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        provider: "email",
-        name: name,
-        email: email
-      })
-    });
+async function submitEmailAuth(e) {
+  if (e) e.preventDefault();
+  const emailInput = document.getElementById("direct-auth-email");
+  const nameInput = document.getElementById("direct-auth-name");
+  const email = emailInput ? emailInput.value.trim() : "";
+  const name = nameInput ? nameInput.value.trim() : "";
 
-    const data = await res.json();
-    if (res.ok && data.status === "success") {
-      closeAuthModal();
-      renderUserInNav(data.user);
-      playPopSound(720);
-      showToast(`✨ Welcome, ${data.user.name}! You are now signed in.`);
-    } else {
-      showToast(`⚠️ Sign in failed: ${data.detail || data.message || "Unknown error"}`);
-    }
-  } catch (err) {
-    showToast(`⚠️ Authentication error: ${err.message}`);
-  } finally {
-    if (submitBtn) {
-      submitBtn.disabled = false;
-      submitBtn.innerHTML = `<span>🚀</span><span>Sign In as Myself</span>`;
-    }
+  if (!email && !name) {
+    showToast("⚠️ Please enter your email to sign in.");
+    return;
   }
+  await performAuthLogin("email", "email-tab-spinner", "btn-submit-direct", name, email);
 }
 
 async function handleGoogleLogin() {
-  const nameInput = document.getElementById("auth-user-name");
-  const emailInput = document.getElementById("auth-user-email");
-  const name = nameInput ? nameInput.value.trim() : "";
-  const email = emailInput ? emailInput.value.trim() : "";
-
-  await performAuthLogin("google", "google-spinner", "btn-login-google", name, email);
+  switchAuthTab("google");
 }
 
 async function handleAppleLogin() {
-  const nameInput = document.getElementById("auth-user-name");
-  const emailInput = document.getElementById("auth-user-email");
-  const name = nameInput ? nameInput.value.trim() : "";
-  const email = emailInput ? emailInput.value.trim() : "";
+  switchAuthTab("apple");
+}
 
-  await performAuthLogin("apple", "apple-spinner", "btn-login-apple", name, email);
+async function handlePersonalLogin(e) {
+  await submitEmailAuth(e);
 }
 
 async function performAuthLogin(provider, spinnerId, buttonId, name = "", email = "") {
@@ -2103,10 +2122,14 @@ function renderLoggedOutNav() {
 window.openAuthModal = openAuthModal;
 window.closeAuthModal = closeAuthModal;
 window.toggleUserDropdown = toggleUserDropdown;
+window.switchAuthTab = switchAuthTab;
+window.quickFillActiveTab = quickFillActiveTab;
+window.submitGoogleAuth = submitGoogleAuth;
+window.submitAppleAuth = submitAppleAuth;
+window.submitEmailAuth = submitEmailAuth;
 window.handlePersonalLogin = handlePersonalLogin;
 window.handleGoogleLogin = handleGoogleLogin;
 window.handleAppleLogin = handleAppleLogin;
-window.quickFillDemoUser = quickFillDemoUser;
 window.switchAccount = switchAccount;
 window.logoutUser = logoutUser;
 

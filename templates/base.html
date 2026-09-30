@@ -172,90 +172,172 @@
       </div>
 
       <div class="modal-dialog-body auth-modal-content">
-        <div class="auth-hero-banner">
-          <div class="auth-hero-badge">POW!</div>
-          <h3 class="auth-hero-title">Sign In to ComicCraft</h3>
-          <p class="auth-hero-sub">
-            Log in with your own name & email to personalize your studio, track comics in your library, and access multi-panel PDF exports.
-          </p>
-        </div>
-
-        <!-- 1. Direct Personal Sign-In Form (Sign In by Yourself) -->
-        <form id="personal-auth-form" onsubmit="handlePersonalLogin(event)">
-          <div class="form-group mb-2">
-            <label class="form-label" for="auth-user-name">Your Full Name / Creator Handle</label>
-            <div class="input-with-icon">
-              <span class="input-icon">👤</span>
-              <input 
-                type="text" 
-                id="auth-user-name" 
-                class="form-input has-icon" 
-                placeholder="e.g. Mohammed Abuthakir" 
-                required
-                autocomplete="name"
-              >
-            </div>
-          </div>
-
-          <div class="form-group mb-3">
-            <label class="form-label" for="auth-user-email">Your Email Address</label>
-            <div class="input-with-icon">
-              <span class="input-icon">✉️</span>
-              <input 
-                type="email" 
-                id="auth-user-email" 
-                class="form-input has-icon" 
-                placeholder="e.g. yourname@gmail.com" 
-                required
-                autocomplete="email"
-              >
-            </div>
-          </div>
-
-          <button type="submit" class="btn-action btn-blue w-full btn-login-submit" id="btn-login-personal">
-            <span>🚀</span>
-            <span>Sign In as Myself</span>
-          </button>
-        </form>
-
-        <div class="auth-divider-wrap">
-          <span class="auth-divider-line"></span>
-          <span class="auth-divider-text">OR SIGN IN WITH</span>
-          <span class="auth-divider-line"></span>
-        </div>
-
-        <div class="oauth-buttons-stack">
-          <!-- Google Sign-In Button -->
-          <button type="button" class="btn-oauth-provider btn-oauth-google" id="btn-login-google" onclick="handleGoogleLogin()">
-            <svg class="oauth-icon-svg" viewBox="0 0 24 24" width="22" height="22">
+        <!-- Auth Provider Tabs Header -->
+        <div class="auth-tabs-header">
+          <button type="button" class="auth-tab-btn active" id="tab-btn-google" onclick="switchAuthTab('google')">
+            <svg class="oauth-tab-icon" viewBox="0 0 24 24" width="18" height="18">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
               <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
               <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
               <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
             </svg>
-            <span class="oauth-btn-text">Continue with Google</span>
-            <span class="oauth-spinner" id="google-spinner" style="display:none;">⏳</span>
+            <span>Google</span>
           </button>
-
-          <!-- Apple Sign-In Button -->
-          <button type="button" class="btn-oauth-provider btn-oauth-apple" id="btn-login-apple" onclick="handleAppleLogin()">
-            <svg class="oauth-icon-svg" viewBox="0 0 170 170" width="20" height="20">
+          <button type="button" class="auth-tab-btn" id="tab-btn-apple" onclick="switchAuthTab('apple')">
+            <svg class="oauth-tab-icon" viewBox="0 0 170 170" width="16" height="16">
               <path fill="currentColor" d="M150.37 130.25c-2.45 5.66-5.35 10.87-8.71 15.66-4.58 6.53-8.33 11.05-11.22 13.56-4.48 4.12-9.28 6.23-14.42 6.35-3.69 0-8.14-1.05-13.32-3.18-5.19-2.12-9.97-3.17-14.34-3.17-4.58 0-9.49 1.05-14.75 3.17-5.26 2.13-9.5 3.24-12.74 3.35-4.35.13-9.16-1.9-14.42-6.08-3.69-3.08-7.73-7.97-12.1-14.67-6.19-9.5-10.9-20.2-14.12-32.08-3.23-11.89-4.85-23.01-4.85-33.38 0-14.37 3.52-26.4 10.56-36.08 7.05-9.68 15.93-14.61 26.65-14.79 4.89 0 10.19 1.25 15.9 3.75 5.71 2.5 9.77 3.78 12.17 3.84 1.74 0 5.87-1.33 12.38-3.99 6.51-2.66 12.08-3.86 16.71-3.6 12.4.98 22.31 5.68 29.74 14.12-10.89 6.54-16.22 15.79-16.01 27.75.22 9.47 3.91 17.51 11.08 24.12 7.16 6.61 15.67 10.22 25.52 10.83-2.18 6.54-4.89 13.17-8.13 19.88zM119.22 33.15c0-6.75 2.5-13.29 7.51-19.62 5.01-6.33 11.21-10.49 18.6-12.48.98 4.9 1.04 9.61.16 14.12-.87 4.52-2.94 9.17-6.2 13.96-3.26 4.79-7.39 8.23-12.38 10.33-4.99 2.1-9.66 3.03-14.01 2.78-.11-1.3-.17-2.6-.17-3.9z"/>
             </svg>
-            <span class="oauth-btn-text">Continue with Apple</span>
-            <span class="oauth-spinner" id="apple-spinner" style="display:none;">⏳</span>
+            <span>Apple</span>
+          </button>
+          <button type="button" class="auth-tab-btn" id="tab-btn-email" onclick="switchAuthTab('email')">
+            <span>✉️</span>
+            <span>Email</span>
           </button>
         </div>
 
+        <!-- Tab 1: Google Sign-In Pane -->
+        <div class="auth-tab-pane active" id="pane-google">
+          <div class="auth-pane-desc">
+            Sign in with your <strong>Google Account</strong> to save comics and sync your library.
+          </div>
+          <form onsubmit="submitGoogleAuth(event)">
+            <div class="form-group mb-2">
+              <label class="form-label" for="google-auth-email">Your Google / Gmail ID</label>
+              <div class="input-with-icon">
+                <span class="input-icon">🔐</span>
+                <input 
+                  type="email" 
+                  id="google-auth-email" 
+                  class="form-input has-icon" 
+                  placeholder="e.g. yourname@gmail.com" 
+                  required
+                  autocomplete="email"
+                >
+              </div>
+            </div>
+            <div class="form-group mb-3">
+              <label class="form-label" for="google-auth-name">Your Full Name</label>
+              <div class="input-with-icon">
+                <span class="input-icon">👤</span>
+                <input 
+                  type="text" 
+                  id="google-auth-name" 
+                  class="form-input has-icon" 
+                  placeholder="e.g. Mohammed" 
+                  required
+                  autocomplete="name"
+                >
+              </div>
+            </div>
+            <button type="submit" class="btn-oauth-provider btn-oauth-google" id="btn-submit-google">
+              <svg class="oauth-icon-svg" viewBox="0 0 24 24" width="22" height="22">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+              </svg>
+              <span>Continue with Google</span>
+              <span class="oauth-spinner" id="google-tab-spinner" style="display:none;">⏳</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- Tab 2: Apple Sign-In Pane -->
+        <div class="auth-tab-pane" id="pane-apple" style="display:none;">
+          <div class="auth-pane-desc">
+            Sign in with your <strong>Apple ID</strong> to link your creator studio.
+          </div>
+          <form onsubmit="submitAppleAuth(event)">
+            <div class="form-group mb-2">
+              <label class="form-label" for="apple-auth-email">Your Apple ID / iCloud Email</label>
+              <div class="input-with-icon">
+                <span class="input-icon">🔐</span>
+                <input 
+                  type="email" 
+                  id="apple-auth-email" 
+                  class="form-input has-icon" 
+                  placeholder="e.g. yourname@icloud.com" 
+                  required
+                  autocomplete="email"
+                >
+              </div>
+            </div>
+            <div class="form-group mb-3">
+              <label class="form-label" for="apple-auth-name">Your Full Name</label>
+              <div class="input-with-icon">
+                <span class="input-icon">👤</span>
+                <input 
+                  type="text" 
+                  id="apple-auth-name" 
+                  class="form-input has-icon" 
+                  placeholder="e.g. Mohammed" 
+                  required
+                  autocomplete="name"
+                >
+              </div>
+            </div>
+            <button type="submit" class="btn-oauth-provider btn-oauth-apple" id="btn-submit-apple">
+              <svg class="oauth-icon-svg" viewBox="0 0 170 170" width="20" height="20">
+                <path fill="currentColor" d="M150.37 130.25c-2.45 5.66-5.35 10.87-8.71 15.66-4.58 6.53-8.33 11.05-11.22 13.56-4.48 4.12-9.28 6.23-14.42 6.35-3.69 0-8.14-1.05-13.32-3.18-5.19-2.12-9.97-3.17-14.34-3.17-4.58 0-9.49 1.05-14.75 3.17-5.26 2.13-9.5 3.24-12.74 3.35-4.35.13-9.16-1.9-14.42-6.08-3.69-3.08-7.73-7.97-12.1-14.67-6.19-9.5-10.9-20.2-14.12-32.08-3.23-11.89-4.85-23.01-4.85-33.38 0-14.37 3.52-26.4 10.56-36.08 7.05-9.68 15.93-14.61 26.65-14.79 4.89 0 10.19 1.25 15.9 3.75 5.71 2.5 9.77 3.78 12.17 3.84 1.74 0 5.87-1.33 12.38-3.99 6.51-2.66 12.08-3.86 16.71-3.6 12.4.98 22.31 5.68 29.74 14.12-10.89 6.54-16.22 15.79-16.01 27.75.22 9.47 3.91 17.51 11.08 24.12 7.16 6.61 15.67 10.22 25.52 10.83-2.18 6.54-4.89 13.17-8.13 19.88zM119.22 33.15c0-6.75 2.5-13.29 7.51-19.62 5.01-6.33 11.21-10.49 18.6-12.48.98 4.9 1.04 9.61.16 14.12-.87 4.52-2.94 9.17-6.2 13.96-3.26 4.79-7.39 8.23-12.38 10.33-4.99 2.1-9.66 3.03-14.01 2.78-.11-1.3-.17-2.6-.17-3.9z"/>
+              </svg>
+              <span>Continue with Apple ID</span>
+              <span class="oauth-spinner" id="apple-tab-spinner" style="display:none;">⏳</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- Tab 3: Direct Email Sign-In Pane -->
+        <div class="auth-tab-pane" id="pane-email" style="display:none;">
+          <div class="auth-pane-desc">
+            Sign in with any <strong>Personal or Studio Email</strong>.
+          </div>
+          <form onsubmit="submitEmailAuth(event)">
+            <div class="form-group mb-2">
+              <label class="form-label" for="direct-auth-email">Your Email Address</label>
+              <div class="input-with-icon">
+                <span class="input-icon">✉️</span>
+                <input 
+                  type="email" 
+                  id="direct-auth-email" 
+                  class="form-input has-icon" 
+                  placeholder="e.g. creator@domain.com" 
+                  required
+                  autocomplete="email"
+                >
+              </div>
+            </div>
+            <div class="form-group mb-3">
+              <label class="form-label" for="direct-auth-name">Your Full Name</label>
+              <div class="input-with-icon">
+                <span class="input-icon">👤</span>
+                <input 
+                  type="text" 
+                  id="direct-auth-name" 
+                  class="form-input has-icon" 
+                  placeholder="e.g. Mohammed" 
+                  required
+                  autocomplete="name"
+                >
+              </div>
+            </div>
+            <button type="submit" class="btn-action btn-blue w-full btn-login-submit" id="btn-submit-direct">
+              <span>🚀</span>
+              <span>Sign In to Studio</span>
+              <span class="oauth-spinner" id="email-tab-spinner" style="display:none;">⏳</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- Demo Shortcut -->
         <div class="auth-demo-shortcut">
-          <button type="button" class="btn-demo-autofill" onclick="quickFillDemoUser()">
+          <button type="button" class="btn-demo-autofill" onclick="quickFillActiveTab()">
             <span>⚡</span>
-            <span>1-Click Test Persona Auto-Fill</span>
+            <span>1-Click Test ID Auto-Fill</span>
           </button>
         </div>
 
         <div class="auth-modal-footer-note">
-          By signing in, your comics, creator handle, and library are synced across ComicCraft.
+          Sign in using your own real ID. Your session, comics, and library are securely linked.
         </div>
       </div>
     </div>

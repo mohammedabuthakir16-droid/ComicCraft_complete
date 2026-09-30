@@ -499,27 +499,34 @@ async def api_auth_login(payload: AuthLoginRequest):
             raw_email = raw_email or token_data.get("email", "")
             avatar_url = avatar_url or token_data.get("picture", "")
 
+    # Require user email or name if no credential token was provided
+    if not raw_email and not raw_name and not payload.credential:
+        raise HTTPException(
+            status_code=400,
+            detail="Please enter your email or account ID to sign in."
+        )
+
     # Provider and identity resolution
     if provider == "google":
         provider_title = "Google"
         provider_id = "google"
-        user_name = raw_name or (raw_email.split("@")[0].capitalize() if raw_email else "Alex Rivera")
-        user_email = raw_email or (f"{user_name.lower().replace(' ', '.')}@gmail.com" if raw_name else "alex.rivera@gmail.com")
+        user_name = raw_name or (raw_email.split("@")[0].replace(".", " ").title() if raw_email else "Google Creator")
+        user_email = raw_email or f"{user_name.lower().replace(' ', '.')}@gmail.com"
         if not avatar_url:
             encoded_name = urllib.parse.quote(user_name)
             avatar_url = f"https://ui-avatars.com/api/?name={encoded_name}&background=4285F4&color=fff&bold=true&rounded=true"
     elif provider == "apple":
         provider_title = "Apple"
         provider_id = "apple"
-        user_name = raw_name or (raw_email.split("@")[0].capitalize() if raw_email else "Jordan Vance")
-        user_email = raw_email or (f"{user_name.lower().replace(' ', '.')}@privaterelay.appleid.com" if raw_name else "jordan.vance@privaterelay.appleid.com")
+        user_name = raw_name or (raw_email.split("@")[0].replace(".", " ").title() if raw_email else "Apple Creator")
+        user_email = raw_email or f"{user_name.lower().replace(' ', '.')}@privaterelay.appleid.com"
         if not avatar_url:
             encoded_name = urllib.parse.quote(user_name)
             avatar_url = f"https://ui-avatars.com/api/?name={encoded_name}&background=000000&color=fff&bold=true&rounded=true"
     else:  # email or direct
         provider_title = "ComicCraft ID"
         provider_id = "email"
-        user_name = raw_name or (raw_email.split("@")[0].capitalize() if raw_email else "Comic Creator")
+        user_name = raw_name or (raw_email.split("@")[0].replace(".", " ").title() if raw_email else "Comic Creator")
         user_email = raw_email or "creator@comiccraft.ai"
         if not avatar_url:
             encoded_name = urllib.parse.quote(user_name)
