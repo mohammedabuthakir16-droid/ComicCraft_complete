@@ -3629,3 +3629,81 @@ body.comic-app-body {
   color: #94a3b8;
   line-height: 1.4;
 }
+
+/* Direct Personal Login & Switch User Styles */
+.btn-login-submit {
+  height: 46px;
+  font-size: 14.5px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 10px;
+  box-shadow: 3px 3px 0px #0f172a;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  margin-top: 6px;
+}
+
+.btn-login-submit:hover {
+  transform: translateY(-1.5px);
+  box-shadow: 4px 4px 0px #0f172a;
+}
+
+.btn-login-submit:active {
+  transform: translateY(1px);
+  box-shadow: 1px 1px 0px #0f172a;
+}
+
+.provider-pill-badge.provider-email {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.provider-tag-email {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+}
+
+.btn-switch-user {
+  background: transparent;
+  border: none;
+  width: 100%;
+  cursor: pointer;
+  text-align: left;
+  color: #475569;
+}
+
+.btn-switch-user:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.auth-demo-shortcut {
+  text-align: center;
+  margin: 14px 0 10px 0;
+}
+
+.btn-demo-autofill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #f8fafc;
+  border: 1.5px dashed #cbd5e1;
+  color: #64748b;
+  font-family: var(--font-ui);
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-demo-autofill:hover {
+  background: #f1f5f9;
+  border-color: #0f172a;
+  color: #0f172a;
+  transform: translateY(-1px);
+}

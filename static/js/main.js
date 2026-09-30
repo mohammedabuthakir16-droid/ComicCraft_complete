@@ -1897,36 +1897,84 @@ function toggleUserDropdown(e) {
   }
 }
 
-function toggleCustomProfileFields() {
-  const fields = document.getElementById("custom-profile-fields");
-  const text = document.getElementById("custom-profile-toggle-text");
-  if (!fields) return;
+function quickFillDemoUser() {
+  const nameInput = document.getElementById("auth-user-name");
+  const emailInput = document.getElementById("auth-user-email");
+  if (nameInput) nameInput.value = "Mohammed";
+  if (emailInput) emailInput.value = "mohammed@comiccraft.ai";
+  showToast("⚡ Pre-filled test creator profile! Click 'Sign In as Myself' or Continue with Google.");
+}
 
-  if (fields.style.display === "none" || !fields.style.display) {
-    fields.style.display = "block";
-    if (text) text.innerText = "− Hide Demo Persona Fields";
-  } else {
-    fields.style.display = "none";
-    if (text) text.innerText = "+ Customize Demo Persona (Optional)";
+async function handlePersonalLogin(e) {
+  if (e) e.preventDefault();
+  const nameInput = document.getElementById("auth-user-name");
+  const emailInput = document.getElementById("auth-user-email");
+  const submitBtn = document.getElementById("btn-login-personal");
+
+  const name = nameInput ? nameInput.value.trim() : "";
+  const email = emailInput ? emailInput.value.trim() : "";
+
+  if (!name || !email) {
+    showToast("⚠️ Please enter both your name and email address.");
+    return;
+  }
+
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = `<span>⏳</span><span>Signing in...</span>`;
+  }
+
+  try {
+    const res = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        provider: "email",
+        name: name,
+        email: email
+      })
+    });
+
+    const data = await res.json();
+    if (res.ok && data.status === "success") {
+      closeAuthModal();
+      renderUserInNav(data.user);
+      playPopSound(720);
+      showToast(`✨ Welcome, ${data.user.name}! You are now signed in.`);
+    } else {
+      showToast(`⚠️ Sign in failed: ${data.detail || data.message || "Unknown error"}`);
+    }
+  } catch (err) {
+    showToast(`⚠️ Authentication error: ${err.message}`);
+  } finally {
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = `<span>🚀</span><span>Sign In as Myself</span>`;
+    }
   }
 }
 
 async function handleGoogleLogin() {
-  await performAuthLogin("google", "google-spinner", "btn-login-google");
+  const nameInput = document.getElementById("auth-user-name");
+  const emailInput = document.getElementById("auth-user-email");
+  const name = nameInput ? nameInput.value.trim() : "";
+  const email = emailInput ? emailInput.value.trim() : "";
+
+  await performAuthLogin("google", "google-spinner", "btn-login-google", name, email);
 }
 
 async function handleAppleLogin() {
-  await performAuthLogin("apple", "apple-spinner", "btn-login-apple");
+  const nameInput = document.getElementById("auth-user-name");
+  const emailInput = document.getElementById("auth-user-email");
+  const name = nameInput ? nameInput.value.trim() : "";
+  const email = emailInput ? emailInput.value.trim() : "";
+
+  await performAuthLogin("apple", "apple-spinner", "btn-login-apple", name, email);
 }
 
-async function performAuthLogin(provider, spinnerId, buttonId) {
+async function performAuthLogin(provider, spinnerId, buttonId, name = "", email = "") {
   const spinner = document.getElementById(spinnerId);
   const button = document.getElementById(buttonId);
-  const customNameInput = document.getElementById("demo-custom-name");
-  const customEmailInput = document.getElementById("demo-custom-email");
-
-  const customName = customNameInput ? customNameInput.value.trim() : "";
-  const customEmail = customEmailInput ? customEmailInput.value.trim() : "";
 
   if (spinner) spinner.style.display = "inline-block";
   if (button) button.style.pointerEvents = "none";
@@ -1934,8 +1982,8 @@ async function performAuthLogin(provider, spinnerId, buttonId) {
   try {
     const payload = {
       provider: provider,
-      name: customName || null,
-      email: customEmail || null
+      name: name || null,
+      email: email || null
     };
 
     const res = await fetch("/api/auth/login", {
@@ -1950,8 +1998,8 @@ async function performAuthLogin(provider, spinnerId, buttonId) {
       renderUserInNav(data.user);
       playPopSound(720);
 
-      const providerLabel = data.user.provider === "Google" ? "Google" : "Apple ID";
-      showToast(`✨ Welcome back, ${data.user.name}! Signed in with ${providerLabel}`);
+      const providerLabel = data.user.provider === "Google" ? "Google" : (data.user.provider === "Apple" ? "Apple ID" : "ComicCraft ID");
+      showToast(`✨ Welcome, ${data.user.name}! Signed in with ${providerLabel}`);
     } else {
       showToast(`⚠️ Sign in failed: ${data.detail || data.message || "Unknown error"}`);
     }
@@ -1967,25 +2015,26 @@ function renderUserInNav(user) {
   const widget = document.getElementById("auth-nav-widget");
   if (!widget) return;
 
-  const firstName = (user.name || "Hero").split(" ")[0];
-  const providerIcon = user.provider_id === "google" ? "G" : "";
-  const avatarUrl = user.avatar_url || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=160&auto=format&fit=crop&q=80";
+  const firstName = (user.name || "Creator").split(" ")[0];
+  const providerIcon = user.provider_id === "google" ? "G" : (user.provider_id === "apple" ? "" : "⚡");
+  const fallbackAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'Creator')}&background=2563eb&color=fff&bold=true&rounded=true`;
+  const avatarUrl = user.avatar_url || fallbackAvatar;
 
   widget.innerHTML = `
     <div class="user-profile-menu" id="user-profile-menu">
       <button type="button" class="btn-user-profile" id="btn-user-profile" onclick="toggleUserDropdown(event)" aria-expanded="false" title="${escapeHtml(user.name)} (${escapeHtml(user.provider)})">
-        <img src="${escapeHtml(avatarUrl)}" alt="${escapeHtml(user.name)}" class="user-avatar-img" onerror="this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=160&auto=format&fit=crop&q=80'">
+        <img src="${escapeHtml(avatarUrl)}" alt="${escapeHtml(user.name)}" class="user-avatar-img" onerror="this.src='${fallbackAvatar}'">
         <span class="user-display-name">${escapeHtml(firstName)}</span>
-        <span class="provider-pill-badge provider-${escapeHtml(user.provider_id)}">${providerIcon}</span>
+        <span class="provider-pill-badge provider-${escapeHtml(user.provider_id || 'email')}">${providerIcon}</span>
         <span class="dropdown-chevron">▼</span>
       </button>
       <div class="user-dropdown-panel" id="user-dropdown-panel">
         <div class="user-dropdown-header">
-          <img src="${escapeHtml(avatarUrl)}" alt="${escapeHtml(user.name)}" class="dropdown-avatar-large" onerror="this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=160&auto=format&fit=crop&q=80'">
+          <img src="${escapeHtml(avatarUrl)}" alt="${escapeHtml(user.name)}" class="dropdown-avatar-large" onerror="this.src='${fallbackAvatar}'">
           <div class="user-dropdown-info">
             <div class="user-dropdown-name">${escapeHtml(user.name)}</div>
             <div class="user-dropdown-email">${escapeHtml(user.email)}</div>
-            <span class="user-provider-tag provider-tag-${escapeHtml(user.provider_id)}">
+            <span class="user-provider-tag provider-tag-${escapeHtml(user.provider_id || 'email')}">
               Signed in with ${escapeHtml(user.provider)}
             </span>
           </div>
@@ -2000,6 +2049,10 @@ function renderUserInNav(user) {
             <span class="item-icon">🎨</span>
             <span>Studio Workspace</span>
           </a>
+          <button type="button" class="user-dropdown-item btn-switch-user" onclick="switchAccount()">
+            <span class="item-icon">🔄</span>
+            <span>Switch Account / Sign In as Other</span>
+          </button>
         </div>
         <div class="user-dropdown-divider"></div>
         <button type="button" class="user-dropdown-logout-btn" onclick="logoutUser()">
@@ -2011,16 +2064,27 @@ function renderUserInNav(user) {
   `;
 }
 
-async function logoutUser() {
+async function switchAccount() {
+  const panel = document.getElementById("user-dropdown-panel");
+  if (panel) panel.classList.remove("open");
+  await logoutUser(false);
+  openAuthModal();
+}
+
+async function logoutUser(showNotification = true) {
   try {
     const res = await fetch("/api/auth/logout", { method: "POST" });
     if (res.ok) {
       renderLoggedOutNav();
       playPopSound(420);
-      showToast("🚪 Signed out of ComicCraft successfully");
+      if (showNotification) {
+        showToast("🚪 Signed out of ComicCraft successfully");
+      }
     }
   } catch (err) {
-    showToast(`⚠️ Logout error: ${err.message}`);
+    if (showNotification) {
+      showToast(`⚠️ Logout error: ${err.message}`);
+    }
   }
 }
 
@@ -2028,7 +2092,7 @@ function renderLoggedOutNav() {
   const widget = document.getElementById("auth-nav-widget");
   if (!widget) return;
   widget.innerHTML = `
-    <button type="button" class="btn-auth-signin" id="btn-open-auth-modal" onclick="openAuthModal()" title="Sign in with Google or Apple">
+    <button type="button" class="btn-auth-signin" id="btn-open-auth-modal" onclick="openAuthModal()" title="Sign in as yourself, with Google, or with Apple">
       <span class="auth-icon-badge">✨</span>
       <span class="auth-btn-label">Sign In</span>
     </button>
@@ -2039,9 +2103,11 @@ function renderLoggedOutNav() {
 window.openAuthModal = openAuthModal;
 window.closeAuthModal = closeAuthModal;
 window.toggleUserDropdown = toggleUserDropdown;
-window.toggleCustomProfileFields = toggleCustomProfileFields;
+window.handlePersonalLogin = handlePersonalLogin;
 window.handleGoogleLogin = handleGoogleLogin;
 window.handleAppleLogin = handleAppleLogin;
+window.quickFillDemoUser = quickFillDemoUser;
+window.switchAccount = switchAccount;
 window.logoutUser = logoutUser;
 
 

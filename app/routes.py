@@ -5,6 +5,7 @@ import logging
 import os
 import re
 import time
+import urllib.parse
 import uuid
 from pathlib import Path
 from typing import Optional, List
@@ -27,11 +28,25 @@ templates = Jinja2Templates(directory=str(config.BASE_DIR / "templates"))
 router = APIRouter()
 
 class AuthLoginRequest(BaseModel):
-    provider: str = Field(..., description="Authentication provider: google or apple")
+    provider: str = Field("email", description="Authentication provider: 'google', 'apple', 'email', or 'direct'")
     credential: Optional[str] = Field(None, description="OAuth credential or ID token")
     email: Optional[str] = Field(None, description="User email address")
     name: Optional[str] = Field(None, description="User display name")
+    password: Optional[str] = Field(None, description="User password (optional for instant sign in)")
     avatar_url: Optional[str] = Field(None, description="User profile photo URL")
+
+def decode_jwt_unverified(token: str) -> Optional[dict]:
+    """Decodes JWT payload without signature verification for client ID token parsing."""
+    try:
+        parts = token.split(".")
+        if len(parts) >= 2:
+            payload = parts[1]
+            padded = payload + "=" * (-len(payload) % 4)
+            data = json.loads(base64.urlsafe_b64decode(padded.encode("utf-8")).decode("utf-8"))
+            return data
+    except Exception:
+        pass
+    return None
 
 def get_current_user_from_request(request: Request) -> Optional[dict]:
     """Retrieves the authenticated user payload from the session cookie."""
@@ -465,31 +480,58 @@ async def get_settings_status():
 @router.post("/api/auth/login")
 async def api_auth_login(payload: AuthLoginRequest):
     """
-    Authenticates a user via Google Sign-In or Apple Sign-In.
-    Supports real tokens or instant one-click demo profiles.
+    Authenticates a user via Direct Email/Name Sign-In, Google Sign-In, or Apple Sign-In.
+    Supports user's own identity, real OAuth credential tokens, or instant verification.
     """
-    provider = payload.provider.lower().strip()
-    if provider not in ("google", "apple"):
-        raise HTTPException(status_code=400, detail="Unsupported auth provider. Use 'google' or 'apple'.")
+    provider = (payload.provider or "email").lower().strip()
+    if provider not in ("google", "apple", "email", "direct"):
+        raise HTTPException(status_code=400, detail="Unsupported auth provider. Use 'google', 'apple', or 'email'.")
 
+    raw_name = (payload.name or "").strip()
+    raw_email = (payload.email or "").strip()
+    avatar_url = payload.avatar_url
+
+    # If real credential token is passed (e.g. from Google Identity Services)
+    if payload.credential:
+        token_data = decode_jwt_unverified(payload.credential)
+        if token_data:
+            raw_name = raw_name or token_data.get("name") or token_data.get("given_name", "")
+            raw_email = raw_email or token_data.get("email", "")
+            avatar_url = avatar_url or token_data.get("picture", "")
+
+    # Provider and identity resolution
     if provider == "google":
-        default_name = "Alex Rivera"
-        default_email = "alex.rivera@gmail.com"
-        default_avatar = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=160&auto=format&fit=crop&q=80"
         provider_title = "Google"
-    else: # apple
-        default_name = "Jordan Vance"
-        default_email = "jordan.vance@privaterelay.appleid.com"
-        default_avatar = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=160&auto=format&fit=crop&q=80"
+        provider_id = "google"
+        user_name = raw_name or (raw_email.split("@")[0].capitalize() if raw_email else "Alex Rivera")
+        user_email = raw_email or (f"{user_name.lower().replace(' ', '.')}@gmail.com" if raw_name else "alex.rivera@gmail.com")
+        if not avatar_url:
+            encoded_name = urllib.parse.quote(user_name)
+            avatar_url = f"https://ui-avatars.com/api/?name={encoded_name}&background=4285F4&color=fff&bold=true&rounded=true"
+    elif provider == "apple":
         provider_title = "Apple"
+        provider_id = "apple"
+        user_name = raw_name or (raw_email.split("@")[0].capitalize() if raw_email else "Jordan Vance")
+        user_email = raw_email or (f"{user_name.lower().replace(' ', '.')}@privaterelay.appleid.com" if raw_name else "jordan.vance@privaterelay.appleid.com")
+        if not avatar_url:
+            encoded_name = urllib.parse.quote(user_name)
+            avatar_url = f"https://ui-avatars.com/api/?name={encoded_name}&background=000000&color=fff&bold=true&rounded=true"
+    else:  # email or direct
+        provider_title = "ComicCraft ID"
+        provider_id = "email"
+        user_name = raw_name or (raw_email.split("@")[0].capitalize() if raw_email else "Comic Creator")
+        user_email = raw_email or "creator@comiccraft.ai"
+        if not avatar_url:
+            encoded_name = urllib.parse.quote(user_name)
+            avatar_url = f"https://ui-avatars.com/api/?name={encoded_name}&background=2563eb&color=fff&bold=true&rounded=true"
 
     user = {
         "id": f"usr_{uuid.uuid4().hex[:8]}",
-        "name": payload.name or default_name,
-        "email": payload.email or default_email,
-        "avatar_url": payload.avatar_url or default_avatar,
+        "name": user_name,
+        "email": user_email,
+        "avatar_url": avatar_url,
         "provider": provider_title,
-        "provider_id": provider,
+        "provider_id": provider_id,
         "logged_in_at": time.time()
     }
 
@@ -497,7 +539,7 @@ async def api_auth_login(payload: AuthLoginRequest):
     response = JSONResponse(
         content={
             "status": "success",
-            "message": f"Successfully signed in with {provider_title}!",
+            "message": f"Successfully signed in as {user_name}!",
             "user": user
         }
     )

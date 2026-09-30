@@ -241,3 +241,22 @@ def test_invalid_auth_provider():
     res = client.post("/api/auth/login", json={"provider": "unsupported_oauth"})
     assert res.status_code == 400
 
+
+def test_personal_auth_login():
+    """Verify user can log in by themselves with their own name and email."""
+    res = client.post(
+        "/api/auth/login",
+        json={
+            "provider": "email",
+            "name": "Mohammed Abuthakir",
+            "email": "mohammed@comiccraft.ai"
+        }
+    )
+    assert res.status_code == 200
+    data = res.json()
+    assert data["status"] == "success"
+    assert data["user"]["name"] == "Mohammed Abuthakir"
+    assert data["user"]["email"] == "mohammed@comiccraft.ai"
+    assert "Mohammed" in data["user"]["avatar_url"]
+    assert "comiccraft_user" in res.cookies
+
