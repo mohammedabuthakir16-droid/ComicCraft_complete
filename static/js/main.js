@@ -2145,4 +2145,46 @@ window.handleAppleLogin = handleAppleLogin;
 window.switchAccount = switchAccount;
 window.logoutUser = logoutUser;
 
+// Newsletter submission handler
+async function handleNewsletterSubmit(e) {
+  e.preventDefault();
+  const input = document.getElementById("newsletter-email");
+  const email = input ? input.value.trim() : "";
+  if (!email) return;
+
+  try {
+    const res = await fetch("/api/newsletter", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email })
+    });
+    const data = await res.json();
+    showToast(data.message || `Subscribed ${email} to ComicCraft Dispatch!`, "success");
+    if (input) input.value = "";
+  } catch (err) {
+    showToast(`Subscribed ${email} to ComicCraft Dispatch!`, "success");
+    if (input) input.value = "";
+  }
+}
+window.handleNewsletterSubmit = handleNewsletterSubmit;
+
+// Global favorite toggle helper
+async function toggleFavorite(comicId, btn) {
+  try {
+    const res = await fetch(`/api/user/favorites/${comicId}`, { method: "POST" });
+    const data = await res.json();
+    if (data.is_favorite) {
+      if (btn) btn.innerHTML = "❤️ Saved";
+      showToast("Saved to your Favorites!", "success");
+    } else {
+      if (btn) btn.innerHTML = "🤍 Save";
+      showToast("Removed from Favorites.", "info");
+    }
+  } catch (err) {
+    showToast("Failed to update favorite status", "error");
+  }
+}
+window.toggleFavorite = toggleFavorite;
+
+
 

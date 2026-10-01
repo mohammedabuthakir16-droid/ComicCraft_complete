@@ -1,0 +1,380 @@
+{% extends "base.html" %}
+
+{% block title %}Pricing & Creator Plans — ComicCraft AI Studio{% endblock %}
+
+{% block content %}
+<div class="pricing-page-container">
+
+  <!-- Hero Header -->
+  <div class="pricing-hero-section studio-card">
+    <div class="pricing-badge-pill">
+      <span class="pulse-indicator"></span>
+      <span>QUANTUM CREATOR TIERS</span>
+    </div>
+    <h1 class="pricing-hero-title">Unlock Infinite Visual Storytelling</h1>
+    <p class="pricing-hero-sub">
+      Choose the creative pass that fits your journey. From casual indie webcomics to commercial graphic novel publishing.
+    </p>
+
+    <!-- Monthly / Annual Toggle Switch -->
+    <div class="billing-toggle-wrapper">
+      <span class="billing-label billing-monthly active" id="billing-monthly-label">Monthly</span>
+      <button type="button" class="billing-toggle-btn" id="billing-toggle" onclick="toggleBillingCycle()" aria-label="Toggle Monthly and Annual billing">
+        <span class="billing-toggle-knob"></span>
+      </button>
+      <span class="billing-label billing-annual" id="billing-annual-label">
+        Annual <span class="annual-discount-pill">Save 25%</span>
+      </span>
+    </div>
+  </div>
+
+  <!-- Pricing Cards Grid -->
+  <div class="pricing-cards-grid">
+    
+    <!-- Tier 1: Spark Creator (Free) -->
+    <div class="pricing-card studio-card">
+      <div class="pricing-card-header">
+        <div class="plan-icon-wrap">⚡</div>
+        <div class="plan-name-col">
+          <h3 class="plan-name">Spark Creator</h3>
+          <p class="plan-tagline">Ideal for exploring AI comic generation</p>
+        </div>
+      </div>
+
+      <div class="plan-price-wrap">
+        <div class="plan-currency">$</div>
+        <div class="plan-amount">0</div>
+        <div class="plan-period">/ month</div>
+      </div>
+      <div class="plan-subprice">100% Free forever &bull; No card required</div>
+
+      <ul class="plan-features-list">
+        <li class="feature-item">
+          <span class="check-icon">✓</span>
+          <span>Up to <strong>4 panels</strong> per comic generation</span>
+        </li>
+        <li class="feature-item">
+          <span class="check-icon">✓</span>
+          <span>Google Gemini 3.5 Flash-Lite neural story scripting</span>
+        </li>
+        <li class="feature-item">
+          <span class="check-icon">✓</span>
+          <span>Access to all <strong>6 Core Art Styles</strong> (Manga, Superhero, Noir, etc.)</span>
+        </li>
+        <li class="feature-item">
+          <span class="check-icon">✓</span>
+          <span>Interactive Classic & Webtoon reader modes</span>
+        </li>
+        <li class="feature-item">
+          <span class="check-icon">✓</span>
+          <span>Interactive ONOMA-SOUND FX board</span>
+        </li>
+        <li class="feature-item">
+          <span class="check-icon">✓</span>
+          <span>Print-ready A4 PDF download (Standard DPI)</span>
+        </li>
+        <li class="feature-item disabled">
+          <span class="cross-icon">✕</span>
+          <span>HD 4K ultra-resolution panel upscaling</span>
+        </li>
+        <li class="feature-item disabled">
+          <span class="cross-icon">✕</span>
+          <span>Commercial publishing license</span>
+        </li>
+      </ul>
+
+      <div class="plan-card-footer">
+        <a href="/" class="btn-action btn-outline w-full text-center">
+          <span>Start Creating Free</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Tier 2: Studio Pro (Featured) -->
+    <div class="pricing-card studio-card featured-tier">
+      <div class="featured-badge-ribbon">
+        <span>✨ MOST POPULAR</span>
+      </div>
+
+      <div class="pricing-card-header">
+        <div class="plan-icon-wrap pro-icon">🎨</div>
+        <div class="plan-name-col">
+          <h3 class="plan-name">Studio Pro</h3>
+          <p class="plan-tagline">For comic artists, writers & indie creators</p>
+        </div>
+      </div>
+
+      <div class="plan-price-wrap">
+        <div class="plan-currency">$</div>
+        <div class="plan-amount price-val-pro" data-monthly="12" data-annual="9">12</div>
+        <div class="plan-period">/ month</div>
+      </div>
+      <div class="plan-subprice price-billed-pro">Billed monthly &bull; Cancel anytime</div>
+
+      <ul class="plan-features-list">
+        <li class="feature-item">
+          <span class="check-icon">✓</span>
+          <span><strong>Unlimited</strong> AI comic story generations</span>
+        </li>
+        <li class="feature-item">
+          <span class="check-icon">✓</span>
+          <span>Up to <strong>6 panels</strong> with panoramic horizontal layouts</span>
+        </li>
+        <li class="feature-item">
+          <span class="check-icon">✓</span>
+          <span>Gemini 3.5 Pro + Deep Reasoning scriptwriting engine</span>
+        </li>
+        <li class="feature-item">
+          <span class="check-icon">✓</span>
+          <span><strong>HD 4K Panel Inking</strong> with deep character consistency</span>
+        </li>
+        <li class="feature-item">
+          <span class="check-icon">✓</span>
+          <span>Live Web Speech Voice Narrator with character pitch</span>
+        </li>
+        <li class="feature-item">
+          <span class="check-icon">✓</span>
+          <span>Art Shaders (Halftone Print, Noir B&W, Cyber Neon, Sepia)</span>
+        </li>
+        <li class="feature-item">
+          <span class="check-icon">✓</span>
+          <span>Vector-grade PDF export without ComicCraft watermark</span>
+        </li>
+        <li class="feature-item">
+          <span class="check-icon">✓</span>
+          <span>Commercial license for webtoon and print distribution</span>
+        </li>
+      </ul>
+
+      <div class="plan-card-footer">
+        <button type="button" class="btn-action btn-blue w-full btn-quantum-plan" onclick="selectPlan('Studio Pro')">
+          <span>⚡ Upgrade to Studio Pro</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Tier 3: Omniverse Studio (Enterprise / Studios) -->
+    <div class="pricing-card studio-card">
+      <div class="pricing-card-header">
+        <div class="plan-icon-wrap omni-icon">🌌</div>
+        <div class="plan-name-col">
+          <h3 class="plan-name">Omniverse Studio</h3>
+          <p class="plan-tagline">For publishing teams, agencies & game studios</p>
+        </div>
+      </div>
+
+      <div class="plan-price-wrap">
+        <div class="plan-currency">$</div>
+        <div class="plan-amount price-val-omni" data-monthly="29" data-annual="22">29</div>
+        <div class="plan-period">/ month</div>
+      </div>
+      <div class="plan-subprice price-billed-omni">Billed monthly &bull; Team collaboration ready</div>
+
+      <ul class="plan-features-list">
+        <li class="feature-item">
+          <span class="check-icon">✓</span>
+          <span><strong>Everything in Studio Pro</strong>, plus:</span>
+        </li>
+        <li class="feature-item">
+          <span class="check-icon">✓</span>
+          <span>Custom Character LoRA Training (Upload reference art)</span>
+        </li>
+        <li class="feature-item">
+          <span class="check-icon">✓</span>
+          <span>Full REST API & Webhook access with 99.9% uptime SLA</span>
+        </li>
+        <li class="feature-item">
+          <span class="check-icon">✓</span>
+          <span>Dedicated high-speed neural GPU inference queue</span>
+        </li>
+        <li class="feature-item">
+          <span class="check-icon">✓</span>
+          <span>Collaborative shared team comic library & cloud sync</span>
+        </li>
+        <li class="feature-item">
+          <span class="check-icon">✓</span>
+          <span>Continuous Image Strip export for Webtoon & Tapas platforms</span>
+        </li>
+        <li class="feature-item">
+          <span class="check-icon">✓</span>
+          <span>Full worldwide commercial & merchandising rights</span>
+        </li>
+      </ul>
+
+      <div class="plan-card-footer">
+        <button type="button" class="btn-action btn-outline w-full" onclick="selectPlan('Omniverse Studio')">
+          <span>Contact Studio Sales</span>
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Feature Comparison Table -->
+  <div class="pricing-comparison-section studio-card">
+    <div class="comparison-header">
+      <span class="comparison-icon">📊</span>
+      <h2 class="comparison-title">Full Feature Comparison Matrix</h2>
+    </div>
+
+    <div class="comparison-table-wrapper">
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th class="col-feature">Creative Capabilities</th>
+            <th class="col-tier">Spark (Free)</th>
+            <th class="col-tier highlight">Studio Pro</th>
+            <th class="col-tier">Omniverse</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="feature-name">Gemini Neural Scriptwriting</td>
+            <td>Flash-Lite</td>
+            <td class="highlight">Flash-Thinking & Pro</td>
+            <td>Custom Tuned Models</td>
+          </tr>
+          <tr>
+            <td class="feature-name">Maximum Panels per Strip</td>
+            <td>4 Panels</td>
+            <td class="highlight">6 Panels</td>
+            <td>12+ Multi-Chapter Panels</td>
+          </tr>
+          <tr>
+            <td class="feature-name">Image Resolution</td>
+            <td>1024 x 1024</td>
+            <td class="highlight">2048 x 2048 (HD)</td>
+            <td>4096 x 4096 (Ultra 4K)</td>
+          </tr>
+          <tr>
+            <td class="feature-name">Webtoon & Cinema Modes</td>
+            <td>✓ Included</td>
+            <td class="highlight">✓ Included</td>
+            <td>✓ Included</td>
+          </tr>
+          <tr>
+            <td class="feature-name">Interactive Audio SFX Synthesizer</td>
+            <td>✓ Included</td>
+            <td class="highlight">✓ Included</td>
+            <td>✓ Included</td>
+          </tr>
+          <tr>
+            <td class="feature-name">AI Voice Story Narration</td>
+            <td>Basic Browser Synth</td>
+            <td class="highlight">Multi-Character Voices</td>
+            <td>Studio WAV Export</td>
+          </tr>
+          <tr>
+            <td class="feature-name">Print-Ready PDF Export</td>
+            <td>Standard PDF</td>
+            <td class="highlight">Vector High-DPI</td>
+            <td>CMYK Print-House Ready</td>
+          </tr>
+          <tr>
+            <td class="feature-name">Watermark Free</td>
+            <td>✕ ComicCraft Badge</td>
+            <td class="highlight">✓ Watermark Free</td>
+            <td>✓ Watermark Free</td>
+          </tr>
+          <tr>
+            <td class="feature-name">Commercial License</td>
+            <td>Personal / Non-commercial</td>
+            <td class="highlight">✓ Full Commercial</td>
+            <td>✓ Global Merchandising</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Frequently Asked Questions Accordion -->
+  <div class="pricing-faq-section studio-card">
+    <div class="faq-header">
+      <span class="faq-icon">💡</span>
+      <h2 class="faq-title">Frequently Asked Questions</h2>
+    </div>
+
+    <div class="faq-grid">
+      <div class="faq-item">
+        <h4 class="faq-question">Can I use ComicCraft completely for free?</h4>
+        <p class="faq-answer">
+          Yes! The Spark Creator plan is completely free forever. You can write stories, generate 4-panel visual comic strips, use the interactive soundboard, and download PDFs without entering a credit card.
+        </p>
+      </div>
+
+      <div class="faq-item">
+        <h4 class="faq-question">How does Google Gemini power the comics?</h4>
+        <p class="faq-answer">
+          ComicCraft uses Google Gemini to read your premise, invent dramatic pacing, write character dialogue balloons, structure onomatopoeia sound effects, and engineer rich visual inking prompts for each panel.
+        </p>
+      </div>
+
+      <div class="faq-item">
+        <h4 class="faq-question">Can I use my own Gemini API Key?</h4>
+        <p class="faq-answer">
+          Absolutely. Click the <strong>API Key</strong> button on the Dynamic Island dock to enter your own Google AI Studio key. This gives you direct access to your personal Gemini quota and latest experimental models.
+        </p>
+      </div>
+
+      <div class="faq-item">
+        <h4 class="faq-question">Do I own the copyright to comics I create?</h4>
+        <p class="faq-answer">
+          On Studio Pro and Omniverse plans, you own full commercial publishing rights to your generated artwork, characters, and storylines for webtoon monetization, print sales, and merchandise.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom CTA Banner -->
+  <div class="pricing-cta-card studio-card">
+    <div class="cta-content">
+      <h2 class="cta-title">Ready to bring your stories to life?</h2>
+      <p class="cta-sub">Join thousands of creators drafting graphic novels and manga on ComicCraft.</p>
+    </div>
+    <div class="cta-actions">
+      <a href="/" class="btn-action btn-blue btn-lg">
+        <span>🎨 Launch Creator Studio</span>
+        <span>→</span>
+      </a>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block script_extra %}
+<script>
+let isAnnual = false;
+function toggleBillingCycle() {
+  isAnnual = !isAnnual;
+  const toggleBtn = document.getElementById('billing-toggle');
+  const monthlyLabel = document.getElementById('billing-monthly-label');
+  const annualLabel = document.getElementById('billing-annual-label');
+  
+  if (isAnnual) {
+    toggleBtn.classList.add('annual-active');
+    monthlyLabel.classList.remove('active');
+    annualLabel.classList.add('active');
+    document.querySelector('.price-val-pro').textContent = '9';
+    document.querySelector('.price-billed-pro').textContent = 'Billed annually ($108/yr) • Save 25%';
+    document.querySelector('.price-val-omni').textContent = '22';
+    document.querySelector('.price-billed-omni').textContent = 'Billed annually ($264/yr) • Save 25%';
+  } else {
+    toggleBtn.classList.remove('annual-active');
+    monthlyLabel.classList.add('active');
+    annualLabel.classList.remove('active');
+    document.querySelector('.price-val-pro').textContent = '12';
+    document.querySelector('.price-billed-pro').textContent = 'Billed monthly • Cancel anytime';
+    document.querySelector('.price-val-omni').textContent = '29';
+    document.querySelector('.price-billed-omni').textContent = 'Billed monthly • Team collaboration ready';
+  }
+}
+
+function selectPlan(planName) {
+  showToast(`Selected ${planName}! Redirecting to checkout portal...`, 'info');
+  setTimeout(() => {
+    window.location.href = '/';
+  }, 1200);
+}
+</script>
+{% endblock %}

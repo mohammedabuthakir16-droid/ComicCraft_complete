@@ -268,3 +268,67 @@ def test_empty_auth_fails():
     assert res.status_code == 400
 
 
+def test_studio_page():
+    """Verify dedicated /studio route renders the creation cockpit."""
+    res = client.get("/studio")
+    assert res.status_code == 200
+    assert "ComicCraft" in res.text
+    assert "Create Your Comic" in res.text or "Studio" in res.text
+
+
+def test_pricing_page():
+    """Verify /pricing route renders the creator plans and comparison matrix."""
+    res = client.get("/pricing")
+    assert res.status_code == 200
+    assert "Spark Creator" in res.text
+    assert "Studio Pro" in res.text
+    assert "Omniverse Studio" in res.text
+    assert "Comparison Matrix" in res.text
+
+
+def test_about_page():
+    """Verify /about route renders neural architecture and pipeline guide."""
+    res = client.get("/about")
+    assert res.status_code == 200
+    assert "Neural Pipeline" in res.text
+    assert "Gemini" in res.text
+    assert "Technology Stack" in res.text
+
+
+def test_profile_page():
+    """Verify /profile route renders creator dashboard and statistics."""
+    res = client.get("/profile")
+    assert res.status_code == 200
+    assert "Creator Dashboard" in res.text
+    assert "Comics in Library" in res.text
+
+
+def test_favorites_api():
+    """Verify favoriting a comic toggles favorite status via API."""
+    res = client.post("/api/user/favorites/comic_test_fav_999")
+    assert res.status_code == 200
+    data = res.json()
+    assert data["comic_id"] == "comic_test_fav_999"
+    assert data["is_favorite"] is True
+
+    # Check list
+    list_res = client.get("/api/user/favorites")
+    assert list_res.status_code == 200
+    assert "comic_test_fav_999" in list_res.json()["favorites"]
+
+    # Toggle off
+    unfav_res = client.post("/api/user/favorites/comic_test_fav_999")
+    assert unfav_res.status_code == 200
+    assert unfav_res.json()["is_favorite"] is False
+
+
+def test_newsletter_api():
+    """Verify newsletter subscription endpoint."""
+    res = client.post("/api/newsletter", json={"email": "creator@comiccraft.studio"})
+    assert res.status_code == 200
+    data = res.json()
+    assert data["status"] == "success"
+    assert "creator@comiccraft.studio" in data["message"]
+
+
+

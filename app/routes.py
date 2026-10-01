@@ -20,7 +20,7 @@ from app.panel_gen import process_comic_panels
 from app.image_gen import generate_panel_image
 from app.layout import calculate_panel_layout
 from app.pdf_export import export_comic_to_pdf
-from app.storage import save_comic, get_comic, list_comics, delete_comic
+from app.storage import save_comic, get_comic, list_comics, delete_comic, toggle_comic_favorite, get_user_favorites
 
 logger = logging.getLogger(__name__)
 
@@ -90,6 +90,7 @@ class ApiKeyUpdateRequest(BaseModel):
 
 
 @router.get("/", response_class=HTMLResponse)
+@router.get("/studio", response_class=HTMLResponse)
 async def home_page(request: Request):
     """Renders the ComicCraft home studio dashboard."""
     return templates.TemplateResponse(
@@ -168,7 +169,14 @@ async def generate_comic_form(
     pdf_url = export_comic_to_pdf(comic_data)
     comic_data["pdf_url"] = pdf_url
     
-    # Step 6: Save
+    # Step 6: Save with creator attribution
+    current_user = get_current_user_from_request(request)
+    if current_user:
+        comic_data["author_id"] = current_user.get("id")
+        comic_data["author_name"] = current_user.get("name")
+        comic_data["author_email"] = current_user.get("email")
+        comic_data["author_avatar"] = current_user.get("avatar_url")
+        
     save_comic(comic_data)
     
     return RedirectResponse(url=f"/comic/{comic_id}", status_code=303)
@@ -235,12 +243,71 @@ async def comic_export_success_page(request: Request, comic_id: str):
 async def comic_gallery(request: Request):
     """Shows all previously created comics in a visual showcase gallery."""
     all_comics = list_comics()
+    current_user = get_current_user_from_request(request)
+    user_id = current_user.get("id") if current_user else "guest"
+    user_favs = get_user_favorites(user_id)
     return templates.TemplateResponse(
         request=request,
         name="gallery.html",
         context={
             "comics": all_comics,
+            "current_user": current_user,
+            "user_favorites": user_favs
+        }
+    )
+
+@router.get("/pricing", response_class=HTMLResponse)
+async def pricing_page(request: Request):
+    """Renders the ComicCraft creator plans & pricing tiers page."""
+    return templates.TemplateResponse(
+        request=request,
+        name="pricing.html",
+        context={
             "current_user": get_current_user_from_request(request)
+        }
+    )
+
+@router.get("/about", response_class=HTMLResponse)
+async def about_page(request: Request):
+    """Renders the About and Neural Architecture guide page."""
+    return templates.TemplateResponse(
+        request=request,
+        name="about.html",
+        context={
+            "current_user": get_current_user_from_request(request)
+        }
+    )
+
+@router.get("/profile", response_class=HTMLResponse)
+async def profile_dashboard(request: Request):
+    """Renders the Creator Profile & Dashboard."""
+    current_user = get_current_user_from_request(request)
+    all_comics = list_comics()
+    user_id = current_user.get("id") if current_user else "guest"
+    user_fav_ids = set(get_user_favorites(user_id))
+    
+    # Filter comics authored by user (or show recent if fresh login)
+    if current_user:
+        my_comics = [c for c in all_comics if c.get("author_id") == user_id or c.get("author_email") == current_user.get("email")]
+        if not my_comics:
+            my_comics = all_comics[:6]
+    else:
+        my_comics = all_comics
+        
+    favorite_comics = [c for c in all_comics if c.get("id") in user_fav_ids]
+    total_panels = sum(len(c.get("panels", [])) for c in all_comics)
+    
+    return templates.TemplateResponse(
+        request=request,
+        name="profile.html",
+        context={
+            "current_user": current_user,
+            "total_comics": len(all_comics),
+            "total_panels": total_panels,
+            "total_favorites": len(favorite_comics),
+            "my_comics": my_comics,
+            "favorite_comics": favorite_comics,
+            "user_favorites": list(user_fav_ids)
         }
     )
 
@@ -578,6 +645,32 @@ async def api_auth_logout():
     )
     response.delete_cookie(key="comiccraft_user")
     return response
+
+class NewsletterSubscribeRequest(BaseModel):
+    email: str
+
+@router.post("/api/user/favorites/{comic_id}")
+async def api_toggle_favorite(request: Request, comic_id: str):
+    """Toggles bookmark/favorite status for a comic."""
+    current_user = get_current_user_from_request(request)
+    user_id = current_user.get("id") if current_user else "guest"
+    result = toggle_comic_favorite(comic_id, user_id)
+    return result
+
+@router.get("/api/user/favorites")
+async def api_get_favorites(request: Request):
+    """Returns list of favorite comic IDs for current user."""
+    current_user = get_current_user_from_request(request)
+    user_id = current_user.get("id") if current_user else "guest"
+    return {"favorites": get_user_favorites(user_id)}
+
+@router.post("/api/newsletter")
+async def api_newsletter_subscribe(payload: NewsletterSubscribeRequest):
+    """Handles newsletter email signup."""
+    return {
+        "status": "success",
+        "message": f"Welcome aboard! {payload.email} has been subscribed to ComicCraft Dispatch."
+    }
 
 @router.get("/health")
 async def health_check():

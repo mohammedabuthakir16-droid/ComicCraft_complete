@@ -1,0 +1,321 @@
+{% extends "base.html" %}
+
+{% block title %}Creator Dashboard & Profile — ComicCraft AI Studio{% endblock %}
+
+{% block content %}
+<div class="profile-page-container">
+
+  <!-- Profile Header Hero Card -->
+  <div class="profile-hero-card studio-card">
+    <div class="profile-hero-inner">
+      <div class="profile-avatar-column">
+        <div class="profile-avatar-wrap">
+          <img 
+            src="{{ current_user.avatar_url if current_user else 'https://ui-avatars.com/api/?name=Creator&background=2563eb&color=fff&rounded=true' }}" 
+            alt="{{ current_user.name if current_user else 'Creator' }}" 
+            class="profile-avatar-img"
+            onerror="this.src='https://ui-avatars.com/api/?name=User&background=2563eb&color=fff&rounded=true'"
+          >
+          <span class="profile-status-dot" title="Active Creator"></span>
+        </div>
+      </div>
+
+      <div class="profile-details-column">
+        <div class="profile-name-row">
+          <h1 class="profile-name">{{ current_user.name if current_user else 'Guest Storyteller' }}</h1>
+          <span class="provider-pill-badge provider-{{ current_user.provider_id if current_user else 'guest' }}">
+            {% if current_user and current_user.provider_id == 'google' %}
+              Google Verified
+            {% elif current_user and current_user.provider_id == 'apple' %}
+              Apple ID Linked
+            {% elif current_user %}
+              {{ current_user.provider }}
+            {% else %}
+              Guest Mode
+            {% endif %}
+          </span>
+        </div>
+
+        <p class="profile-email">
+          {{ current_user.email if current_user else 'Sign in to sync your comics across devices' }}
+        </p>
+
+        <div class="profile-quick-actions">
+          {% if current_user %}
+            <button type="button" class="btn-action btn-outline btn-sm" onclick="switchAccount()">
+              <span>🔄</span>
+              <span>Switch Account</span>
+            </button>
+            <button type="button" class="btn-action btn-outline btn-sm btn-delete" onclick="logoutUser()">
+              <span>🚪</span>
+              <span>Sign Out</span>
+            </button>
+          {% else %}
+            <button type="button" class="btn-action btn-blue btn-sm" onclick="openAuthModal()">
+              <span>✨</span>
+              <span>Sign In with Google or Apple</span>
+            </button>
+          {% endif %}
+          <a href="/" class="btn-action btn-blue btn-sm">
+            <span>🎨</span>
+            <span>New Comic</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Creator Telemetry & Stats Counters -->
+  <div class="profile-stats-grid">
+    <div class="stat-card studio-card">
+      <div class="stat-icon-wrap">📚</div>
+      <div class="stat-info-col">
+        <span class="stat-number">{{ total_comics }}</span>
+        <span class="stat-label">Comics in Library</span>
+      </div>
+    </div>
+
+    <div class="stat-card studio-card">
+      <div class="stat-icon-wrap">🖼️</div>
+      <div class="stat-info-col">
+        <span class="stat-number">{{ total_panels }}</span>
+        <span class="stat-label">Illustrated Panels</span>
+      </div>
+    </div>
+
+    <div class="stat-card studio-card">
+      <div class="stat-icon-wrap">❤️</div>
+      <div class="stat-info-col">
+        <span class="stat-number">{{ total_favorites }}</span>
+        <span class="stat-label">Saved Favorites</span>
+      </div>
+    </div>
+
+    <div class="stat-card studio-card">
+      <div class="stat-icon-wrap">⚡</div>
+      <div class="stat-info-col">
+        <span class="stat-number">Active</span>
+        <span class="stat-label">Gemini Neural Engine</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dashboard Tabs Section -->
+  <div class="profile-dashboard-tabs studio-card">
+    <div class="dashboard-tabs-header">
+      <button type="button" class="dash-tab-btn active" id="tab-btn-my-comics" onclick="switchDashTab('my-comics')">
+        <span>📚 My Comic Works ({{ my_comics|length }})</span>
+      </button>
+      <button type="button" class="dash-tab-btn" id="tab-btn-favorites" onclick="switchDashTab('favorites')">
+        <span>❤️ Bookmarked Favorites ({{ favorite_comics|length }})</span>
+      </button>
+      <button type="button" class="dash-tab-btn" id="tab-btn-settings" onclick="switchDashTab('settings')">
+        <span>⚙️ Creator Settings & API</span>
+      </button>
+    </div>
+
+    <!-- Tab 1: My Comics -->
+    <div class="dash-tab-pane active" id="pane-my-comics">
+      {% if my_comics %}
+      <div class="gallery-comics-grid">
+        {% for comic in my_comics %}
+        <div class="comic-shelf-card studio-card">
+          <a href="/comic/{{ comic.id }}" class="shelf-thumb-link">
+            <div class="shelf-thumb-wrap">
+              {% if comic.panels and comic.panels[0].image_url %}
+              <img src="{{ comic.panels[0].image_url }}" alt="{{ comic.title }}" class="shelf-thumb-img" loading="lazy">
+              {% else %}
+              <div class="shelf-thumb-placeholder"><span>💥</span></div>
+              {% endif %}
+              <div class="shelf-overlay-sheen"></div>
+              <div class="shelf-badge-top">
+                <span class="badge-panels-count">{{ comic.panel_count }} PANELS</span>
+              </div>
+              <div class="shelf-badge-bottom">
+                <span class="badge-style-name">{{ comic.art_style }}</span>
+              </div>
+            </div>
+          </a>
+          <div class="shelf-body">
+            <div class="shelf-meta-row">
+              <span class="shelf-genre-tag">{{ comic.genre }}</span>
+              <span class="shelf-date-tag">{{ comic.created_at[:10] if comic.created_at else 'Recent' }}</span>
+            </div>
+            <h3 class="shelf-comic-title">
+              <a href="/comic/{{ comic.id }}" class="shelf-title-link">{{ comic.title }}</a>
+            </h3>
+            <p class="shelf-synopsis">
+              {{ (comic.get('synopsis') or comic.get('prompt') or '')[:100] }}...
+            </p>
+          </div>
+          <div class="shelf-footer">
+            <a href="/comic/{{ comic.id }}" class="btn-action btn-blue btn-sm shelf-read-btn">Read Strip</a>
+            <a href="/download/{{ comic.id }}" class="btn-action btn-outline btn-sm">PDF</a>
+            <form action="/delete/{{ comic.id }}" method="POST" onsubmit="return confirm('Delete this comic?');" class="shelf-delete-form">
+              <button type="submit" class="btn-action btn-outline btn-sm btn-delete" title="Delete">🗑️</button>
+            </form>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="empty-dash-shelf">
+        <span class="empty-dash-icon">🎨</span>
+        <h3>No Comics in Your Personal Shelf Yet</h3>
+        <p>Start a new storyline using Story Sparks or your own prompt to see your creations here.</p>
+        <a href="/" class="btn-action btn-blue mt-3">Create First Comic →</a>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Tab 2: Bookmarked Favorites -->
+    <div class="dash-tab-pane" id="pane-favorites" style="display:none;">
+      {% if favorite_comics %}
+      <div class="gallery-comics-grid">
+        {% for comic in favorite_comics %}
+        <div class="comic-shelf-card studio-card">
+          <a href="/comic/{{ comic.id }}" class="shelf-thumb-link">
+            <div class="shelf-thumb-wrap">
+              {% if comic.panels and comic.panels[0].image_url %}
+              <img src="{{ comic.panels[0].image_url }}" alt="{{ comic.title }}" class="shelf-thumb-img" loading="lazy">
+              {% else %}
+              <div class="shelf-thumb-placeholder"><span>❤️</span></div>
+              {% endif %}
+              <div class="shelf-overlay-sheen"></div>
+              <div class="shelf-badge-top">
+                <span class="badge-panels-count">{{ comic.panel_count }} PANELS</span>
+              </div>
+              <div class="shelf-badge-bottom">
+                <span class="badge-style-name">{{ comic.art_style }}</span>
+              </div>
+            </div>
+          </a>
+          <div class="shelf-body">
+            <div class="shelf-meta-row">
+              <span class="shelf-genre-tag">{{ comic.genre }}</span>
+              <span class="shelf-date-tag">{{ comic.created_at[:10] if comic.created_at else 'Recent' }}</span>
+            </div>
+            <h3 class="shelf-comic-title">
+              <a href="/comic/{{ comic.id }}" class="shelf-title-link">{{ comic.title }}</a>
+            </h3>
+            <p class="shelf-synopsis">
+              {{ (comic.get('synopsis') or comic.get('prompt') or '')[:100] }}...
+            </p>
+          </div>
+          <div class="shelf-footer">
+            <a href="/comic/{{ comic.id }}" class="btn-action btn-blue btn-sm shelf-read-btn">Read Strip</a>
+            <a href="/download/{{ comic.id }}" class="btn-action btn-outline btn-sm">PDF</a>
+            <button type="button" class="btn-action btn-outline btn-sm" onclick="toggleFavorite('{{ comic.id }}', this)">❤️ Saved</button>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="empty-dash-shelf">
+        <span class="empty-dash-icon">🤍</span>
+        <h3>No Favorites Bookmarked Yet</h3>
+        <p>Browse the Community Gallery and tap the heart icon on stories you love to pin them here.</p>
+        <a href="/gallery" class="btn-action btn-outline mt-3">Browse Gallery →</a>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Tab 3: Creator Settings -->
+    <div class="dash-tab-pane" id="pane-settings" style="display:none;">
+      <div class="settings-form-wrapper">
+        <div class="settings-group-card">
+          <h3 class="settings-heading">🔑 Google Gemini API Configuration</h3>
+          <p class="settings-sub">Manage your personal Google AI Studio neural key for ultra-fast story scripting and character dialogue.</p>
+          <div class="settings-api-row">
+            <button type="button" class="btn-action btn-blue" onclick="openApiKeyModal()">
+              <span>⚡</span>
+              <span>Configure / Update Gemini API Key</span>
+            </button>
+            <span class="label-hint">Key is encrypted and stored locally in your environment.</span>
+          </div>
+        </div>
+
+        <div class="settings-group-card mt-4">
+          <h3 class="settings-heading">🎨 Default Studio Preferences</h3>
+          <p class="settings-sub">Set preferred starting styles for quick creation in the studio cockpit.</p>
+          <div class="form-grid-2col">
+            <div class="form-group">
+              <label class="form-label">Preferred Comic Art Style</label>
+              <select class="form-select" id="pref-art-style">
+                <option value="Japanese Manga">Japanese Manga</option>
+                <option value="Western Superhero" selected>Western Superhero</option>
+                <option value="Cyberpunk Noir">Cyberpunk Noir</option>
+                <option value="Vintage Indie Comic">Vintage Indie Comic</option>
+                <option value="Anime Shonen">Anime Shonen</option>
+                <option value="Cinematic Graphic Novel">Cinematic Graphic Novel</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Default Panel Count</label>
+              <select class="form-select" id="pref-panel-count">
+                <option value="2">2 Panels (Quick Strip)</option>
+                <option value="3">3 Panels (Triptych)</option>
+                <option value="4" selected>4 Panels (Classic Grid)</option>
+                <option value="6">6 Panels (Full Story Page)</option>
+              </select>
+            </div>
+          </div>
+          <button type="button" class="btn-action btn-blue mt-3" onclick="saveCreatorPreferences()">
+            <span>Save Preferences</span>
+          </button>
+        </div>
+
+        <div class="settings-group-card mt-4 danger-zone">
+          <h3 class="settings-heading text-red">⚠️ Session Management</h3>
+          <p class="settings-sub">Sign out or reset your local creator identity cookies.</p>
+          <button type="button" class="btn-action btn-outline btn-delete" onclick="logoutUser()">
+            <span>🚪 Sign Out of Current Session</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}
+
+{% block script_extra %}
+<script>
+function switchDashTab(tabId) {
+  document.querySelectorAll('.dash-tab-btn').forEach(btn => btn.classList.remove('active'));
+  document.querySelectorAll('.dash-tab-pane').forEach(pane => {
+    pane.classList.remove('active');
+    pane.style.display = 'none';
+  });
+
+  const activeBtn = document.getElementById(`tab-btn-${tabId}`);
+  const activePane = document.getElementById(`pane-${tabId}`);
+  if (activeBtn && activePane) {
+    activeBtn.classList.add('active');
+    activePane.classList.add('active');
+    activePane.style.display = 'block';
+  }
+}
+
+function saveCreatorPreferences() {
+  const style = document.getElementById('pref-art-style').value;
+  const panels = document.getElementById('pref-panel-count').value;
+  localStorage.setItem('comiccraft_pref_style', style);
+  localStorage.setItem('comiccraft_pref_panels', panels);
+  showToast('Studio preferences saved successfully!', 'success');
+}
+
+// Load preferences on page load
+document.addEventListener('DOMContentLoaded', () => {
+  const savedStyle = localStorage.getItem('comiccraft_pref_style');
+  const savedPanels = localStorage.getItem('comiccraft_pref_panels');
+  if (savedStyle && document.getElementById('pref-art-style')) {
+    document.getElementById('pref-art-style').value = savedStyle;
+  }
+  if (savedPanels && document.getElementById('pref-panel-count')) {
+    document.getElementById('pref-panel-count').value = savedPanels;
+  }
+});
+</script>
+{% endblock %}

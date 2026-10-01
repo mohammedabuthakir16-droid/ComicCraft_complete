@@ -57,3 +57,34 @@ def delete_comic(comic_id: str) -> bool:
         _save_db(db)
         return True
     return False
+
+def toggle_comic_favorite(comic_id: str, user_id: str = "guest") -> Dict[str, Any]:
+    """Toggles favorite state for a user and updates comic like counter."""
+    db = _load_db()
+    favs = db.setdefault("favorites", {})
+    user_favs = set(favs.get(user_id, []))
+    is_fav = comic_id in user_favs
+    if is_fav:
+        user_favs.remove(comic_id)
+        now_fav = False
+    else:
+        user_favs.add(comic_id)
+        now_fav = True
+    favs[user_id] = list(user_favs)
+    
+    # Update like count on the comic object
+    likes = 0
+    for c in db.get("comics", []):
+        if c.get("id") == comic_id:
+            c["likes"] = max(0, c.get("likes", 0) + (1 if now_fav else -1))
+            likes = c["likes"]
+            break
+            
+    _save_db(db)
+    return {"comic_id": comic_id, "is_favorite": now_fav, "likes": likes}
+
+def get_user_favorites(user_id: str = "guest") -> List[str]:
+    """Retrieves list of favorite comic IDs for a user."""
+    db = _load_db()
+    return db.get("favorites", {}).get(user_id, [])
+

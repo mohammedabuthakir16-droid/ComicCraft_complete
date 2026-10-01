@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Comic Gallery & Archive — ComicCraft Creations{% endblock %}
+{% block title %}Community Comic Gallery & Archive — ComicCraft Creations{% endblock %}
 
 {% block content %}
 <div class="gallery-container">
@@ -24,11 +24,75 @@
     </div>
   </div>
 
+  <!-- Filter & Search Control Toolbar -->
+  <div class="gallery-toolbar studio-card">
+    <div class="gallery-search-group">
+      <span class="search-icon">🔍</span>
+      <input 
+        type="text" 
+        id="gallery-search-input" 
+        class="form-input gallery-search-input" 
+        placeholder="Search stories by title, hero, or plot keywords..." 
+        oninput="filterGallery()"
+      >
+      <button type="button" class="btn-clear-search" id="btn-clear-search" onclick="clearGallerySearch()" style="display:none;">✕</button>
+    </div>
+
+    <!-- Art Style Filter Pills -->
+    <div class="gallery-filter-chips" id="gallery-style-filters">
+      <button type="button" class="filter-chip active" data-filter="all" onclick="setStyleFilter('all', this)">
+        All Styles
+      </button>
+      <button type="button" class="filter-chip" data-filter="Japanese Manga" onclick="setStyleFilter('Japanese Manga', this)">
+        Manga
+      </button>
+      <button type="button" class="filter-chip" data-filter="Western Superhero" onclick="setStyleFilter('Western Superhero', this)">
+        Superhero
+      </button>
+      <button type="button" class="filter-chip" data-filter="Cyberpunk Noir" onclick="setStyleFilter('Cyberpunk Noir', this)">
+        Noir
+      </button>
+      <button type="button" class="filter-chip" data-filter="Vintage Indie Comic" onclick="setStyleFilter('Vintage Indie Comic', this)">
+        Indie
+      </button>
+      <button type="button" class="filter-chip" data-filter="Anime Shonen" onclick="setStyleFilter('Anime Shonen', this)">
+        Anime
+      </button>
+      <button type="button" class="filter-chip" data-filter="Cinematic Graphic Novel" onclick="setStyleFilter('Cinematic Graphic Novel', this)">
+        Graphic Novel
+      </button>
+    </div>
+
+    <!-- Stats & Sorting Bar -->
+    <div class="gallery-meta-bar">
+      <div class="gallery-count-badge">
+        Showing <span id="gallery-visible-count">{{ comics|length }}</span> of {{ comics|length }} comic works
+      </div>
+      <div class="gallery-sort-group">
+        <label for="gallery-sort-select">Sort by:</label>
+        <select id="gallery-sort-select" class="form-select gallery-sort-select" onchange="sortGallery(this.value)">
+          <option value="newest" selected>Newest First</option>
+          <option value="oldest">Oldest First</option>
+          <option value="panels">Most Panels</option>
+          <option value="title">Title A-Z</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
   <!-- Comics Grid -->
   {% if comics %}
-  <div class="gallery-comics-grid">
+  <div class="gallery-comics-grid" id="gallery-comics-grid">
     {% for comic in comics %}
-    <div class="comic-shelf-card studio-card">
+    <div 
+      class="comic-shelf-card studio-card" 
+      data-id="{{ comic.id }}"
+      data-title="{{ comic.title|lower }}"
+      data-character="{{ comic.character_name|lower }}"
+      data-style="{{ comic.art_style }}"
+      data-panels="{{ comic.panel_count }}"
+      data-created="{{ comic.created_at }}"
+    >
       
       <!-- Card Image Thumbnail -->
       <a href="/comic/{{ comic.id }}" class="shelf-thumb-link">
@@ -51,6 +115,16 @@
           <div class="shelf-badge-bottom">
             <span class="badge-style-name">{{ comic.art_style }}</span>
           </div>
+
+          <!-- Favorite Heart Button (Floats on Top Right) -->
+          <button 
+            type="button" 
+            class="shelf-fav-btn {% if comic.id in user_favorites %}active{% endif %}" 
+            onclick="toggleCardFavorite(event, '{{ comic.id }}', this)" 
+            title="Bookmark / Favorite"
+          >
+            <span class="heart-icon">{% if comic.id in user_favorites %}❤️{% else %}🤍{% endif %}</span>
+          </button>
         </div>
       </a>
 
@@ -95,6 +169,14 @@
     {% endfor %}
   </div>
 
+  <!-- No Search Results Found State -->
+  <div id="no-search-results" class="empty-shelf-card studio-card" style="display:none;">
+    <div class="empty-shelf-icon">🔍</div>
+    <h2 class="empty-shelf-title">No Matching Stories Found</h2>
+    <p class="empty-shelf-desc">Try clearing your search query or switching art style filters.</p>
+    <button type="button" class="btn-action btn-blue" onclick="clearGallerySearch()">Reset Filters</button>
+  </div>
+
   {% else %}
   <!-- Empty State -->
   <div class="empty-shelf-card studio-card">
@@ -111,4 +193,102 @@
   {% endif %}
 
 </div>
+{% endblock %}
+
+{% block script_extra %}
+<script>
+let currentStyleFilter = 'all';
+
+function setStyleFilter(style, btn) {
+  currentStyleFilter = style;
+  document.querySelectorAll('#gallery-style-filters .filter-chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  filterGallery();
+}
+
+function clearGallerySearch() {
+  const input = document.getElementById('gallery-search-input');
+  if (input) input.value = '';
+  document.getElementById('btn-clear-search').style.display = 'none';
+  setStyleFilter('all', document.querySelector('#gallery-style-filters .filter-chip[data-filter="all"]'));
+}
+
+function filterGallery() {
+  const searchInput = document.getElementById('gallery-search-input');
+  const clearBtn = document.getElementById('btn-clear-search');
+  const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
+  
+  if (clearBtn) {
+    clearBtn.style.display = query ? 'block' : 'none';
+  }
+
+  const cards = document.querySelectorAll('#gallery-comics-grid .comic-shelf-card');
+  let visibleCount = 0;
+
+  cards.forEach(card => {
+    const title = card.getAttribute('data-title') || '';
+    const char = card.getAttribute('data-character') || '';
+    const style = card.getAttribute('data-style') || '';
+    
+    const matchesSearch = !query || title.includes(query) || char.includes(query);
+    const matchesStyle = (currentStyleFilter === 'all') || (style === currentStyleFilter);
+
+    if (matchesSearch && matchesStyle) {
+      card.style.display = '';
+      visibleCount++;
+    } else {
+      card.style.display = 'none';
+    }
+  });
+
+  const countBadge = document.getElementById('gallery-visible-count');
+  if (countBadge) countBadge.textContent = visibleCount;
+
+  const noResults = document.getElementById('no-search-results');
+  if (noResults) {
+    noResults.style.display = (visibleCount === 0 && cards.length > 0) ? 'block' : 'none';
+  }
+}
+
+function sortGallery(criteria) {
+  const grid = document.getElementById('gallery-comics-grid');
+  if (!grid) return;
+  const cards = Array.from(grid.querySelectorAll('.comic-shelf-card'));
+
+  cards.sort((a, b) => {
+    if (criteria === 'newest') {
+      return (b.getAttribute('data-created') || '').localeCompare(a.getAttribute('data-created') || '');
+    } else if (criteria === 'oldest') {
+      return (a.getAttribute('data-created') || '').localeCompare(b.getAttribute('data-created') || '');
+    } else if (criteria === 'panels') {
+      return parseInt(b.getAttribute('data-panels') || 0) - parseInt(a.getAttribute('data-panels') || 0);
+    } else if (criteria === 'title') {
+      return (a.getAttribute('data-title') || '').localeCompare(b.getAttribute('data-title') || '');
+    }
+    return 0;
+  });
+
+  cards.forEach(card => grid.appendChild(card));
+}
+
+async function toggleCardFavorite(event, comicId, btn) {
+  event.preventDefault();
+  event.stopPropagation();
+  try {
+    const res = await fetch(`/api/user/favorites/${comicId}`, { method: 'POST' });
+    const data = await res.json();
+    if (data.is_favorite) {
+      btn.classList.add('active');
+      btn.querySelector('.heart-icon').textContent = '❤️';
+      showToast('Comic saved to your Favorites!', 'success');
+    } else {
+      btn.classList.remove('active');
+      btn.querySelector('.heart-icon').textContent = '🤍';
+      showToast('Removed from Favorites.', 'info');
+    }
+  } catch (err) {
+    showToast('Failed to update favorite', 'error');
+  }
+}
+</script>
 {% endblock %}

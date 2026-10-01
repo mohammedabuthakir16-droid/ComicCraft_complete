@@ -32,17 +32,21 @@
           <span class="pulse-indicator"></span>
           <span>⚡ Gemini Neural Core</span>
         </div>
-        <a href="/" class="nav-link {% if request.url.path == '/' %}active{% endif %}">
+        <a href="/" class="nav-link {% if request.url.path == '/' or request.url.path == '/studio' %}active{% endif %}" title="Comic Creation Studio">
           <span class="nav-icon">🎨</span>
           <span>Studio</span>
         </a>
-        <a href="/gallery" class="nav-link {% if request.url.path == '/gallery' %}active{% endif %}">
+        <a href="/gallery" class="nav-link {% if request.url.path == '/gallery' %}active{% endif %}" title="Community Comic Archive">
           <span class="nav-icon">📚</span>
           <span>Gallery</span>
         </a>
-        <a href="/docs" target="_blank" class="nav-link" title="Interactive FastAPI Swagger Docs">
-          <span class="nav-icon">⚡</span>
-          <span>API Docs</span>
+        <a href="/pricing" class="nav-link {% if request.url.path == '/pricing' %}active{% endif %}" title="Creator Plans & Pricing">
+          <span class="nav-icon">💎</span>
+          <span>Pricing</span>
+        </a>
+        <a href="/about" class="nav-link {% if request.url.path == '/about' %}active{% endif %}" title="About & Neural Architecture">
+          <span class="nav-icon">ℹ️</span>
+          <span>About</span>
         </a>
         <button type="button" class="btn-api-key-config" id="btn-open-api-modal" title="Configure or update Google Gemini API Key">
           <span>🔑</span>
@@ -74,6 +78,10 @@
               </div>
               <div class="user-dropdown-divider"></div>
               <div class="user-dropdown-links">
+                <a href="/profile" class="user-dropdown-item">
+                  <span class="item-icon">👤</span>
+                  <span>Creator Dashboard</span>
+                </a>
                 <a href="/gallery" class="user-dropdown-item">
                   <span class="item-icon">📚</span>
                   <span>My Comic Library</span>
@@ -82,9 +90,13 @@
                   <span class="item-icon">🎨</span>
                   <span>Studio Workspace</span>
                 </a>
+                <a href="/pricing" class="user-dropdown-item">
+                  <span class="item-icon">💎</span>
+                  <span>Upgrade to Pro</span>
+                </a>
                 <button type="button" class="user-dropdown-item btn-switch-user" onclick="switchAccount()">
                   <span class="item-icon">🔄</span>
-                  <span>Switch Account / Sign In as Other</span>
+                  <span>Switch Account / Sign In</span>
                 </button>
               </div>
               <div class="user-dropdown-divider"></div>
@@ -351,20 +363,83 @@
   <!-- Global Toast Notification Container -->
   <div id="toast-notification" class="toast-notification"></div>
 
-  <!-- Footer -->
+  <!-- Comprehensive 4-Column Quantum Glass Footer -->
   <footer class="app-footer">
-    <div class="footer-inner">
-      <p class="footer-tagline">
-        <strong>ComicCraft</strong> — Next-Generation AI Comic Storyboard Creator using Gemini Models &nbsp;|&nbsp; Built with FastAPI, Jinja2, Google GenAI SDK & Procedural Inking
-      </p>
-      <div class="footer-links">
-        <a href="/" class="footer-link">Studio</a>
-        <span>•</span>
-        <a href="/gallery" class="footer-link">Gallery Archive</a>
-        <span>•</span>
-        <a href="/docs" target="_blank" class="footer-link">OpenAPI Specification</a>
-        <span>•</span>
-        <a href="http://127.0.0.1:8000/download/hope_whispering_woods" target="_blank" class="footer-link">Sample Hope PDF</a>
+    <div class="footer-container">
+      <div class="footer-grid">
+        
+        <!-- Column 1: Brand & Neural Telemetry -->
+        <div class="footer-col brand-col">
+          <div class="footer-brand">
+            <span class="brand-icon">POW!</span>
+            <div class="brand-title-wrap">
+              <span class="brand-text">Comic<span class="brand-accent">Craft</span></span>
+              <span class="brand-sub">AI Comic Story Creator</span>
+            </div>
+          </div>
+          <p class="footer-bio">
+            Next-generation visual storytelling suite combining Google Gemini neural reasoning, multi-style comic diffusion, and procedural lettering into a unified macOS 27 spatial environment.
+          </p>
+          <div class="system-status-indicator">
+            <span class="pulse-indicator"></span>
+            <span class="status-txt">All Systems Operational &bull; Gemini 3.5 Active</span>
+          </div>
+        </div>
+
+        <!-- Column 2: Studio Tools -->
+        <div class="footer-col">
+          <h4 class="footer-col-title">Studio Tools</h4>
+          <ul class="footer-nav-list">
+            <li><a href="/" class="footer-nav-item"><span>🎨</span> Creator Studio Cockpit</a></li>
+            <li><a href="/gallery" class="footer-nav-item"><span>📚</span> Community Comic Archive</a></li>
+            <li><a href="/pricing" class="footer-nav-item"><span>💎</span> Creator Plans & Pro Tiers</a></li>
+            <li><a href="/profile" class="footer-nav-item"><span>👤</span> Creator Dashboard</a></li>
+            <li><a href="javascript:void(0)" onclick="openApiKeyModal()" class="footer-nav-item"><span>🔑</span> Configure Gemini Key</a></li>
+          </ul>
+        </div>
+
+        <!-- Column 3: Platform & Docs -->
+        <div class="footer-col">
+          <h4 class="footer-col-title">Platform & Specs</h4>
+          <ul class="footer-nav-list">
+            <li><a href="/about" class="footer-nav-item"><span>ℹ️</span> About Neural Pipeline</a></li>
+            <li><a href="/docs" target="_blank" class="footer-nav-item"><span>⚡</span> OpenAPI Swagger Docs</a></li>
+            <li><a href="/redoc" target="_blank" class="footer-nav-item"><span>📖</span> ReDoc API Reference</a></li>
+            <li><a href="/health" target="_blank" class="footer-nav-item"><span>🩺</span> System Health Status</a></li>
+            <li><a href="https://github.com/mohammedabuthakirm/ComicCraft_complete" target="_blank" rel="noopener" class="footer-nav-item"><span>🐙</span> GitHub Repository</a></li>
+          </ul>
+        </div>
+
+        <!-- Column 4: Newsletter & Community -->
+        <div class="footer-col newsletter-col">
+          <h4 class="footer-col-title">Join ComicCraft Dispatch</h4>
+          <p class="newsletter-desc">
+            Get early access to upcoming styles, LoRA character models, and comic layout templates.
+          </p>
+          <form class="footer-newsletter-form" onsubmit="handleNewsletterSubmit(event)">
+            <div class="input-with-action">
+              <input type="email" id="newsletter-email" class="form-input newsletter-input" placeholder="creator@studio.com" required>
+              <button type="submit" class="btn-action btn-blue btn-subscribe">Join</button>
+            </div>
+          </form>
+          <div class="footer-social-row">
+            <a href="https://github.com/mohammedabuthakirm/ComicCraft_complete" target="_blank" rel="noopener" class="social-icon-btn" title="GitHub">🐙</a>
+            <a href="https://aistudio.google.com" target="_blank" rel="noopener" class="social-icon-btn" title="Google AI Studio">⚡</a>
+            <a href="https://huggingface.co" target="_blank" rel="noopener" class="social-icon-btn" title="HuggingFace">🤗</a>
+            <a href="https://fastapi.tiangolo.com" target="_blank" rel="noopener" class="social-icon-btn" title="FastAPI">🚀</a>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Bottom Bar -->
+      <div class="footer-bottom-bar">
+        <div class="footer-legal">
+          &copy; 2026 ComicCraft Studio. Built with Google Gemini Models, FastAPI, and Procedural Typography.
+        </div>
+        <div class="footer-badges">
+          <span class="spatial-ui-badge">macOS 27 &bull; iOS 27 Spatial Quantum Glass</span>
+        </div>
       </div>
     </div>
   </footer>
