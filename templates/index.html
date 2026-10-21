@@ -440,10 +440,12 @@
           </div>
 
           <div class="mock-panel-art-frame">
-            <img src="/static/images/hope_fox.jpg" id="mock-art-image" alt="Artwork Preview" class="mock-art-img">
+            <canvas id="mock-art-canvas" class="mock-art-canvas" width="640" height="400"></canvas>
+            <img src="/static/images/hope_fox.jpg" id="mock-art-image" alt="Artwork Preview" class="mock-art-img" style="display: none;">
             <div id="mock-sound-badge" class="mock-sound-effect">RUSTLE...</div>
             <div class="art-overlay-gradient"></div>
             <div class="camera-shot-tag" id="mock-camera-shot">ESTABLISHING WIDE SHOT</div>
+            <div class="imagination-live-tag" id="mock-live-tag">✨ REAL-TIME IMAGINATION SKETCH</div>
           </div>
 
           <!-- Narration Caption Box -->
@@ -463,6 +465,44 @@
             <p id="mock-dialogue-text">
               "The elders warned that no one returns from the Gloom... but I can feel the trees weeping."
             </p>
+          </div>
+        </div>
+
+        <!-- Real-time Imagination Arc Timeline -->
+        <div class="imagination-timeline-box">
+          <div class="timeline-header">
+            <span class="timeline-title">⚡ REAL-TIME STORY ARC BEATS</span>
+            <span class="timeline-status" id="imagination-status-pill">● Reactive Sync</span>
+          </div>
+          <div class="timeline-beats-grid" id="timeline-beats-grid">
+            <div class="timeline-beat-card active" data-scene="1">
+              <span class="beat-num">1</span>
+              <div class="beat-info">
+                <span class="beat-label">The Hook</span>
+                <span class="beat-snippet" id="beat-snippet-1">Setting the premise</span>
+              </div>
+            </div>
+            <div class="timeline-beat-card" data-scene="2">
+              <span class="beat-num">2</span>
+              <div class="beat-info">
+                <span class="beat-label">Tension</span>
+                <span class="beat-snippet" id="beat-snippet-2">Complications emerge</span>
+              </div>
+            </div>
+            <div class="timeline-beat-card" data-scene="3">
+              <span class="beat-num">3</span>
+              <div class="beat-info">
+                <span class="beat-label">Climax</span>
+                <span class="beat-snippet" id="beat-snippet-3">Decisive turning point</span>
+              </div>
+            </div>
+            <div class="timeline-beat-card" data-scene="4">
+              <span class="beat-num">4</span>
+              <div class="beat-info">
+                <span class="beat-label">Resolution</span>
+                <span class="beat-snippet" id="beat-snippet-4">Emotional payoff</span>
+              </div>
+            </div>
           </div>
         </div>
 

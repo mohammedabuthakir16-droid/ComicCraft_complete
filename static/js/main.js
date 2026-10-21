@@ -326,7 +326,7 @@ function initInspireMe() {
 }
 
 /* ==========================================================================
-   5. Enhanced Live Storyboard Multi-Scene Engine & Fullscreen Toggle
+   5. Enhanced Live Reactive Imagination Storyboard Engine
    ========================================================================== */
 function initLiveMockSync() {
   // 1. Show/Hide Toggle Button
@@ -353,13 +353,14 @@ function initLiveMockSync() {
     });
   }
 
-  // 2. Multi-Scene Storyboard Elements
-  const sceneElements = {
+  // 2. Multi-Scene Elements
+  const el = {
     tabs: document.querySelectorAll(".scene-tab-btn"),
     btnPrev: document.getElementById("btn-scene-prev"),
     btnNext: document.getElementById("btn-scene-next"),
     panelTitle: document.getElementById("mock-panel-title"),
     panelMeta: document.getElementById("mock-panel-meta"),
+    canvas: document.getElementById("mock-art-canvas"),
     artImg: document.getElementById("mock-art-image"),
     soundBadge: document.getElementById("mock-sound-badge"),
     cameraShot: document.getElementById("mock-camera-shot"),
@@ -367,108 +368,456 @@ function initLiveMockSync() {
     speakerName: document.getElementById("mock-speaker-name"),
     dialogueText: document.getElementById("mock-dialogue-text"),
     charInput: document.getElementById("character-input"),
-    promptInput: document.getElementById("prompt-input")
-  };
-
-  const sceneTemplates = {
-    1: {
-      title: "Panel 1: The Inciting Hook",
-      shot: "ESTABLISHING WIDE SHOT",
-      sound: "RUSTLE...",
-      image: "/static/images/hope_fox.jpg",
-      narration: "Elders called it madness. But when the starlight blossoms began to wither, courage wasn't a choice—it was a necessity.",
-      dialogue: "The elders warned that no one returns from the Gloom... but I can feel the trees weeping."
-    },
-    2: {
-      title: "Panel 2: The Rising Tension",
-      shot: "DUTCH ANGLE / MEDIUM TENSION",
-      sound: "WHOOSH!",
-      image: "/static/images/hero_forest_bg.jpg",
-      narration: "Every whisper of the wind carried forgotten warnings. Shadows stretched along the mossy stone arches like reaching claws.",
-      dialogue: "Steady now. Fear is just mist—it only blinds you if you stop moving forward!"
-    },
-    3: {
-      title: "Panel 3: The Climax Splash",
-      shot: "DYNAMIC LOW-ANGLE SPLASH",
-      sound: "KABOOM!",
-      image: "/static/images/landscape_bg.jpg",
-      narration: "A blinding arc of celestial radiance tore through the canopy, illuminating the sacred blossom atop the obsidian monolith.",
-      dialogue: "There you are! Stand down, shadows—this light belongs to the stars!"
-    },
-    4: {
-      title: "Panel 4: The Poignant Resolution",
-      shot: "EMOTIONAL CLOSE-UP / WIDE HORIZON",
-      sound: "CHIRP...",
-      image: "/static/images/hope_fox.jpg",
-      narration: "The dawn crept quietly through the branches, bathing the restored forest in warm, golden tranquility.",
-      dialogue: "It's over. The grove breathes again. Tomorrow will come after all."
-    }
+    promptInput: document.getElementById("prompt-input"),
+    styleSelect: document.getElementById("art-style-select"),
+    styleBadge: document.getElementById("preview-style-badge"),
+    statusPill: document.getElementById("imagination-status-pill"),
+    beatCards: document.querySelectorAll(".timeline-beat-card"),
+    snippets: [
+      document.getElementById("beat-snippet-1"),
+      document.getElementById("beat-snippet-2"),
+      document.getElementById("beat-snippet-3"),
+      document.getElementById("beat-snippet-4")
+    ]
   };
 
   let currentSceneIdx = 1;
+  let cachedScenes = {};
+
+  // NLP Premise Parser: Deduces protagonist, theme, and 4 dramatic beats
+  function parsePremise(promptText, rawChar, artStyle) {
+    const p = (promptText || "").trim();
+    const pLow = p.toLowerCase();
+    
+    // Protagonist detection
+    let hero = (rawChar || "").trim();
+    if (!hero || hero.toLowerCase() === "hero" || hero.toLowerCase() === "protagonist") {
+      const matchNamed = p.match(/\b(?:named|called)\s+([A-Z][a-z]+)/);
+      if (matchNamed) {
+        hero = matchNamed[1];
+      } else if (pLow.includes("chef") || pLow.includes("cook") || pLow.includes("pizza") || pLow.includes("bake")) {
+        hero = "Chef Marco";
+      } else if (pLow.includes("space") || pLow.includes("astronaut") || pLow.includes("alien") || pLow.includes("galaxy")) {
+        hero = "Captain Nova";
+      } else if (pLow.includes("detective") || pLow.includes("noir") || pLow.includes("investigat") || pLow.includes("crime")) {
+        hero = "Detective Vance";
+      } else if (pLow.includes("wizard") || pLow.includes("magic") || pLow.includes("spell") || pLow.includes("sorcerer")) {
+        hero = "Archmage Zephyr";
+      } else if (pLow.includes("cyber") || pLow.includes("hack") || pLow.includes("neon") || pLow.includes("robot")) {
+        hero = "Aria Volt";
+      } else if (pLow.includes("fox") || pLow.includes("wolf") || pLow.includes("cat") || pLow.includes("critter")) {
+        hero = "Pip";
+      } else if (pLow.includes("samurai") || pLow.includes("ninja") || pLow.includes("blade")) {
+        hero = "Kenji";
+      } else if (pLow.includes("knight") || pLow.includes("dragon") || pLow.includes("kingdom")) {
+        hero = "Sir Kay";
+      } else {
+        hero = "Valiant";
+      }
+    }
+
+    // Setting & sensory detection
+    let theme = {
+      type: "general",
+      envName: "the scene",
+      sounds: ["WHOOSH!", "CLANG!", "KABLAMMMM!", "TRIUMPH!"],
+      shots: ["ESTABLISHING WIDE SHOT", "DUTCH ANGLE ACTION", "DYNAMIC CLIMAX SPLASH", "POIGNANT WIDE HORIZON"],
+      palette: { skyTop: [29, 78, 216], skyBottom: [239, 68, 68], accent: [250, 204, 21], sil: [15, 23, 42] }
+    };
+
+    if (pLow.includes("cook") || pLow.includes("chef") || pLow.includes("bake") || pLow.includes("pizza") || pLow.includes("food") || pLow.includes("kitchen")) {
+      theme = {
+        type: "kitchen",
+        envName: "the bustling kitchen",
+        sounds: ["SIZZLE!", "CLATTER!", "WHOOSH!", "DING!"],
+        shots: ["WARM KITCHEN PANORAMA", "DUTCH ANGLE PREPARATION", "SIZZLING ACTION CLIMAX", "SATISFYING BANQUET DAWN"],
+        palette: { skyTop: [60, 30, 20], skyBottom: [217, 119, 6], accent: [251, 191, 36], sil: [30, 18, 12] }
+      };
+    } else if (pLow.includes("space") || pLow.includes("galaxy") || pLow.includes("planet") || pLow.includes("alien") || pLow.includes("star") || pLow.includes("astronaut")) {
+      theme = {
+        type: "space",
+        envName: "the cosmic frontier",
+        sounds: ["HUMMMM...", "BEEP-BEEP!", "WARP-FLASH!", "HARMONY!"],
+        shots: ["ORBITAL CELESTIAL WIDE", "COSMIC TENSION MEDIUM", "WARP SPEED CLIMAX", "DEEP SPACE HORIZON"],
+        palette: { skyTop: [10, 10, 35], skyBottom: [88, 28, 135], accent: [56, 189, 248], sil: [8, 6, 22] }
+      };
+    } else if (pLow.includes("detective") || pLow.includes("noir") || pLow.includes("investigat") || pLow.includes("crime") || pLow.includes("rain") || pLow.includes("shadow")) {
+      theme = {
+        type: "noir",
+        envName: "the midnight streets",
+        sounds: ["DRIP-DROP...", "CREAAAK...", "BLAMMMM!", "TICK-TOCK..."],
+        shots: ["RAIN-SLICKED ESTABLISHING", "SHADOWY INTERROGATION", "MUZZLE FLASH CLIMAX", "FOGGY DAWN RESOLUTION"],
+        palette: { skyTop: [15, 23, 42], skyBottom: [30, 41, 59], accent: [251, 191, 36], sil: [10, 15, 26] }
+      };
+    } else if (pLow.includes("cyber") || pLow.includes("hack") || pLow.includes("neon") || pLow.includes("robot") || pLow.includes("future")) {
+      theme = {
+        type: "cyberpunk",
+        envName: "Neo-Metropolis",
+        sounds: ["SKRRRT...", "STATIC-ZZZT!", "OVERRIDE!", "CLICK."],
+        shots: ["SKYSCRAPER ROOFTOP WIDE", "NEON ALLEY COMBAT", "CYBER CORE OVERLOAD", "DAWN OVER THE SPRAY"],
+        palette: { skyTop: [15, 10, 35], skyBottom: [79, 10, 95], accent: [6, 182, 212], sil: [8, 5, 18] }
+      };
+    } else if (pLow.includes("forest") || pLow.includes("tree") || pLow.includes("wood") || pLow.includes("enchanted") || pLow.includes("grove") || pLow.includes("blossom") || pLow.includes("fox")) {
+      theme = {
+        type: "forest",
+        envName: "the mystical woods",
+        sounds: ["RUSTLE...", "CREEEAK...", "SHRRREEE-FLASH!", "CHIRP..."],
+        shots: ["MISTY CANOPY ESTABLISHING", "TWISTED BRAMBLE TRAIL", "CELESTIAL BLOSSOM SPLASH", "SUNLIT MEADOW HORIZON"],
+        palette: { skyTop: [30, 58, 80], skyBottom: [13, 148, 136], accent: [254, 240, 138], sil: [10, 30, 40] }
+      };
+    } else if (pLow.includes("ocean") || pLow.includes("sea") || pLow.includes("water") || pLow.includes("pirate") || pLow.includes("island")) {
+      theme = {
+        type: "ocean",
+        envName: "the crashing waves",
+        sounds: ["SPLASH!", "CREAK...", "THUNDER-CLAP!", "GENTLE WAVES..."],
+        shots: ["TURQUOISE REEF PANORAMA", "TURBULENT SWELL ACTION", "LEVIATHAN SURGE CLIMAX", "SUNSET CALM HORIZON"],
+        palette: { skyTop: [12, 74, 110], skyBottom: [14, 165, 233], accent: [253, 224, 71], sil: [8, 47, 73] }
+      };
+    } else if (pLow.includes("magic") || pLow.includes("wizard") || pLow.includes("dragon") || pLow.includes("castle") || pLow.includes("knight")) {
+      theme = {
+        type: "castle",
+        envName: "the ancient citadel",
+        sounds: ["CRACKLE!", "CLANGGG!", "KABOOM!", "RESONANCE!"],
+        shots: ["CITADEL BATTLEMENT WIDE", "RUNIC CROSSROADS ACTION", "MYSTICAL CLASH SPLASH", "PEACEFUL CITADEL DAWN"],
+        palette: { skyTop: [30, 27, 75], skyBottom: [126, 34, 206], accent: [250, 204, 21], sil: [19, 15, 38] }
+      };
+    }
+
+    const shortPremise = p.length > 5 ? p : "an extraordinary adventure begins";
+    
+    // Synthesize 4 reactive beats
+    return {
+      hero: hero,
+      theme: theme,
+      scenes: {
+        1: {
+          title: `Panel 1: The Inciting Hook`,
+          shot: theme.shots[0],
+          sound: theme.sounds[0],
+          narration: `It began in ${theme.envName}. The moment ${hero} encountered ${shortPremise}, there was no turning back.`,
+          dialogue: `Look at this... something extraordinary is taking shape right before our eyes!`,
+          snippet: `Encountering ${theme.envName}`
+        },
+        2: {
+          title: `Panel 2: Rising Stakes & Friction`,
+          shot: theme.shots[1],
+          sound: theme.sounds[1],
+          narration: `Complications flared across ${theme.envName}. The challenge of ${shortPremise} tested every ounce of instinct.`,
+          dialogue: `Hold fast! The pressure is rising, but we've come too far to surrender now!`,
+          snippet: `Overcoming the obstacle`
+        },
+        3: {
+          title: `Panel 3: The Climax Splash`,
+          shot: theme.shots[2],
+          sound: theme.sounds[2],
+          narration: `A flash of sheer determination tore through the tension as ${hero} met the decisive moment head-on.`,
+          dialogue: `This is where the story turns! Everything we have—NOW!`,
+          snippet: `The dramatic turning point`
+        },
+        4: {
+          title: `Panel 4: The Poignant Payoff`,
+          shot: theme.shots[3],
+          sound: theme.sounds[3],
+          narration: `As dust settled over ${theme.envName}, peace returned with the sunrise. A new chapter had been etched into legend.`,
+          dialogue: `We did it. Tomorrow is wide open—and full of possibility.`,
+          snippet: `Victorious horizon`
+        }
+      }
+    };
+  }
+
+  // Real-time Canvas Renderer (Draws Stylized Imagination Sketch)
+  function drawImaginationCanvas(sceneNum, parsed, artStyle) {
+    if (!el.canvas) return;
+    const ctx = el.canvas.getContext("2d");
+    const width = el.canvas.width;
+    const height = el.canvas.height;
+    const pal = parsed.theme.palette;
+    const soundText = parsed.scenes[sceneNum].sound;
+
+    ctx.clearRect(0, 0, width, height);
+
+    // 1. Sky Gradient
+    const grad = ctx.createLinearGradient(0, 0, 0, height);
+    grad.addColorStop(0, `rgb(${pal.skyTop.join(",")})`);
+    grad.addColorStop(1, `rgb(${pal.skyBottom.join(",")})`);
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, width, height);
+
+    // 2. Comic Ben-Day Dots or Speed Lines based on style
+    const isManga = (artStyle || "").toLowerCase().includes("manga");
+    const isNoir = (artStyle || "").toLowerCase().includes("noir") || (artStyle || "").toLowerCase().includes("graphic novel");
+    
+    if (sceneNum === 3 || isManga) {
+      // Dynamic radial action lines
+      const cx = width / 2;
+      const cy = height * 0.45;
+      ctx.strokeStyle = `rgba(${pal.accent.join(",")}, 0.22)`;
+      ctx.lineWidth = 2.5;
+      for (let i = 0; i < 24; i++) {
+        const angle = (Math.PI * 2 / 24) * i;
+        ctx.beginPath();
+        ctx.moveTo(cx + Math.cos(angle) * 30, cy + Math.sin(angle) * 30);
+        ctx.lineTo(cx + Math.cos(angle) * width, cy + Math.sin(angle) * height);
+        ctx.stroke();
+      }
+    } else {
+      // Ben-day dots
+      ctx.fillStyle = "rgba(255, 255, 255, 0.08)";
+      for (let y = 10; y < height; y += 22) {
+        for (let x = 10; x < width; x += 22) {
+          ctx.beginPath();
+          ctx.arc(x, y, 2.5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+    }
+
+    // 3. Glowing Moon / Core / Streetlamp
+    const coreX = sceneNum % 2 === 1 ? width * 0.68 : width * 0.32;
+    const coreY = height * 0.32;
+    const radialGrad = ctx.createRadialGradient(coreX, coreY, 5, coreX, coreY, 90);
+    radialGrad.addColorStop(0, `rgba(${pal.accent.join(",")}, 0.8)`);
+    radialGrad.addColorStop(0.5, `rgba(${pal.accent.join(",")}, 0.25)`);
+    radialGrad.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = radialGrad;
+    ctx.beginPath();
+    ctx.arc(coreX, coreY, 90, 0, Math.PI * 2);
+    ctx.fill();
+
+    // 4. Scenery Silhouettes
+    const groundY = height * 0.68;
+    ctx.fillStyle = `rgb(${pal.sil.join(",")})`;
+
+    if (parsed.theme.type === "cyberpunk" || parsed.theme.type === "noir") {
+      // Skyscraper outlines
+      let curX = 0;
+      const bWidths = [50, 75, 60, 90, 65, 80, 55, 85, 70];
+      const bHeights = [140, 220, 160, 250, 180, 210, 130, 240, 170];
+      for (let i = 0; i < bWidths.length && curX < width; i++) {
+        const bw = bWidths[i];
+        const bh = bHeights[i];
+        const bTop = groundY - bh + 50;
+        ctx.fillRect(curX, bTop, bw, height);
+        // Windows
+        ctx.fillStyle = `rgba(${pal.accent.join(",")}, 0.5)`;
+        for (let wy = bTop + 15; wy < groundY; wy += 22) {
+          ctx.fillRect(curX + 8, wy, 8, 8);
+          if (bw > 55) ctx.fillRect(curX + 22, wy, 8, 8);
+        }
+        ctx.fillStyle = `rgb(${pal.sil.join(",")})`;
+        curX += bw + 4;
+      }
+    } else if (parsed.theme.type === "space") {
+      // Planetary curvature
+      ctx.beginPath();
+      ctx.arc(width / 2, height + 80, 260, Math.PI, 0);
+      ctx.fill();
+      // Stars
+      ctx.fillStyle = "#ffffff";
+      const stars = [[80, 60], [180, 110], [300, 40], [450, 80], [560, 120], [520, 45], [120, 150]];
+      for (let s of stars) {
+        ctx.fillRect(s[0], s[1], 2.5, 2.5);
+      }
+    } else if (parsed.theme.type === "kitchen") {
+      // Kitchen table & shelves
+      ctx.fillRect(0, groundY, width, height);
+      ctx.fillRect(width * 0.2, groundY - 60, 70, 60);
+      ctx.fillRect(width * 0.65, groundY - 80, 60, 80);
+      // Steam
+      ctx.strokeStyle = "rgba(255,255,255,0.4)";
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(width * 0.25, groundY - 65);
+      ctx.bezierCurveTo(width * 0.23, groundY - 110, width * 0.28, groundY - 130, width * 0.25, groundY - 160);
+      ctx.stroke();
+    } else {
+      // Hills / Forest ridge
+      ctx.beginPath();
+      ctx.moveTo(0, groundY);
+      ctx.quadraticCurveTo(width * 0.25, groundY - 45, width * 0.5, groundY - 10);
+      ctx.quadraticCurveTo(width * 0.75, groundY + 25, width, groundY - 30);
+      ctx.lineTo(width, height);
+      ctx.lineTo(0, height);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    // 5. Protagonist Dynamic Silhouette
+    const heroX = sceneNum === 2 ? width * 0.35 : (sceneNum === 3 ? width * 0.5 : width * 0.45);
+    const heroY = groundY - 40;
+    ctx.fillStyle = "#020617";
+    
+    // Head & features
+    ctx.beginPath();
+    ctx.arc(heroX, heroY - 40, 18, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Hero torso / cape / motion
+    ctx.beginPath();
+    ctx.moveTo(heroX - 16, heroY + 45);
+    ctx.lineTo(heroX, heroY - 24);
+    ctx.lineTo(heroX + 16, heroY + 45);
+    ctx.closePath();
+    ctx.fill();
+
+    // Cape / gesture in action scenes
+    if (sceneNum === 2 || sceneNum === 3) {
+      ctx.beginPath();
+      ctx.moveTo(heroX - 10, heroY - 18);
+      ctx.lineTo(heroX - 45, heroY + 30);
+      ctx.lineTo(heroX - 12, heroY + 12);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    // 6. Action Sound Burst in Canvas
+    const burstX = width - 85;
+    const burstY = 55;
+    const spikes = 10;
+    const rOuter = 46;
+    const rInner = 24;
+
+    ctx.fillStyle = "#ef4444";
+    ctx.strokeStyle = "#000000";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    for (let i = 0; i < spikes * 2; i++) {
+      const r = i % 2 === 0 ? rOuter : rInner;
+      const angle = (Math.PI / spikes) * i;
+      const bx = burstX + Math.cos(angle) * r;
+      const by = burstY + Math.sin(angle) * r;
+      if (i === 0) ctx.moveTo(bx, by);
+      else ctx.lineTo(bx, by);
+    }
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "bold 13px 'Bangers', Impact, sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(soundText, burstX, burstY);
+
+    // 7. Comic Panel Outer Border
+    ctx.strokeStyle = "#0f172a";
+    ctx.lineWidth = 6;
+    ctx.strokeRect(3, 3, width - 6, height - 6);
+  }
 
   function renderScene(sceneNum) {
     currentSceneIdx = sceneNum;
-    const data = sceneTemplates[sceneNum];
-    if (!data) return;
+    const promptVal = el.promptInput ? el.promptInput.value : "";
+    const charVal = el.charInput ? el.charInput.value : "";
+    const styleVal = el.styleSelect ? el.styleSelect.value : "Classic Comic Book";
 
-    // Update active tab
-    sceneElements.tabs.forEach(tab => {
-      if (tab.getAttribute("data-scene") === sceneNum.toString()) {
-        tab.classList.add("active");
-      } else {
-        tab.classList.remove("active");
-      }
+    const parsed = parsePremise(promptVal, charVal, styleVal);
+    cachedScenes = parsed.scenes;
+    const sc = parsed.scenes[sceneNum] || parsed.scenes[1];
+
+    // Update active tab buttons
+    el.tabs.forEach(tab => {
+      const tabNum = parseInt(tab.getAttribute("data-scene"), 10);
+      if (tabNum === sceneNum) tab.classList.add("active");
+      else tab.classList.remove("active");
     });
 
-    const charName = sceneElements.charInput ? sceneElements.charInput.value.trim() : "HERO";
-    const displayName = charName ? charName.toUpperCase() : "HERO";
+    // Update timeline beat cards
+    el.beatCards.forEach(card => {
+      const cardNum = parseInt(card.getAttribute("data-scene"), 10);
+      if (cardNum === sceneNum) card.classList.add("active");
+      else card.classList.remove("active");
+    });
 
-    if (sceneElements.panelTitle) sceneElements.panelTitle.innerText = data.title;
-    if (sceneElements.panelMeta) sceneElements.panelMeta.innerText = `Scene ${sceneNum} of 4`;
-    if (sceneElements.cameraShot) sceneElements.cameraShot.innerText = data.shot;
-    if (sceneElements.soundBadge) sceneElements.soundBadge.innerText = data.sound;
-    if (sceneElements.artImg) sceneElements.artImg.src = data.image;
-    if (sceneElements.narrationText) sceneElements.narrationText.innerText = `"${data.narration}"`;
-    if (sceneElements.speakerName) sceneElements.speakerName.innerText = displayName;
-    if (sceneElements.dialogueText) sceneElements.dialogueText.innerText = `"${data.dialogue}"`;
+    // Update snippets
+    for (let i = 1; i <= 4; i++) {
+      const snip = el.snippets[i - 1];
+      if (snip && parsed.scenes[i]) {
+        snip.innerText = parsed.scenes[i].snippet;
+      }
+    }
 
-    // Tactile sound
-    playPopSound(420 + sceneNum * 60);
+    if (el.panelTitle) el.panelTitle.innerText = sc.title;
+    if (el.panelMeta) el.panelMeta.innerText = `Scene ${sceneNum} of 4`;
+    if (el.cameraShot) el.cameraShot.innerText = sc.shot;
+    if (el.soundBadge) el.soundBadge.innerText = sc.sound;
+    if (el.narrationText) el.narrationText.innerText = `"${sc.narration}"`;
+    if (el.speakerName) el.speakerName.innerText = parsed.hero.toUpperCase();
+    if (el.dialogueText) el.dialogueText.innerText = `"${sc.dialogue}"`;
+    if (el.styleBadge) el.styleBadge.innerText = styleVal;
+
+    // Draw reactive dynamic canvas
+    drawImaginationCanvas(sceneNum, parsed, styleVal);
+
+    if (el.statusPill) {
+      el.statusPill.innerText = "● Real-Time Sync";
+      el.statusPill.style.color = "#059669";
+    }
   }
 
+  // Debounced input handler for live reactive typing
+  let debounceTimer = null;
+  function handleLiveInput() {
+    if (el.statusPill) {
+      el.statusPill.innerText = "⚡ Thinking...";
+      el.statusPill.style.color = "#2563eb";
+    }
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+      renderScene(currentSceneIdx);
+    }, 120);
+  }
+
+  // Bind input listeners
+  if (el.promptInput) el.promptInput.addEventListener("input", handleLiveInput);
+  if (el.charInput) el.charInput.addEventListener("input", handleLiveInput);
+
   // Bind tabs
-  sceneElements.tabs.forEach(tab => {
+  el.tabs.forEach(tab => {
     tab.addEventListener("click", () => {
       const num = parseInt(tab.getAttribute("data-scene"), 10) || 1;
       renderScene(num);
+      playPopSound(420 + num * 50);
+    });
+  });
+
+  // Bind beat timeline cards
+  el.beatCards.forEach(card => {
+    card.addEventListener("click", () => {
+      const num = parseInt(card.getAttribute("data-scene"), 10) || 1;
+      renderScene(num);
+      playPopSound(420 + num * 50);
     });
   });
 
   // Bind prev/next
-  if (sceneElements.btnPrev) {
-    sceneElements.btnPrev.addEventListener("click", () => {
+  if (el.btnPrev) {
+    el.btnPrev.addEventListener("click", () => {
       const prev = currentSceneIdx > 1 ? currentSceneIdx - 1 : 4;
       renderScene(prev);
+      playPopSound(460);
     });
   }
-  if (sceneElements.btnNext) {
-    sceneElements.btnNext.addEventListener("click", () => {
+  if (el.btnNext) {
+    el.btnNext.addEventListener("click", () => {
       const next = currentSceneIdx < 4 ? currentSceneIdx + 1 : 1;
       renderScene(next);
+      playPopSound(520);
     });
   }
 
-  // Dynamic character input update
-  if (sceneElements.charInput) {
-    sceneElements.charInput.addEventListener("input", () => {
-      const val = sceneElements.charInput.value.trim();
-      if (sceneElements.speakerName) {
-        sceneElements.speakerName.innerText = val ? val.toUpperCase() : "HERO";
-      }
+  // Style change hook to update canvas palette
+  if (el.styleSelect) {
+    el.styleSelect.addEventListener("change", () => {
+      renderScene(currentSceneIdx);
     });
   }
+
+  // Initial render
+  setTimeout(() => renderScene(1), 50);
 }
+
 
 /* ==========================================================================
    6. Form Submission & Enhanced Loading Modal Progression

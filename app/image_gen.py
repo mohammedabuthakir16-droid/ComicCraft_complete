@@ -1,5 +1,6 @@
 import asyncio
 import hashlib
+import io
 import logging
 import math
 import random
@@ -13,24 +14,101 @@ from app import config
 
 logger = logging.getLogger(__name__)
 
-def _clean_and_condense_prompt(raw_prompt: str, art_style: str) -> str:
+def _format_diffusion_prompt(raw_prompt: str, art_style: str) -> str:
     """
-    Cleans and condenses verbose LLM prompts into a punchy, highly effective
-    diffusion prompt under 180 characters to prevent HTTP timeouts and 429 rate-limiting.
+    Cleans and optimizes the comic panel visual description into a high-impact,
+    coherent diffusion prompt that maintains character continuity, composition,
+    and visual art style.
     """
-    # Remove newlines, brackets, and quotes
-    text = raw_prompt.replace("\n", " ").replace('"', '').replace("'", "")
-    # Remove duplicate boilerplate phrases
-    text = re.sub(r'\b(masterpiece|high resolution|clean bold line art|expressive character emotion|professional coloring|graphic novel quality|high detail)\b', '', text, flags=re.IGNORECASE)
-    # Strip excess whitespace
-    text = re.sub(r'\s+', ' ', text).strip(', ')
+    # Remove awkward brackets, newlines, quotes
+    clean = raw_prompt.replace("\n", " ").replace('"', '').replace("'", "")
+    clean = re.sub(r'\s+', ' ', clean).strip(', ')
     
-    # Keep the most descriptive core (up to 130 chars)
-    if len(text) > 130:
-        # Cut at word boundary
-        text = text[:130].rsplit(' ', 1)[0]
+    # Ensure art style is represented
+    style_tag = art_style.strip()
+    
+    # Cap prompt length cleanly at word boundary to stay within optimal diffusion token budget (around 320 chars)
+    if len(clean) > 320:
+        clean = clean[:320].rsplit(' ', 1)[0]
         
-    return f"comic book panel art, {text}, {art_style}, detailed line art, masterpiece"
+    return f"comic book panel, {clean}, {style_tag}, sharp clean line art, vibrant comic colors, graphic novel illustration, high resolution masterpiece"
+
+def _detect_scene_elements(prompt: str) -> Dict[str, Any]:
+    """Detects scene genre, palette, and silhouettes for procedural rendering."""
+    p = prompt.lower()
+    
+    if any(k in p for k in ("kitchen", "cook", "chef", "bake", "pizza", "food", "restaurant")):
+        return {
+            "type": "kitchen",
+            "sky_top": (45, 25, 20),
+            "sky_bottom": (180, 83, 9),
+            "accent": (251, 191, 36),
+            "silhouette": (25, 15, 10),
+            "sound_default": "SIZZLE!"
+        }
+    elif any(k in p for k in ("space", "galaxy", "orbit", "alien", "planet", "star", "astronaut", "nebula")):
+        return {
+            "type": "space",
+            "sky_top": (10, 10, 30),
+            "sky_bottom": (76, 29, 149),
+            "accent": (56, 189, 248),
+            "silhouette": (5, 5, 20),
+            "sound_default": "WHOOSH!"
+        }
+    elif any(k in p for k in ("detective", "noir", "investigat", "crime", "rain", "alley", "shadow")):
+        return {
+            "type": "noir",
+            "sky_top": (15, 23, 42),
+            "sky_bottom": (30, 41, 59),
+            "accent": (251, 191, 36),
+            "silhouette": (10, 15, 26),
+            "sound_default": "DRIP-DROP..."
+        }
+    elif any(k in p for k in ("cyber", "hack", "neon", "robot", "future", "megacity", "droid")):
+        return {
+            "type": "cyberpunk",
+            "sky_top": (10, 10, 28),
+            "sky_bottom": (49, 10, 80),
+            "accent": (6, 182, 212),
+            "silhouette": (5, 5, 15),
+            "sound_default": "SKRRRT..."
+        }
+    elif any(k in p for k in ("forest", "tree", "wood", "enchanted", "nature", "grove", "fox")):
+        return {
+            "type": "forest",
+            "sky_top": (30, 58, 80),
+            "sky_bottom": (13, 148, 136),
+            "accent": (254, 240, 138),
+            "silhouette": (10, 30, 40),
+            "sound_default": "RUSTLE..."
+        }
+    elif any(k in p for k in ("sea", "ocean", "water", "underwater", "trench", "ship", "pirate")):
+        return {
+            "type": "ocean",
+            "sky_top": (12, 74, 110),
+            "sky_bottom": (14, 165, 233),
+            "accent": (253, 224, 71),
+            "silhouette": (8, 47, 73),
+            "sound_default": "SPLASH!"
+        }
+    elif any(k in p for k in ("wizard", "magic", "castle", "knight", "dragon", "dungeon")):
+        return {
+            "type": "castle",
+            "sky_top": (30, 27, 75),
+            "sky_bottom": (126, 34, 206),
+            "accent": (250, 204, 21),
+            "silhouette": (19, 15, 38),
+            "sound_default": "CRACKLE!"
+        }
+    else:
+        return {
+            "type": "general",
+            "sky_top": (29, 78, 216),
+            "sky_bottom": (239, 68, 68),
+            "accent": (250, 204, 21),
+            "silhouette": (15, 23, 42),
+            "sound_default": "POW!"
+        }
 
 def _generate_procedural_comic_image(
     prompt: str,
@@ -42,35 +120,19 @@ def _generate_procedural_comic_image(
     height: int = 600
 ) -> str:
     """
-    Renders an atmospheric, cinematic graphic novel panel with multi-layer
+    Renders an atmospheric, cinematic graphic novel panel with prompt-specific
     scenery silhouettes, chiaroscuro shading, Ben-Day halftone texture,
     and comic typography. Ensures 100% offline reliability.
     """
-    seed = int(hashlib.md5(prompt.encode("utf-8")).hexdigest()[:8], 16)
+    seed = int(hashlib.md5(f"{prompt}_{panel_title}".encode("utf-8")).hexdigest()[:8], 16)
     rng = random.Random(seed)
     
-    # Style-specific color palettes
-    style_lower = art_style.lower()
-    if "dark" in style_lower or "noir" in style_lower:
-        sky_top, sky_bottom = (15, 23, 42), (30, 41, 59)
-        accent_color = (251, 191, 36) # Amber streetlight
-        silhouette_color = (10, 15, 26)
-    elif "cyber" in style_lower or "sci-fi" in style_lower:
-        sky_top, sky_bottom = (10, 10, 28), (49, 10, 80)
-        accent_color = (6, 182, 212) # Cyan neon
-        silhouette_color = (5, 5, 15)
-    elif "manga" in style_lower or "anime" in style_lower:
-        sky_top, sky_bottom = (245, 245, 245), (200, 200, 200)
-        accent_color = (220, 38, 38) # Crimson accent
-        silhouette_color = (20, 20, 20)
-    elif "water" in style_lower or "fantasy" in style_lower:
-        sky_top, sky_bottom = (30, 58, 80), (13, 148, 136)
-        accent_color = (254, 240, 138) # Starlight gold
-        silhouette_color = (10, 30, 40)
-    else: # Classic Comic Book
-        sky_top, sky_bottom = (29, 78, 216), (239, 68, 68)
-        accent_color = (250, 204, 21) # Classic comic yellow
-        silhouette_color = (15, 23, 42)
+    scene = _detect_scene_elements(prompt)
+    sky_top = scene["sky_top"]
+    sky_bottom = scene["sky_bottom"]
+    accent_color = scene["accent"]
+    silhouette_color = scene["silhouette"]
+    active_sound = sound_effect.strip() if sound_effect else scene["sound_default"]
 
     img = Image.new("RGB", (width, height), sky_top)
     draw = ImageDraw.Draw(img)
@@ -83,21 +145,21 @@ def _generate_procedural_comic_image(
         b = int(sky_top[2] + (sky_bottom[2] - sky_top[2]) * factor)
         draw.line([(0, y), (width, y)], fill=(r, g, b))
 
-    # 2. Dramatic Speed Lines / Light Beams
+    # 2. Dramatic Light Beams / Speed Lines
     center_x, center_y = width // 2, int(height * 0.45)
     num_beams = 16
     for i in range(num_beams):
         if i % 2 == 0:
-            angle = (2 * math.pi / num_beams) * i + (rng.random() * 0.1)
+            angle = (2 * math.pi / num_beams) * i + (rng.random() * 0.08)
             dx = math.cos(angle) * width * 1.5
             dy = math.sin(angle) * height * 1.5
             draw.polygon(
                 [(center_x, center_y), (center_x + dx, center_y + dy), (center_x + dx * 0.9, center_y + dy * 0.9)],
-                fill=(accent_color[0], accent_color[1], accent_color[2])
+                fill=accent_color
             )
 
-    # 3. Soft Celestial Glow / Moon / Light Core
-    glow_r = 90
+    # 3. Soft Celestial Core / Lamp / Moon
+    glow_r = 75
     draw.ellipse(
         [(center_x - glow_r, center_y - glow_r), (center_x + glow_r, center_y + glow_r)],
         fill=accent_color,
@@ -106,27 +168,54 @@ def _generate_procedural_comic_image(
     )
 
     # 4. Comic Ben-Day Halftone Dots
-    for y in range(0, height, 22):
-        for x in range(0, width, 22):
-            draw.ellipse([(x - 2, y - 2), (x + 2, y + 2)], fill=(255, 255, 255, 40))
+    for y in range(0, height, 24):
+        for x in range(0, width, 24):
+            draw.ellipse([(x - 2, y - 2), (x + 2, y + 2)], fill=(255, 255, 255, 30))
 
-    # 5. Dynamic Scenery Silhouettes (City Skyline / Forest Ridge)
+    # 5. Dynamic Scenery Silhouettes Based on Prompt Theme
     ground_y = int(height * 0.65)
-    if "cyber" in style_lower or "noir" in style_lower or "city" in prompt.lower():
-        # Skyscraper silhouettes
+    s_type = scene["type"]
+    
+    if s_type in ("cyberpunk", "noir"):
+        # Skyscraper silhouettes with illuminated windows
         cur_x = 0
         while cur_x < width:
-            b_width = rng.randint(40, 90)
-            b_height = rng.randint(80, 220)
+            b_width = rng.randint(45, 95)
+            b_height = rng.randint(90, 240)
             b_top = ground_y - b_height + 40
             draw.rectangle([(cur_x, b_top), (cur_x + b_width, height)], fill=silhouette_color)
-            # Illuminated windows
-            for wy in range(b_top + 15, ground_y, 20):
+            for wy in range(b_top + 15, ground_y, 22):
                 if rng.random() > 0.4:
                     draw.rectangle([(cur_x + 8, wy), (cur_x + 18, wy + 8)], fill=accent_color)
-                if rng.random() > 0.4 and b_width > 40:
+                if rng.random() > 0.4 and b_width > 45:
                     draw.rectangle([(cur_x + 24, wy), (cur_x + 34, wy + 8)], fill=(255, 255, 255))
             cur_x += b_width + 4
+    elif s_type == "space":
+        # Planetary horizon and distant celestial bodies
+        draw.arc([(center_x - 220, ground_y - 80), (center_x + 220, ground_y + 360)], 0, 180, fill=accent_color, width=4)
+        for _ in range(35):
+            sx, sy = rng.randint(0, width), rng.randint(0, ground_y)
+            draw.ellipse([(sx, sy), (sx + 3, sy + 3)], fill=(255, 255, 255))
+        # Surface terrain
+        terrain_points = [(0, ground_y)]
+        for x in range(0, width + 50, 50):
+            terrain_points.append((x, ground_y + rng.randint(-15, 25)))
+        terrain_points.append((width, height))
+        terrain_points.append((0, height))
+        draw.polygon(terrain_points, fill=silhouette_color)
+    elif s_type == "kitchen":
+        # Countertops, hanging utensils, and warm kitchen frames
+        draw.rectangle([(0, ground_y), (width, height)], fill=silhouette_color)
+        draw.rectangle([(width // 4, ground_y - 70), (width // 4 + 80, ground_y)], fill=accent_color)
+        draw.rectangle([(3 * width // 4 - 60, ground_y - 90), (3 * width // 4 + 40, ground_y)], fill=(255, 255, 255))
+    elif s_type == "ocean":
+        # Crashing rolling waves
+        wave_points = [(0, ground_y)]
+        for x in range(0, width + 40, 40):
+            wave_points.append((x, ground_y + int(math.sin(x * 0.05) * 20)))
+        wave_points.append((width, height))
+        wave_points.append((0, height))
+        draw.polygon(wave_points, fill=silhouette_color)
     else:
         # Organic trees / Mountain ridge
         mountain_points = [(0, ground_y)]
@@ -137,22 +226,20 @@ def _generate_procedural_comic_image(
         mountain_points.append((0, height))
         draw.polygon(mountain_points, fill=silhouette_color)
 
-    # 6. Hero Silhouette in Foreground
-    hero_x, hero_y = int(width * 0.42), int(height * 0.62)
-    # Head & ears
+    # 6. Hero Dynamic Silhouette in Foreground
+    hero_x, hero_y = int(width * 0.44), int(height * 0.60)
     draw.ellipse([(hero_x, hero_y - 45), (hero_x + 36, hero_y - 12)], fill=(0, 0, 0))
-    # Cape / shoulders
     draw.polygon([
-        (hero_x - 20, hero_y + 60),
+        (hero_x - 22, hero_y + 65),
         (hero_x + 18, hero_y - 10),
-        (hero_x + 56, hero_y + 60)
+        (hero_x + 58, hero_y + 65)
     ], fill=(0, 0, 0))
 
     # 7. Action Sound Effect Burst
-    if sound_effect:
-        badge_text = sound_effect.strip().upper()
+    if active_sound:
+        badge_text = active_sound.strip().upper()
         spikes = 12
-        r_outer, r_inner = 110, 60
+        r_outer, r_inner = 105, 55
         s_cx, s_cy = width - 110, 85
         points = []
         for i in range(spikes * 2):
@@ -179,134 +266,7 @@ def _generate_procedural_comic_image(
     img.save(output_path, "PNG")
     return f"/static/outputs/{output_path.name}"
 
-import io
-from collections import defaultdict
-
-# Cache of used image URLs per comic_id to guarantee unique artwork across every panel
-_used_comic_urls = defaultdict(set)
-
-def _extract_scene_search_query(panel_title: str, raw_prompt: str, art_style: str) -> str:
-    """
-    Extracts distinct scene action, character, and setting keywords from panel description
-    while removing repetitive prompt boilerplate so every panel gets unique artwork.
-    """
-    stop_words = {
-        "comic", "book", "panel", "art", "style", "classic", "detailed", "line",
-        "masterpiece", "high", "detail", "resolution", "shot", "angle", "establishing",
-        "cinematic", "dynamic", "medium", "vintage", "coloring", "halftone", "dots",
-        "the", "and", "with", "for", "from", "into", "that", "this", "her", "his", "its",
-        "graphic", "novel", "quality", "american", "illustration", "scene"
-    }
-    
-    title_words = [w for w in re.findall(r"[a-zA-Z]+", panel_title) if w.lower() not in stop_words and len(w) > 2]
-    desc_words = [w for w in re.findall(r"[a-zA-Z]+", raw_prompt) if w.lower() not in stop_words and len(w) > 2]
-    
-    seen = set()
-    unique_words = []
-    for w in title_words + desc_words:
-        low = w.lower()
-        if low not in seen and low not in stop_words:
-            seen.add(low)
-            unique_words.append(w)
-            
-    selected = " ".join(unique_words[:7])
-    return f"{selected} {art_style} comic illustration artwork"
-
-async def _fetch_ai_web_comic_image(
-    prompt: str,
-    art_style: str,
-    panel_title: str,
-    output_path: Path,
-    comic_id: str = "default",
-    panel_number: int = 1
-) -> bool:
-    """
-    Primary AI Comic Artwork Engine:
-    Searches and retrieves authentic, high-resolution comic, graphic novel, and concept artwork
-    matching the scene action, character, and art style.
-    Uses Bing search index for unmetered reliability, with DuckDuckGo fallback.
-    Tracks URLs to guarantee distinct artwork across all comic panels.
-    """
-    search_queries = [
-        _extract_scene_search_query(panel_title, prompt, art_style),
-        f"{panel_title} {art_style} comic book action scene",
-        f"{panel_title} graphic novel illustration"
-    ]
-    
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
-    }
-
-    # 1. Primary Retrieval: Direct Bing Image Search Index
-    for query in search_queries:
-        try:
-            bing_url = f"https://www.bing.com/images/search?q={urllib.parse.quote(query)}&FORM=HDRSC2"
-            async with httpx.AsyncClient(timeout=8.0, follow_redirects=True) as client:
-                r = await client.get(bing_url, headers=headers)
-                if r.status_code == 200:
-                    matches = re.findall(r"murl&quot;:&quot;(https?://[^&]+)&quot;", r.text)
-                    if matches:
-                        # Offset by panel number for diverse composition across panels
-                        offset = (panel_number - 1) % max(1, len(matches))
-                        candidates = matches[offset:] + matches[:offset]
-                        
-                        for img_url in candidates[:10]:
-                            if img_url in _used_comic_urls[comic_id]:
-                                continue
-                            try:
-                                img_res = await client.get(img_url, headers=headers, timeout=7.0)
-                                if img_res.status_code == 200 and len(img_res.content) > 8000:
-                                    with Image.open(io.BytesIO(img_res.content)) as im:
-                                        rgb_im = im.convert("RGB")
-                                        resized = rgb_im.resize((800, 600), Image.Resampling.LANCZOS)
-                                        resized.save(output_path, format="PNG", optimize=True)
-                                        _used_comic_urls[comic_id].add(img_url)
-                                        logger.info(f"Retrieved authentic comic art via Bing for panel {panel_number} ('{panel_title}'): {output_path.name} ({output_path.stat().st_size} bytes)")
-                                        return True
-                            except Exception:
-                                continue
-        except Exception as e:
-            logger.warning(f"Bing search query failed for '{query}': {e}")
-
-    # 2. Secondary Retrieval: DuckDuckGo Index
-    for query in search_queries[:2]:
-        try:
-            url = f"https://duckduckgo.com/?q={urllib.parse.quote(query)}"
-            async with httpx.AsyncClient(timeout=8.0, follow_redirects=True) as client:
-                r = await client.get(url, headers=headers)
-                vqd_match = re.search(r'vqd=([\d-]+)', r.text) or re.search(r'vqd=\"([^\"]+)\"', r.text)
-                if not vqd_match:
-                    continue
-                vqd = vqd_match.group(1)
-                
-                i_url = f"https://duckduckgo.com/i.js?l=us-en&o=json&q={urllib.parse.quote(query)}&vqd={vqd}&f=,,,&p=1"
-                r2 = await client.get(i_url, headers={**headers, "Referer": "https://duckduckgo.com/"})
-                if r2.status_code == 200:
-                    results = r2.json().get("results", [])
-                    offset = (panel_number - 1) % max(1, len(results))
-                    candidates = results[offset:] + results[:offset]
-                    for item in candidates[:6]:
-                        img_url = item.get("image")
-                        if not img_url or img_url in _used_comic_urls[comic_id]:
-                            continue
-                        try:
-                            img_res = await client.get(img_url, headers=headers, timeout=7.0)
-                            if img_res.status_code == 200 and len(img_res.content) > 8000:
-                                with Image.open(io.BytesIO(img_res.content)) as im:
-                                    rgb_im = im.convert("RGB")
-                                    resized = rgb_im.resize((800, 600), Image.Resampling.LANCZOS)
-                                    resized.save(output_path, format="PNG", optimize=True)
-                                    _used_comic_urls[comic_id].add(img_url)
-                                    logger.info(f"Retrieved authentic comic art via DDG for panel {panel_number} ('{panel_title}'): {output_path.name}")
-                                    return True
-                        except Exception:
-                            continue
-        except Exception as e:
-            logger.warning(f"DuckDuckGo search attempt failed for query '{query}': {e}")
-            
-    return False
-
-async def _fetch_pollinations_image(
+async def _generate_pollinations_diffusion(
     prompt: str,
     seed: int,
     output_path: Path,
@@ -314,22 +274,33 @@ async def _fetch_pollinations_image(
     height: int = 600
 ) -> bool:
     """
-    Secondary fallback image generator using Pollinations AI sana model.
+    Primary AI Image Generation:
+    Invokes Pollinations text-to-image diffusion models with prompt engineering.
     """
-    clean_prompt = prompt.replace("\n", " ").strip()
-    encoded = urllib.parse.quote(clean_prompt)
-    url = f"https://image.pollinations.ai/prompt/{encoded}?seed={seed}&nologo=true&model=sana"
+    encoded_prompt = urllib.parse.quote(prompt)
+    endpoints = [
+        f"https://image.pollinations.ai/prompt/{encoded_prompt}?width={width}&height={height}&seed={seed}&nologo=true",
+        f"https://image.pollinations.ai/prompt/{encoded_prompt}?width={width}&height={height}&seed={seed}&nologo=true&model=turbo"
+    ]
     
-    try:
-        async with httpx.AsyncClient(timeout=8.0) as client:
-            res = await client.get(url)
-            if res.status_code == 200 and len(res.content) > 1500:
-                with open(output_path, "wb") as f:
-                    f.write(res.content)
-                logger.info(f"Generated panel image via Pollinations [Size: {len(res.content)} bytes]")
-                return True
-    except Exception as e:
-        logger.warning(f"Pollinations request failed ({type(e).__name__}: {e})")
+    headers = {
+        "User-Agent": "ComicCraft-Studio/2.0 (Macintosh; Comic AI Director)"
+    }
+    
+    for url in endpoints:
+        try:
+            async with httpx.AsyncClient(timeout=14.0, follow_redirects=True) as client:
+                res = await client.get(url, headers=headers)
+                if res.status_code == 200 and len(res.content) > 3000:
+                    # Convert to RGB image and ensure correct dimensions
+                    with Image.open(io.BytesIO(res.content)) as im:
+                        rgb = im.convert("RGB")
+                        resized = rgb.resize((width, height), Image.Resampling.LANCZOS)
+                        resized.save(output_path, format="PNG", optimize=True)
+                        logger.info(f"Generated authentic comic diffusion image: {output_path.name} ({len(res.content)} bytes)")
+                        return True
+        except Exception as e:
+            logger.warning(f"Pollinations diffusion attempt failed for {url[:50]}...: {e}")
             
     return False
 
@@ -343,10 +314,9 @@ async def generate_panel_image(
     force_regenerate: bool = False
 ) -> str:
     """
-    Generates high-quality comic panel art with multi-tier reliability:
-    1. Primary: Thematic AI Graphic Novel & Comic Concept Artwork Engine.
-    2. Secondary: Pollinations AI sana generator.
-    3. Tertiary: High-Fidelity Procedural Comic Scene Renderer.
+    Generates high-quality comic panel art faithful to the prompt:
+    1. Primary: Genuine AI Text-to-Image Diffusion Model (Pollinations).
+    2. Fallback: Prompt-Aware Procedural Graphic Novel Renderer.
     """
     filename = f"{comic_id}_panel_{panel_number}.png"
     output_path = config.OUTPUT_DIR / filename
@@ -356,35 +326,22 @@ async def generate_panel_image(
         if output_path.stat().st_size > 1500:
             return f"/static/outputs/{filename}"
             
-    # Deterministic seed for panel continuity
+    # Deterministic seed for panel visual continuity
     seed = int(hashlib.md5(f"{comic_id}_{panel_number}".encode()).hexdigest()[:6], 16)
-    condensed_prompt = _clean_and_condense_prompt(prompt, art_style)
+    diffusion_prompt = _format_diffusion_prompt(prompt, art_style)
     
-    # 1. Primary Engine: Distinct Thematic Comic Artwork
-    web_success = await _fetch_ai_web_comic_image(
-        prompt=prompt,
-        art_style=art_style,
-        panel_title=panel_title,
+    # 1. Primary Engine: AI Diffusion Image Generation
+    success = await _generate_pollinations_diffusion(
+        prompt=diffusion_prompt,
+        seed=seed,
         output_path=output_path,
-        comic_id=comic_id,
-        panel_number=panel_number
+        width=800,
+        height=600
     )
-    if web_success:
+    if success:
         return f"/static/outputs/{filename}"
 
-    # 2. Secondary Engine: Pollinations AI (if web search unavailable)
-    if config.IMAGE_PROVIDER == "pollinations":
-        pol_success = await _fetch_pollinations_image(
-            prompt=condensed_prompt,
-            seed=seed,
-            output_path=output_path,
-            width=800,
-            height=600
-        )
-        if pol_success:
-            return f"/static/outputs/{filename}"
-
-    # 3. Tertiary Engine: High-Fidelity Procedural Comic Scene Fallback
+    # 2. Secondary Engine: Prompt-Aware Atmospheric Comic Renderer
     logger.info(f"Using atmospheric graphic novel renderer for panel {panel_number}")
     return _generate_procedural_comic_image(
         prompt=prompt,
@@ -393,4 +350,3 @@ async def generate_panel_image(
         output_path=output_path,
         art_style=art_style
     )
-

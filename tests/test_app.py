@@ -331,4 +331,26 @@ def test_newsletter_api():
     assert "creator@comiccraft.studio" in data["message"]
 
 
+@pytest.mark.asyncio
+async def test_custom_prompt_relevance():
+    """Verify generated comic story is strictly relevant to custom user prompt and character name."""
+    from app.gemini_api import _generate_enhanced_story
+    story = _generate_enhanced_story(
+        prompt="A robotic chef in Tokyo cooking molecular ramen for cyborgs",
+        character_name="Chef Byte",
+        art_style="Cyberpunk Sci-Fi",
+        panel_count=4
+    )
+    assert story["character_name"] == "Chef Byte"
+    assert "Cyberpunk" in story["art_style"]
+    assert len(story["panels"]) == 4
+    # Ensure neither canned 'Hope the Fox' nor 'Alex Vanguard' are returned
+    assert "Hope" not in story["title"]
+    assert "Sentinel Bay" not in story["title"]
+    assert "Whispering Woods" not in story["title"]
+    # Check that panel 1 features Chef Byte
+    assert "Chef Byte" in story["panels"][0]["dialogue"] or "Chef Byte" in story["panels"][0]["visual_description"]
+
+
+
 
