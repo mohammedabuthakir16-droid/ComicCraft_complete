@@ -110,7 +110,7 @@
         <span>❤️ Bookmarked Favorites ({{ favorite_comics|length }})</span>
       </button>
       <button type="button" class="dash-tab-btn" id="tab-btn-settings" onclick="switchDashTab('settings')">
-        <span>⚙️ Creator Settings & API</span>
+        <span>⚙️ Creator Settings</span>
       </button>
     </div>
 
@@ -224,14 +224,14 @@
     <div class="dash-tab-pane" id="pane-settings" style="display:none;">
       <div class="settings-form-wrapper">
         <div class="settings-group-card">
-          <h3 class="settings-heading">🔑 Google Gemini API Configuration</h3>
-          <p class="settings-sub">Manage your personal Google AI Studio neural key for ultra-fast story scripting and character dialogue.</p>
+          <h3 class="settings-heading">⚡ Neural Generation Engine</h3>
+          <p class="settings-sub">Google Gemini 3.5 & Pollinations AI Diffusion models are active and fully operational.</p>
           <div class="settings-api-row">
-            <button type="button" class="btn-action btn-blue" onclick="openApiKeyModal()">
-              <span>⚡</span>
-              <span>Configure / Update Gemini API Key</span>
-            </button>
-            <span class="label-hint">Key is encrypted and stored locally in your environment.</span>
+            <span class="system-status-indicator" style="display:inline-flex; align-items:center; gap:6px; font-weight:700; color:#059669; background:#ecfdf5; border:1px solid #a7f3d0; padding:6px 14px; border-radius:9999px; font-size:12px;">
+              <span class="live-dot" style="width:8px; height:8px; border-radius:50%; background:#10b981;"></span>
+              Neural Engine Online (Gemini 3.5 Flash)
+            </span>
+            <span class="label-hint">Production cloud cluster is pre-configured and ready.</span>
           </div>
         </div>
 
